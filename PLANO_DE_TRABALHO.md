@@ -157,9 +157,20 @@ testar antes de entregar, não expandir escopo sem perguntar.
       Carteira de teste: 7 posições (clássicas staked/não-staked + 2
       concentradas), US$ 438,03 em pools + US$ 341,58 a receber, faixa
       na/fora ok. Fixture salvo em `poc/fixture-0x892Ff98a.json`.
-      PENDENTE: validação do Alan comparando uma carteira conhecida com o
-      site aerodrome.finance (critério de saída da fase).
-- [ ] Fase 2 — próxima
+      VALIDADA pelo Alan em 10/07/2026: carteira 0x05963CdC conferida contra
+      o site da Aerodrome — posições, quantidades e recompensas AERO batem.
+- [x] Fase 2 — motor/core CONCLUÍDO em 10/07/2026:
+      `core/` (types + ProtocolAdapter, math/ticks, prices/defillama,
+      adapters/aerodrome) com 18 testes unitários (`npm test`) usando
+      fixtures reais + `npm run typecheck` limpo. A CLI `npm run poc` virou
+      casca fina sobre o core. Regressão ao vivo nas 2 carteiras: idêntica.
+      Achados da Fase 1 RESOLVIDOS: (1) byAddress abandonado — metadados
+      lidos direto do pool (imune a versão do Sugar); (2) varredura paralela
+      (8 janelas) 78 s → 14 s no RPC público; positionsUnstakedConcentrated
+      pagina por NFT da conta (barato); proteção contra truncamento de 200
+      posições/chamada (janela cheia é re-varrida em metades, com teste).
+- [ ] Fase 3 — API (`/api/positions`) — próxima. Nota: cache + RPC pago
+      (Alchemy) podem baixar os ~14 s para ~2–5 s; decidir na fase.
 
 ## Achados da Fase 1 (para a Fase 2 resolver)
 1. **Struct `Lp` divergente**: o contrato publicado (0x69dD…99A1) reverte no

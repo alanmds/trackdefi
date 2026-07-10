@@ -5,7 +5,8 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["poc", "core"]
+  "include": ["poc", "core", "tests"]
 }
