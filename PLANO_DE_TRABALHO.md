@@ -169,8 +169,31 @@ testar antes de entregar, não expandir escopo sem perguntar.
       (8 janelas) 78 s → 14 s no RPC público; positionsUnstakedConcentrated
       pagina por NFT da conta (barato); proteção contra truncamento de 200
       posições/chamada (janela cheia é re-varrida em metades, com teste).
-- [ ] Fase 3 — API (`/api/positions`) — próxima. Nota: cache + RPC pago
-      (Alchemy) podem baixar os ~14 s para ~2–5 s; decidir na fase.
+- [x] Fase 3 — API CONCLUÍDA em 10/07/2026 (Opus 4.8). App Next.js 16
+      (App Router) + rota `GET /api/positions?address=0x...`:
+      `core/service.ts` (buildResponse puro + getWalletPositions) monta o DTO
+      com US$ já calculado no servidor e zero bigint no JSON; `core/guards.ts`
+      (TtlCache 60s + FixedWindowLimiter 30/min por IP, relógio injetável);
+      `core/chain.ts` (RPC por env BASE_RPC_URLS, senão públicos). Rota =
+      casca fina: valida (400), rate-limit (429), cache (x-cache HIT/MISS),
+      timeout 50s (504), upstream (502). 12 testes novos (service+guards,
+      total 30) + `npm run check-api` bate na chain real: 200/HIT/400 ok,
+      MISS ~12–16 s, HIT 0 ms. `npm run build` verde (rota = ƒ dynamic).
+      DECISÃO RPC: seguimos no público por ora (funciona); Alchemy é drop-in
+      por env quando quisermos ~2–5 s. Ver risco Vercel abaixo.
+- [ ] Fase 4 — Interface (Next.js) — próxima. DTO pronto em
+      `core/service.ts` (PositionsResponseDTO); a UI só consome `/api/positions`.
+
+## Notas para a Fase 6 (deploy)
+- **Limite de duração da função Vercel**: a varredura leva ~12–16 s no RPC
+  público. `maxDuration=60` está setado, mas o plano Vercel free pode capar
+  em 10 s → conferir na Fase 6. Mitigação já mapeada: RPC pago (env) +
+  cache derrubam a resposta típica para poucos segundos.
+- `next-env.d.ts` e `.next/` são gitignored; o Next reconfigura o tsconfig
+  (jsx react-jsx, isolatedModules) na 1ª build — já commitado assim.
+- **TypeScript fixado em 5.x**: TS 7 (porta nativa) quebra a detecção de TS do
+  Next 16 ("The id argument must be of type string"). NÃO subir para 7 até o
+  Next suportar. O `tsc` puro funciona nas duas; o problema é só a integração.
 
 ## Achados da Fase 1 (para a Fase 2 resolver)
 1. **Struct `Lp` divergente**: o contrato publicado (0x69dD…99A1) reverte no
