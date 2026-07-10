@@ -181,8 +181,29 @@ testar antes de entregar, não expandir escopo sem perguntar.
       MISS ~12–16 s, HIT 0 ms. `npm run build` verde (rota = ƒ dynamic).
       DECISÃO RPC: seguimos no público por ora (funciona); Alchemy é drop-in
       por env quando quisermos ~2–5 s. Ver risco Vercel abaixo.
-- [ ] Fase 4 — Interface (Next.js) — próxima. DTO pronto em
-      `core/service.ts` (PositionsResponseDTO); a UI só consome `/api/positions`.
+- [x] Fase 4 — Interface CONCLUÍDA em 10/07/2026 (Fable 5). Landing
+      (busca com validação + demo wallet + trust/como funciona) e página
+      `/w/<endereco>` (KPIs, cards com badges de status ícone+texto, barra
+      de faixa com marcador, claimables, estados de loading com cronômetro/
+      erro/vazio). Identidade: fundo NavajoWhite #FFDEAD (pedido do Alan),
+      cartões #FFFDF6, tinta #2E2013, bronze #7A4A10, status
+      verde/âmbar/vermelho VALIDADOS pelo script dataviz nas 2 superfícies;
+      fontes Fraunces (títulos) + Inter (UI, números tabulares).
+      Verificação visual via painel de preview (desktop + mobile) com dados
+      reais congelados; produção testada ao vivo: 200 OK em 14,9 s.
+- [ ] Fase 5 — Validação e endurecimento — próxima (Fable 5).
+
+## Notas de desenvolvimento (Fase 4)
+- **Modo fixture**: `TRACKDEFI_FIXTURE=poc/fixture-dto.json` faz a API servir
+  um DTO congelado (7 posições reais) sem rede — é assim que o painel de
+  preview do Claude (que roda SEM acesso à internet) consegue renderizar a
+  página de resultados. NUNCA setar em produção. Os `.claude/launch.json`
+  (deste projeto e do MeusGastos) já vêm com ele.
+- **Next dev mode é lento para a varredura** (instrumentação de fetch):
+  estoura o timeout de 50 s. Produção (`npm run build && npm run start`) faz
+  em ~14 s. Testar desempenho SEMPRE em produção.
+- Painel de preview no Windows: npm falha por caminho com espaços → launch
+  usa `cmd.exe` + caminho curto 8.3 (`C:\Users\Pc\DOCUME~1\CLAUDE~1\TRACKD~1`).
 
 ## Notas para a Fase 6 (deploy)
 - **Limite de duração da função Vercel**: a varredura leva ~12–16 s no RPC

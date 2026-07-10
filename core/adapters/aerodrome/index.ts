@@ -121,15 +121,21 @@ export class AerodromeAdapter implements ProtocolAdapter {
     });
     let total = 0n;
     let ok = 0;
+    let firstError: Error | undefined;
     res.forEach((r, i) => {
       if (r.status === "success") {
         total += r.result as bigint;
         ok++;
       } else {
-        this.warn(`factory ${this.factories[i]} não respondeu allPoolsLength`);
+        firstError ??= r.error;
+        this.warn(`factory ${this.factories[i]} não respondeu allPoolsLength: ${r.error?.message?.split("\n")[0] ?? "?"}`);
       }
     });
-    if (ok === 0) throw new Error("nenhuma factory respondeu — RPC fora do ar?");
+    if (ok === 0) {
+      throw new Error(
+        `nenhuma factory respondeu — RPC fora do ar? causa: ${firstError?.message?.split("\n").slice(0, 3).join(" | ") ?? "desconhecida"}`,
+      );
+    }
     return total + 200n; // folga para pools criados durante a varredura
   }
 

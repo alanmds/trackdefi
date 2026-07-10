@@ -13,6 +13,7 @@
  *   504  { error: "timeout" }
  */
 
+import { readFileSync } from "node:fs";
 import { getAddress, isAddress } from "viem";
 import { createBaseReader } from "../../../core/chain";
 import { getWalletPositions } from "../../../core/service";
@@ -62,15 +63,26 @@ export function OPTIONS(): Response {
 export async function GET(request: Request): Promise<Response> {
   const ip = (request.headers.get("x-forwarded-for") ?? "local").split(",")[0].trim();
   if (!limiter.check(ip)) {
-    return jsonResponse({ error: "rate_limited", message: "Muitas requisições. Tente novamente em instantes." }, 429);
+    return jsonResponse({ error: "rate_limited", message: "Too many requests. Try again in a few seconds." }, 429);
   }
 
   const raw = new URL(request.url).searchParams.get("address")?.trim() ?? "";
   if (!isAddress(raw)) {
-    return jsonResponse({ error: "invalid_address", message: "Endereço de carteira inválido." }, 400);
+    return jsonResponse({ error: "invalid_address", message: "Invalid wallet address." }, 400);
   }
   const address = getAddress(raw);
   const cacheKey = address.toLowerCase();
+
+  // Modo fixture (dev/preview sem rede): serve um DTO congelado do disco.
+  // NUNCA setar em produção — .env.example documenta.
+  const fixturePath = process.env.TRACKDEFI_FIXTURE?.trim();
+  if (fixturePath) {
+    try {
+      return jsonResponse(readFileSync(fixturePath, "utf8"), 200, { "x-fixture": "1" });
+    } catch {
+      /* fixture ausente — segue o fluxo normal */
+    }
+  }
 
   const cached = cache.get(cacheKey);
   if (cached) return jsonResponse(cached, 200, { "x-cache": "HIT" });
@@ -82,8 +94,9 @@ export async function GET(request: Request): Promise<Response> {
     return jsonResponse(body, 200, { "x-cache": "MISS" });
   } catch (e) {
     if ((e as Error).message === "timeout") {
-      return jsonResponse({ error: "timeout", message: "A leitura da blockchain demorou demais. Tente novamente." }, 504);
+      return jsonResponse({ error: "timeout", message: "The blockchain read took too long. Please try again." }, 504);
     }
-    return jsonResponse({ error: "upstream", message: "Falha ao ler a blockchain. Tente novamente em instantes." }, 502);
+    console.error(`[api/positions] upstream failure for ${address}:`, e);
+    return jsonResponse({ error: "upstream", message: "Failed to read the blockchain. Try again in a moment." }, 502);
   }
 }

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "trackdefi",
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": ["/c", "set", "TRACKDEFI_FIXTURE=poc/fixture-dto.json", "&&", "npm", "run", "dev"],
+      "port": 3000
+    }
+  ]
+}
