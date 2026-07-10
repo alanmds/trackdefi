@@ -17,7 +17,7 @@ import { readFileSync } from "node:fs";
 import { getAddress, isAddress } from "viem";
 import { createBaseReader } from "../../../core/chain";
 import { getWalletPositions } from "../../../core/service";
-import { FixedWindowLimiter, TtlCache } from "../../../core/guards";
+import { FixedWindowLimiter, Semaphore, TtlCache } from "../../../core/guards";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,9 +28,12 @@ const RL_WINDOW_MS = 60_000;
 const RL_MAX = 30; // requisições por IP por minuto
 const SCAN_TIMEOUT_MS = 50_000;
 
+const MAX_CONCURRENT_SCANS = 4; // varreduras simultâneas por instância (protege a cota do RPC)
+
 // Estado por instância — ver LIMITAÇÃO em core/guards.ts.
 const cache = new TtlCache<string>(CACHE_TTL_MS);
 const limiter = new FixedWindowLimiter(RL_WINDOW_MS, RL_MAX);
+const scans = new Semaphore(MAX_CONCURRENT_SCANS);
 
 function jsonResponse(body: unknown, status: number, extra?: Record<string, string>): Response {
   return new Response(typeof body === "string" ? body : JSON.stringify(body), {
@@ -74,9 +77,9 @@ export async function GET(request: Request): Promise<Response> {
   const cacheKey = address.toLowerCase();
 
   // Modo fixture (dev/preview sem rede): serve um DTO congelado do disco.
-  // NUNCA setar em produção — .env.example documenta.
+  // Ignorado na Vercel por segurança, além de documentado no .env.example.
   const fixturePath = process.env.TRACKDEFI_FIXTURE?.trim();
-  if (fixturePath) {
+  if (fixturePath && !process.env.VERCEL) {
     try {
       return jsonResponse(readFileSync(fixturePath, "utf8"), 200, { "x-fixture": "1" });
     } catch {
@@ -86,6 +89,14 @@ export async function GET(request: Request): Promise<Response> {
 
   const cached = cache.get(cacheKey);
   if (cached) return jsonResponse(cached, 200, { "x-cache": "HIT" });
+
+  if (!scans.tryAcquire()) {
+    return jsonResponse(
+      { error: "busy", message: "The server is scanning other wallets right now. Try again in a few seconds." },
+      503,
+      { "retry-after": "10" },
+    );
+  }
 
   try {
     const dto = await withTimeout(getWalletPositions(createBaseReader(), address), SCAN_TIMEOUT_MS);
@@ -98,5 +109,7 @@ export async function GET(request: Request): Promise<Response> {
     }
     console.error(`[api/positions] upstream failure for ${address}:`, e);
     return jsonResponse({ error: "upstream", message: "Failed to read the blockchain. Try again in a moment." }, 502);
+  } finally {
+    scans.release();
   }
 }

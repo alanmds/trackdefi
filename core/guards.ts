@@ -29,6 +29,25 @@ export class TtlCache<V> {
   }
 }
 
+/**
+ * Limite de trabalhos simultâneos por instância (ex.: varreduras on-chain).
+ * Protege a cota do RPC contra rajadas de endereços diferentes.
+ */
+export class Semaphore {
+  private inUse = 0;
+  constructor(private max: number) {}
+
+  tryAcquire(): boolean {
+    if (this.inUse >= this.max) return false;
+    this.inUse++;
+    return true;
+  }
+
+  release(): void {
+    this.inUse = Math.max(0, this.inUse - 1);
+  }
+}
+
 /** Janela fixa por chave (ex.: IP). check() retorna true se a requisição é permitida. */
 export class FixedWindowLimiter {
   private hits = new Map<string, number[]>();

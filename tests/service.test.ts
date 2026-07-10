@@ -74,22 +74,31 @@ describe("buildResponse", () => {
     scanMs: 1234,
     warnings: [],
   });
+  const bySymbol = (s: string) => dto.positions.find((p) => p.poolSymbol === s)!;
 
   it("metadados básicos e 4 posições", () => {
     expect(dto.chain).toBe("base");
     expect(dto.protocol).toBe("aerodrome");
     expect(dto.scanMs).toBe(1234);
     expect(dto.positions).toHaveLength(4);
+    expect(dto.totalPositions).toBe(4);
+  });
+
+  it("ordena por valor: maiores primeiro, sem preço por último", () => {
+    expect(dto.positions[0].poolSymbol).toBe("CL1-USDC/cbBTC"); // ~US$ 158
+    expect(dto.positions[1].poolSymbol).toBe("CL1-WETH/USDC"); // ~US$ 48
+    expect(dto.positions[2].valueUsd).toBeNull();
+    expect(dto.positions[3].valueUsd).toBeNull();
   });
 
   it("tokens sem preço (cbXEN) → valor null e contados em positionsWithoutPrice", () => {
-    expect(dto.positions[0].valueUsd).toBeNull();
-    expect(dto.positions[1].valueUsd).toBeNull();
+    expect(bySymbol("vAMM-USDC/cbXEN").valueUsd).toBeNull();
+    expect(bySymbol("vAMM-AERO/cbXEN").valueUsd).toBeNull();
     expect(dto.totals.positionsWithoutPrice).toBe(2);
   });
 
   it("posição WETH/USDC precificada bate com o cálculo esperado", () => {
-    const p = dto.positions[2];
+    const p = bySymbol("CL1-WETH/USDC");
     // 0.010096204202506029 WETH * 1800 + 29.885708 USDC
     expect(p.valueUsd).toBeCloseTo(0.010096204202506029 * 1800 + 29.885708, 4);
     expect(p.token0.priceUsd).toBe(1800);
@@ -99,7 +108,7 @@ describe("buildResponse", () => {
   });
 
   it("cbBTC concentrada: faixa invertida para USDC/cbBTC legível", () => {
-    const p = dto.positions[3];
+    const p = bySymbol("CL1-USDC/cbBTC");
     expect(p.range!.inverted).toBe(true);
     expect(p.range!.quoteLabel).toBe("USDC/cbBTC");
     expect(p.range!.lower).toBeGreaterThan(50_000);
@@ -107,14 +116,14 @@ describe("buildResponse", () => {
   });
 
   it("totals.valueUsd = soma apenas das posições precificadas", () => {
-    const expected = (dto.positions[2].valueUsd ?? 0) + (dto.positions[3].valueUsd ?? 0);
+    const expected = (bySymbol("CL1-WETH/USDC").valueUsd ?? 0) + (bySymbol("CL1-USDC/cbBTC").valueUsd ?? 0);
     expect(dto.totals.valueUsd).toBeCloseTo(expected, 6);
     expect(dto.totals.valueUsd).toBeGreaterThan(190);
     expect(dto.totals.valueUsd).toBeLessThan(230);
   });
 
   it("recompensas com emissão AERO precificada", () => {
-    const p = dto.positions[2];
+    const p = bySymbol("CL1-WETH/USDC");
     const emission = p.rewards.find((r) => r.kind === "emission");
     expect(emission?.symbol).toBe("AERO");
     expect(emission?.valueUsd).toBeCloseTo((emission?.amount ?? 0) * 0.5, 6);
@@ -124,6 +133,22 @@ describe("buildResponse", () => {
   it("DTO é 100% serializável — sem bigint vazando", () => {
     const round = JSON.parse(JSON.stringify(dto));
     expect(typeof round.positions[0].token0.amountRaw).toBe("string");
-    expect(round.positions[2].positionId).toBe("1774608");
+    expect(round.positions[1].positionId).toBe("1774608");
+  });
+
+  it("corte para carteiras-lixeira: top N por valor, totais sobre todas", () => {
+    const cut = buildResponse({
+      address: fixture.account,
+      normalized: normalizedFixture(),
+      prices: PRICES,
+      scanMs: 1,
+      warnings: [],
+      maxPositions: 2,
+    });
+    expect(cut.totalPositions).toBe(4);
+    expect(cut.positions).toHaveLength(2);
+    expect(cut.positions[0].poolSymbol).toBe("CL1-USDC/cbBTC");
+    expect(cut.totals.valueUsd).toBeCloseTo(dto.totals.valueUsd, 6); // totais NÃO mudam
+    expect(cut.totals.positionsWithoutPrice).toBe(2); // conta até as cortadas
   });
 });

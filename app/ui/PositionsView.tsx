@@ -16,6 +16,7 @@ const ERROR_COPY: Record<string, { title: string; body: string }> = {
   rate_limited: { title: "Too many requests", body: "Please wait a few seconds and try again." },
   timeout: { title: "The blockchain took too long", body: "The network is slow right now. Try again in a moment." },
   upstream: { title: "Couldn't reach the blockchain", body: "A network hiccup on our side. Try again in a moment." },
+  busy: { title: "Server is busy", body: "We're scanning other wallets right now. Try again in a few seconds." },
   network: { title: "Connection problem", body: "Check your internet connection and try again." },
 };
 
@@ -145,10 +146,24 @@ export default function PositionsView({ address }: { address: string }) {
             </div>
             <div className="kpi">
               <div className="label">Positions</div>
-              <div className="value">{state.data.positions.length}</div>
+              <div className="value">{state.data.totalPositions}</div>
               <div className="hint">scanned in {(state.data.scanMs / 1000).toFixed(1)} s</div>
             </div>
           </div>
+
+          {state.data.totalPositions > state.data.positions.length && (
+            <p className="scan-warnings">
+              Showing the top {state.data.positions.length} positions by value (of {state.data.totalPositions}).
+              Totals include all of them.
+            </p>
+          )}
+
+          {state.data.warnings.length > 0 && (
+            <p className="scan-warnings" title={state.data.warnings.join("\n")}>
+              ⚠ {state.data.warnings.length} warning{state.data.warnings.length > 1 ? "s" : ""} during the scan — some
+              data may be incomplete. Refresh to retry.
+            </p>
+          )}
 
           <div className="positions-grid">
             {state.data.positions.map((p) => (

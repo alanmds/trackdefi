@@ -549,6 +549,16 @@ button {
   text-align: right;
 }
 
+.scan-warnings {
+  font-size: 13px;
+  color: var(--warn);
+  background: var(--warn-bg);
+  border: 1px solid color-mix(in srgb, var(--warn) 30%, var(--card));
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin: 0 0 14px;
+}
+
 /* estados */
 
 .state-box {

@@ -191,7 +191,25 @@ testar antes de entregar, não expandir escopo sem perguntar.
       fontes Fraunces (títulos) + Inter (UI, números tabulares).
       Verificação visual via painel de preview (desktop + mobile) com dados
       reais congelados; produção testada ao vivo: 200 OK em 14,9 s.
-- [ ] Fase 5 — Validação e endurecimento — próxima (Fable 5).
+- [x] Fase 5 — Validação e endurecimento CONCLUÍDA em 10/07/2026 (Fable 5).
+      BATERIA: 6 carteiras reais (a do Alan, demo, robô de 1.160 mints/100min
+      que terminou vazio, média, pequena e a lixeira 0x…0001 com 27.786
+      posições de spam) — TODAS passaram nas invariantes do DTO e na
+      CONTRAPROVA INDEPENDENTE: `core/math/liquidity.ts` (Q96/BigInt, port de
+      getAmountsForLiquidity) recalcula amounts das concentradas a partir de
+      liquidity+slot0 lido direto do pool e bate com o Sugar (tolerância 1%).
+      ENDURECIMENTOS: cleanSymbol (símbolos de contratos de terceiros:
+      remove controle/invisíveis/RTL, limita tamanho); Semaphore de 4
+      varreduras simultâneas por instância (503 busy + retry-after); fixture
+      ignorado na Vercel; resposta CORTADA nas top 200 posições por valor
+      (totais sobre todas + totalPositions no DTO + aviso na UI — carteiras
+      -lixeira existem!); avisos de varredura visíveis na UI; RPC 100% fora
+      do ar → 502 limpo em ~1 s (poc/check-outage.ts). 44 testes.
+      Scripts permanentes: poc/find-wallets.ts (garimpa carteiras ativas) e
+      poc/validate-batch.ts (bateria completa — rodar antes de cada release).
+- [ ] Fase 6 — Publicação (Vercel) — próxima. Rodar validate-batch após o
+      deploy. LIMITAÇÃO CONHECIDA: carteira-lixeira (27k posições) leva
+      ~140 s > timeout de 50 s → 504 honesto; caso patológico, aceito no MVP.
 
 ## Notas de desenvolvimento (Fase 4)
 - **Modo fixture**: `TRACKDEFI_FIXTURE=poc/fixture-dto.json` faz a API servir

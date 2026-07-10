@@ -20,6 +20,19 @@ import { AERO, CHAIN_ID, FACTORIES, LP_SUGAR } from "./config";
 
 const ZERO: Address = "0x0000000000000000000000000000000000000000";
 
+/**
+ * Símbolos de token/pool vêm de contratos de TERCEIROS (qualquer um cria um
+ * token com symbol() arbitrário): remove caracteres de controle/invisíveis
+ * e limita o tamanho antes de qualquer exibição.
+ */
+export function cleanSymbol(raw: string, fallback: string, max = 24): string {
+  const cleaned = raw
+    .replace(/[\p{Cc}\p{Cf}\p{Zl}\p{Zp}]/gu, "")
+    .trim()
+    .slice(0, max);
+  return cleaned || fallback;
+}
+
 export interface PoolMeta {
   kind: PositionKind;
   /** tick spacing (concentrada) — usado no símbolo composto */
@@ -237,7 +250,7 @@ export class AerodromeAdapter implements ProtocolAdapter {
           kind: stable.status === "success" && (stable.result as boolean) ? "v2-stable" : "v2-volatile",
           spacing: null,
           tick: null,
-          symbol: symbol.status === "success" ? (symbol.result as string) : null,
+          symbol: symbol.status === "success" ? cleanSymbol(symbol.result as string, "", 40) || null : null,
           token0: token0.result as Address,
           token1: token1.result as Address,
         });
@@ -263,7 +276,7 @@ export class AerodromeAdapter implements ProtocolAdapter {
       }
       out.set(a, {
         address: a,
-        symbol: sym.status === "success" ? (sym.result as string) : a.slice(0, 8),
+        symbol: sym.status === "success" ? cleanSymbol(sym.result as string, a.slice(0, 8)) : a.slice(0, 8),
         decimals: dec.status === "success" ? Number(dec.result) : 18,
       });
     });

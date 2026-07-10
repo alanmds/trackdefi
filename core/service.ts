@@ -74,9 +74,16 @@ export interface PositionsResponseDTO {
     rewardsUsd: number;
     positionsWithoutPrice: number;
   };
+  /** total real de posições; `positions` traz no máximo as top N por valor */
+  totalPositions: number;
   positions: PositionDTO[];
   warnings: string[];
 }
+
+/** Carteiras-lixeira acumulam dezenas de milhares de posições de spam
+ * (achado da Fase 5: 0x…0001 tem 27.786). Resposta traz só as top N por
+ * valor — os TOTAIS continuam calculados sobre todas. */
+const MAX_POSITIONS_IN_RESPONSE = 200;
 
 function human(raw: bigint, decimals: number): number {
   return Number(formatUnits(raw, decimals));
@@ -94,8 +101,9 @@ export function buildResponse(params: {
   prices: Map<string, number>;
   scanMs: number;
   warnings: string[];
+  maxPositions?: number;
 }): PositionsResponseDTO {
-  const { address, normalized, prices, scanMs, warnings } = params;
+  const { address, normalized, prices, scanMs, warnings, maxPositions = MAX_POSITIONS_IN_RESPONSE } = params;
 
   const positions: PositionDTO[] = normalized.map((p) => {
     const p0 = priceOf(prices, p.token0.address);
@@ -171,11 +179,15 @@ export function buildResponse(params: {
     };
   });
 
+  // totais sobre TODAS as posições, antes de qualquer corte
   const totals = {
     valueUsd: positions.reduce((s, p) => s + (p.valueUsd ?? 0), 0),
     rewardsUsd: positions.reduce((s, p) => s + (p.rewardsUsd ?? 0), 0),
     positionsWithoutPrice: positions.filter((p) => p.valueUsd === null).length,
   };
+
+  // maiores valores primeiro; sem preço por último
+  positions.sort((a, b) => (b.valueUsd ?? -1) - (a.valueUsd ?? -1));
 
   return {
     address,
@@ -184,7 +196,8 @@ export function buildResponse(params: {
     fetchedAt: new Date().toISOString(),
     scanMs,
     totals,
-    positions,
+    totalPositions: positions.length,
+    positions: positions.length > maxPositions ? positions.slice(0, maxPositions) : positions,
     warnings,
   };
 }
