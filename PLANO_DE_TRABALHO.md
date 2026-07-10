@@ -207,9 +207,23 @@ testar antes de entregar, não expandir escopo sem perguntar.
       do ar → 502 limpo em ~1 s (poc/check-outage.ts). 44 testes.
       Scripts permanentes: poc/find-wallets.ts (garimpa carteiras ativas) e
       poc/validate-batch.ts (bateria completa — rodar antes de cada release).
-- [ ] Fase 6 — Publicação (Vercel) — próxima. Rodar validate-batch após o
-      deploy. LIMITAÇÃO CONHECIDA: carteira-lixeira (27k posições) leva
-      ~140 s > timeout de 50 s → 504 honesto; caso patológico, aceito no MVP.
+- [~] Fase 6 — Publicação: CÓDIGO PRONTO em 10/07/2026 (Opus 4.8), aguardando
+      passos de conta do Alan (só ele pode: criar GitHub/Vercel, deploy).
+      Preparado e testado: página /how-it-works (confiança/segurança + "não é
+      aconselhamento"), headers de segurança em next.config (X-Frame DENY,
+      nosniff, HSTS, Referrer-Policy, Permissions-Policy, CSP frame-ancestors;
+      X-Powered-By removido — todos conferidos na resposta HTTP), OG/Twitter
+      meta, Vercel Analytics (sem cookies) no layout, robots.txt (bloqueia
+      /w/ e /api/), README.md e DEPLOY.md (passo a passo em PT). Build verde
+      com as novas rotas; 44 testes ok.
+      Passos do Alan em DEPLOY.md: (1) GitHub → me manda a URL do repo, eu dou
+      push; (2) Vercel import (auto-detecta Next); (3) opcional BASE_RPC_URLS
+      (Alchemy) + ligar Analytics. Domínio grátis .vercel.app primeiro
+      (decisão do Alan). Após deploy: rodar validate-batch contra a URL real.
+      NOTA npm audit: 2 moderadas em postcss DENTRO da árvore do Next (build-
+      time, não exposto); "fix" rebaixaria Next p/ v9 → NÃO rodar --force.
+      LIMITAÇÃO: carteira-lixeira (27k) > timeout → 504 honesto; RPC dedicado
+      mitiga.
 
 ## Notas de desenvolvimento (Fase 4)
 - **Modo fixture**: `TRACKDEFI_FIXTURE=poc/fixture-dto.json` faz a API servir
