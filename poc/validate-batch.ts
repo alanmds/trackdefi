@@ -39,7 +39,7 @@ const client = createPublicClient({
   ),
 });
 
-type Check = { name: string; ok: boolean; detail?: string };
+export type Check = { name: string; ok: boolean; detail?: string };
 
 function approxEqual(a: bigint, b: bigint, tolPct: number, absEps: bigint): boolean {
   const diff = a > b ? a - b : b - a;
@@ -48,7 +48,7 @@ function approxEqual(a: bigint, b: bigint, tolPct: number, absEps: bigint): bool
   return diff * 10000n <= ref * BigInt(Math.round(tolPct * 100));
 }
 
-function dtoInvariants(dto: PositionsResponseDTO): Check[] {
+export function dtoInvariants(dto: PositionsResponseDTO): Check[] {
   const checks: Check[] = [];
   let sumValue = 0;
   let sumRewards = 0;
@@ -181,7 +181,11 @@ async function main() {
   if (failures > 0) process.exit(1);
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+// só roda a bateria quando executado direto (o arquivo também é importado
+// pelo validate-live.ts, que reaproveita dtoInvariants)
+if (process.argv[1]?.replace(/\\/g, "/").endsWith("validate-batch.ts")) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

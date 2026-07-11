@@ -207,7 +207,18 @@ testar antes de entregar, não expandir escopo sem perguntar.
       do ar → 502 limpo em ~1 s (poc/check-outage.ts). 44 testes.
       Scripts permanentes: poc/find-wallets.ts (garimpa carteiras ativas) e
       poc/validate-batch.ts (bateria completa — rodar antes de cada release).
-- [~] Fase 6 — Publicação: CÓDIGO PRONTO em 10/07/2026 (Opus 4.8), aguardando
+- [x] Fase 6 — Publicação CONCLUÍDA em 10/07/2026. **SITE NO AR:
+      https://trackdefi.vercel.app** (repo: github.com/alanmds/trackdefi;
+      push → redeploy automático). Validação de produção
+      (poc/validate-live.ts): 14/14 checks — scan no servidor da Vercel em
+      ~4–5 s (3× mais rápido que local; latência de datacenter), cache HIT
+      164 ms, fixture desligado, posições-gabarito presentes, invariantes ok,
+      headers de segurança e robots.txt conferidos no domínio público.
+      Pendências OPCIONAIS do Alan no painel Vercel (DEPLOY.md Parte 3):
+      ligar Analytics (1 clique) e BASE_RPC_URLS da Alchemy (nem parece
+      necessário — 4 s já está ótimo). Domínio próprio: decidir após validar
+      com usuários.
+      Histórico da preparação: CÓDIGO PRONTO em 10/07/2026 (Opus 4.8), aguardando
       passos de conta do Alan (só ele pode: criar GitHub/Vercel, deploy).
       Preparado e testado: página /how-it-works (confiança/segurança + "não é
       aconselhamento"), headers de segurança em next.config (X-Frame DENY,
