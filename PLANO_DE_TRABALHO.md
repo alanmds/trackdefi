@@ -235,6 +235,21 @@ testar antes de entregar, não expandir escopo sem perguntar.
       time, não exposto); "fix" rebaixaria Next p/ v9 → NÃO rodar --force.
       LIMITAÇÃO: carteira-lixeira (27k) > timeout → 504 honesto; RPC dedicado
       mitiga.
+- [x] Fase 7 — Playbook de expansão CONCLUÍDA em 10/07/2026 (Fable 5).
+      Entregável: **PLAYBOOK_EXPANSAO.md** — contrato de comportamento de um
+      adapter, levantamento das costuras mono-protocolo (tabela arquivo a
+      arquivo), Receita A (nova rede do ecossistema Sugar, ~1 sessão) e
+      Receita B (Uniswap V3 na Base, 2–3 sessões, fees via collect simulado),
+      ordem recomendada e definition of done por expansão.
+      DESCOBERTA-CHAVE: o Sugar existe em 12 REDES (optimism, celo, fraxtal,
+      ink, lisk, metall2, mode, soneium, superseed, swell, unichain + base) →
+      o adapter atual parametrizado cobre Velodrome/Optimism quase de graça;
+      multi-rede é MAIS BARATO que multi-protocolo. Ordem: (1) Velodrome/OP,
+      (2) Uniswap V3/Base, (3) Uniswap nas redes grandes, (4) cauda Sugar.
+
+═══ PLANO ORIGINAL 100% CONCLUÍDO (fases 0–7) em 10/07/2026 ═══
+Próximos passos são as expansões do PLAYBOOK_EXPANSAO.md, priorizadas pelo
+feedback de usuários do site no ar (https://trackdefi.vercel.app).
 
 ## Notas de desenvolvimento (Fase 4)
 - **Modo fixture**: `TRACKDEFI_FIXTURE=poc/fixture-dto.json` faz a API servir

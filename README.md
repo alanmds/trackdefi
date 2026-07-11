@@ -18,7 +18,8 @@ design — see `core/adapters/`).
 
 Protocol-specific code lives behind one interface (`core/types.ts` →
 `ProtocolAdapter`). Adding a network/exchange = a new adapter; the API, prices,
-and UI don't change.
+and UI don't change. The step-by-step recipes for expanding live in
+[PLAYBOOK_EXPANSAO.md](PLAYBOOK_EXPANSAO.md) (pt-BR).
 
 ```
 core/            pure engine, testable without a UI
