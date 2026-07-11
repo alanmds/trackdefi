@@ -74,7 +74,7 @@ export default function PositionsView({ address }: { address: string }) {
         <div className="wallet-id">
           <h1 title={address}>{shortAddress(address)}</h1>
           <span className="wallet-sub">
-            Base · Aerodrome ·{" "}
+            Base · Aerodrome + Uniswap v3 ·{" "}
             <a href={`https://basescan.org/address/${address}`} target="_blank" rel="noopener noreferrer">
               BaseScan ↗
             </a>
@@ -95,7 +95,10 @@ export default function PositionsView({ address }: { address: string }) {
           <div className="state-box" aria-live="polite">
             <div className="spinner" aria-hidden />
             <h2>Scanning the blockchain…</h2>
-            <p>Reading 34,000+ Aerodrome pools for this wallet — classic, concentrated and gauge-staked positions.</p>
+            <p>
+              Reading Aerodrome (34,000+ pools) and Uniswap v3 on Base — classic, concentrated and gauge-staked
+              positions.
+            </p>
             <Elapsed />
           </div>
           <div className="skeleton-grid" aria-hidden>
@@ -119,7 +122,7 @@ export default function PositionsView({ address }: { address: string }) {
       {state.phase === "done" && state.data.positions.length === 0 && (
         <div className="state-box">
           <h2>No liquidity positions found</h2>
-          <p>This wallet has no active Aerodrome positions on Base right now.</p>
+          <p>This wallet has no active Aerodrome or Uniswap v3 positions on Base right now.</p>
           <Link href="/" className="btn">
             Track another wallet
           </Link>

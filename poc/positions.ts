@@ -1,40 +1,34 @@
 /**
- * trackdefi — CLI de verificação (agora uma casca fina sobre o core/).
- *
- * Lê TODAS as posições de liquidez de uma carteira na Aerodrome (rede Base).
- * Sem chaves, sem login — somente leitura.
+ * trackdefi — CLI de verificação: roda o MESMO caminho da API de produção
+ * (todos os protocolos do registry, agregados) e imprime o DTO.
  *
  * Uso:
- *   npm run poc -- 0xENDERECO            # imprime as posições
- *   npm run poc -- 0xENDERECO --json     # também salva poc/fixture-<addr>.json
+ *   npm run poc -- 0xENDERECO            # imprime as posições (todos os protocolos)
+ *   npm run poc -- 0xENDERECO --json     # também salva fixture cru da Aerodrome
  */
 
 import { writeFileSync } from "node:fs";
-import { createPublicClient, fallback, formatUnits, getAddress, http, isAddress } from "viem";
-import { base } from "viem/chains";
+import { getAddress, isAddress } from "viem";
+import { createBaseReader } from "../core/chain";
 import { AerodromeAdapter } from "../core/adapters/aerodrome/index";
-import { CHAIN_SLUG } from "../core/adapters/aerodrome/config";
-import { orientRange } from "../core/math/ticks";
-import { fetchUsdPrices } from "../core/prices/defillama";
-import type { ChainReader, LpPosition } from "../core/types";
+import { getWalletPositions, type PositionDTO } from "../core/service";
 
-const RPCS = [
-  "https://mainnet.base.org",
-  "https://base-rpc.publicnode.com",
-  "https://base.llamarpc.com",
-];
-
-function fmt(raw: bigint, decimals: number, digits = 6): string {
-  const n = Number(formatUnits(raw, decimals));
-  return n.toLocaleString("pt-BR", { maximumFractionDigits: digits });
-}
-
-function usd(n: number | undefined): string {
-  if (n === undefined) return "—";
+function usd(n: number | null): string {
+  if (n === null || !Number.isFinite(n)) return "—";
   return "US$ " + n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function kindLabel(p: LpPosition): string {
+function amt(n: number): string {
+  if (!Number.isFinite(n)) return "—";
+  if (n !== 0 && Math.abs(n) < 1) return n.toLocaleString("pt-BR", { maximumSignificantDigits: 4 });
+  return n.toLocaleString("pt-BR", { maximumFractionDigits: 4 });
+}
+
+function price(n: number): string {
+  return n.toLocaleString("pt-BR", { maximumSignificantDigits: 6 });
+}
+
+function kindLabel(p: PositionDTO): string {
   if (p.kind === "concentrated") return "concentrada";
   return p.kind === "v2-stable" ? "clássica estável" : "clássica volátil";
 }
@@ -48,97 +42,55 @@ async function main() {
     process.exit(1);
   }
   const account = getAddress(input);
+  const reader = createBaseReader();
 
-  console.log(`\ntrackdefi — Aerodrome @ Base`);
+  console.log(`\ntrackdefi — Base (caminho completo de produção)`);
   console.log(`Carteira: ${account}\n`);
+  console.log("Varrendo todos os protocolos do registry...");
 
-  const client = createPublicClient({
-    chain: base,
-    transport: fallback(RPCS.map((url) => http(url, { timeout: 30_000 }))),
-  });
-  const adapter = new AerodromeAdapter(client as unknown as ChainReader, {
-    onWarn: (m) => console.warn(`  aviso: ${m}`),
-  });
+  const dto = await getWalletPositions(reader, account);
+  console.log(
+    `Concluído em ${(dto.scanMs / 1000).toFixed(1)} s — ${dto.totalPositions} posição(ões) [${dto.protocols.join(", ")}]\n`,
+  );
+  for (const w of dto.warnings) console.warn(`  aviso: ${w}`);
 
-  console.log("Varrendo posições (janelas em paralelo)...");
-  const t0 = Date.now();
-  const raw = await adapter.fetchRawPositions(account);
-  const scanSecs = ((Date.now() - t0) / 1000).toFixed(1);
-  const positions = await adapter.normalize(raw);
-  console.log(`Varredura concluída em ${scanSecs} s — ${positions.length} posição(ões).\n`);
-
-  if (positions.length === 0) {
-    console.log("Nenhuma posição de liquidez encontrada na Aerodrome para esta carteira.");
+  if (dto.totalPositions === 0) {
+    console.log("Nenhuma posição de liquidez encontrada para esta carteira.");
     return;
   }
 
-  const tokenAddrs = positions.flatMap((p) => [
-    p.token0.address,
-    p.token1.address,
-    ...p.rewards.map((r) => r.token.address),
-  ]);
-  const prices = await fetchUsdPrices(CHAIN_SLUG, tokenAddrs, (m) => console.warn(`  aviso: ${m}`));
-  const priceOf = (addr: string) => prices.get(addr.toLowerCase());
-  const valUsd = (raw: bigint, token: { address: string; decimals: number }): number | undefined => {
-    const p = priceOf(token.address);
-    return p === undefined ? undefined : Number(formatUnits(raw, token.decimals)) * p;
-  };
-
-  let totalUsd = 0;
-  let totalRewardsUsd = 0;
-  let missingPrices = 0;
-
-  positions.forEach((p, i) => {
-    const v0 = valUsd(p.amount0Raw, p.token0);
-    const v1 = valUsd(p.amount1Raw, p.token1);
-    const value = v0 !== undefined && v1 !== undefined ? v0 + v1 : undefined;
-    if (value !== undefined) totalUsd += value;
-    else missingPrices++;
-
-    const badges = [
-      p.kind === "concentrated" ? `concentrada, id NFT #${p.positionId}` : "clássica",
-    ];
-    console.log(`── Posição ${i + 1}: ${p.poolSymbol} (${badges.join(", ")})`);
+  dto.positions.forEach((p, i) => {
+    console.log(`── Posição ${i + 1}: ${p.poolSymbol} [${p.protocol}]${p.positionId ? ` (NFT #${p.positionId})` : ""}`);
     console.log(
-      `   Tipo: ${kindLabel(p)}${p.staked ? " · EM STAKE no gauge" : ""}${p.managedByAlm ? " · via ALM (gestor automático)" : ""}`,
+      `   Tipo: ${kindLabel(p)}${p.staked ? " · EM STAKE no gauge" : ""}${p.managedByAlm ? " · via ALM" : ""}`,
     );
     console.log(
-      `   ${p.token0.symbol}: ${fmt(p.amount0Raw, p.token0.decimals)}   ${p.token1.symbol}: ${fmt(p.amount1Raw, p.token1.decimals)}   Valor: ${usd(value)}`,
+      `   ${p.token0.symbol}: ${amt(p.token0.amount)}   ${p.token1.symbol}: ${amt(p.token1.amount)}   Valor: ${usd(p.valueUsd)}`,
     );
-
     if (p.range) {
-      const o = orientRange(p.range.priceLower, p.range.priceUpper, p.range.priceCurrent);
-      const pair = o.inverted
-        ? `${p.token0.symbol}/${p.token1.symbol}`
-        : `${p.token1.symbol}/${p.token0.symbol}`;
-      const f = (n: number) => n.toLocaleString("pt-BR", { maximumSignificantDigits: 6 });
       console.log(
-        `   Faixa: ${f(o.lower)} – ${f(o.upper)} ${pair} → ${p.range.inRange ? "✅ NA FAIXA" : "⚠️ FORA DA FAIXA"}`,
+        `   Faixa: ${price(p.range.lower)} – ${price(p.range.upper)} ${p.range.quoteLabel} → ${p.range.inRange ? "✅ NA FAIXA" : "⚠️ FORA DA FAIXA"}`,
       );
     }
-
     if (p.rewards.length > 0) {
-      const parts: string[] = [];
-      let rewUsd = 0;
-      let complete = true;
-      for (const r of p.rewards) {
-        parts.push(`${fmt(r.raw, r.token.decimals)} ${r.token.symbol}${r.kind === "emission" ? " (emissões)" : ""}`);
-        const v = valUsd(r.raw, r.token);
-        if (v === undefined) complete = false;
-        else rewUsd += v;
-      }
-      console.log(`   A receber: ${parts.join(" + ")} ≈ ${complete ? usd(rewUsd) : "—"}`);
-      if (complete) totalRewardsUsd += rewUsd;
+      const parts = p.rewards.map(
+        (r) => `${amt(r.amount)} ${r.symbol}${r.kind === "emission" ? " (emissões)" : ""}`,
+      );
+      console.log(`   A receber: ${parts.join(" + ")} ≈ ${usd(p.rewardsUsd)}`);
     }
     console.log("");
   });
 
   console.log(`══════════════════════════════════════════════`);
-  console.log(`TOTAL em pools:   ${usd(totalUsd)}${missingPrices ? `  (+ ${missingPrices} posição(ões) sem preço)` : ""}`);
-  console.log(`TOTAL a receber:  ${usd(totalRewardsUsd)}`);
-  console.log(`Conferir em: https://aerodrome.finance/dash?account=${account}\n`);
+  console.log(
+    `TOTAL em pools:   ${usd(dto.totals.valueUsd)}${dto.totals.positionsWithoutPrice ? `  (+ ${dto.totals.positionsWithoutPrice} sem preço)` : ""}`,
+  );
+  console.log(`TOTAL a receber:  ${usd(dto.totals.rewardsUsd)}`);
+  console.log(`Conferir: https://trackdefi.vercel.app/w/${account}\n`);
 
   if (wantJson) {
+    const adapter = new AerodromeAdapter(reader);
+    const raw = await adapter.fetchRawPositions(account);
     const file = `poc/fixture-${account.slice(0, 10)}.json`;
     writeFileSync(
       file,
@@ -148,7 +100,7 @@ async function main() {
         2,
       ),
     );
-    console.log(`Fixture salvo em ${file} (posições cruas, para testes).`);
+    console.log(`Fixture cru (Aerodrome) salvo em ${file}.`);
   }
 }
 

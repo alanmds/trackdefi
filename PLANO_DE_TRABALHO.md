@@ -251,6 +251,28 @@ testar antes de entregar, não expandir escopo sem perguntar.
 Próximos passos são as expansões do PLAYBOOK_EXPANSAO.md, priorizadas pelo
 feedback de usuários do site no ar (https://trackdefi.vercel.app).
 
+## Expansões executadas
+
+- [x] **Receita B — Uniswap V3 na Base** (11/07/2026, Fable 5). Backup prévio
+      em `backups/2026-07-11_fases0-7_completas` + tag git
+      `fases-0-7-completas`. Entregas: `core/math/tickmath.ts` (port exato do
+      TickMath em BigInt — vetores de teste = pares tick↔sqrt_ratio REAIS do
+      fixture + extremos canônicos, exercitam todos os 20 coeficientes);
+      `core/adapters/uniswap-v3/` (enumeração por NFT via multicall, amounts
+      pela nossa matemática Q96, taxas via collect() SIMULADO — eth_call, 100%
+      leitura — com fallback tokensOwed+aviso, teto de 1000 NFTs);
+      `core/adapters/registry.ts` + agregação no service (Promise.allSettled:
+      protocolo caído = warning/resposta parcial; todos caídos = 502); DTO:
+      `protocol` → `protocols[]`; badge de protocolo nos cards; textos de
+      cobertura atualizados; CLI agora roda o caminho completo de produção.
+      60 testes (16 novos). ATENÇÃO: slot0 da Uniswap tem 7 campos (o do
+      Slipstream tem 6) — ABIs separadas de propósito. vitest/tsc excluem
+      `backups/`.
+      Validação ao vivo: baleia 0xD3923BeC com 348 posições NOS DOIS
+      protocolos (US$ 434.748, corte top-200 ok, zero avisos, 33 s local);
+      carteira do Alan: 4 Aerodrome intactas + 1 Uniswap ESCONDIDA descoberta
+      (WETH/BRETT 1%, NFT #651436 — o produto provou o valor no dono).
+
 ## Notas de desenvolvimento (Fase 4)
 - **Modo fixture**: `TRACKDEFI_FIXTURE=poc/fixture-dto.json` faz a API servir
   um DTO congelado (7 posições reais) sem rede — é assim que o painel de

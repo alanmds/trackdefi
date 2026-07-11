@@ -1,5 +1,5 @@
 import type { PositionDTO } from "../../core/service";
-import { fmtAmount, fmtUsd } from "./format";
+import { fmtAmount, fmtUsd, protocolLabel } from "./format";
 import RangeBar from "./RangeBar";
 
 function kindLabel(p: PositionDTO): string {
@@ -25,6 +25,7 @@ export default function PositionCard({ p }: { p: PositionDTO }) {
       </div>
 
       <div className="badges">
+        <span className="badge">{protocolLabel(p.protocol)}</span>
         <span className="badge">{kindLabel(p)}</span>
         {p.range &&
           (p.range.inRange ? (

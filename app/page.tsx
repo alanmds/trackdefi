@@ -22,6 +22,7 @@ export default function Home() {
         </p>
         <div className="coverage">
           <span className="chip">Base · Aerodrome</span>
+          <span className="chip">Base · Uniswap v3</span>
           <span className="chip">
             More networks <span className="soon">— coming</span>
           </span>

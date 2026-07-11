@@ -62,8 +62,8 @@ export default function HowItWorks() {
 
       <h2>Coverage</h2>
       <p>
-        Today: the Base network and the Aerodrome exchange. The app is built so more networks and exchanges can be added
-        without changing how it works for you.
+        Today: the Base network, with the Aerodrome and Uniswap v3 exchanges. The app is built so more networks and
+        exchanges can be added without changing how it works for you.
       </p>
 
       <p className="prose-back">

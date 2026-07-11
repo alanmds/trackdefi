@@ -9,8 +9,10 @@
 import { createPublicClient, http, parseAbiItem, type Address } from "viem";
 import { base } from "viem/chains";
 
-// NFPM do Slipstream na Base (dono dos NFTs de posição concentrada)
-const NFPM: Address = "0x827922686190790b37229fd06084350E74485b72";
+// NFPM do Slipstream na Base (dono dos NFTs de posição concentrada).
+// Passe outro NFPM como argumento p/ garimpar outros protocolos
+// (ex.: Uniswap V3 na Base = 0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1).
+const NFPM: Address = (process.argv[2] as Address) ?? "0x827922686190790b37229fd06084350E74485b72";
 
 const client = createPublicClient({ chain: base, transport: http("https://mainnet.base.org", { timeout: 30_000 }) });
 

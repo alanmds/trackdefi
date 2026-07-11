@@ -78,7 +78,7 @@ describe("buildResponse", () => {
 
   it("metadados básicos e 4 posições", () => {
     expect(dto.chain).toBe("base");
-    expect(dto.protocol).toBe("aerodrome");
+    expect(dto.protocols).toEqual(["aerodrome"]);
     expect(dto.scanMs).toBe(1234);
     expect(dto.positions).toHaveLength(4);
     expect(dto.totalPositions).toBe(4);

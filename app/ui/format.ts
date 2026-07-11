@@ -36,3 +36,12 @@ export function fmtRangePrice(n: number): string {
 export function shortAddress(addr: string): string {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
+
+const PROTOCOL_LABELS: Record<string, string> = {
+  aerodrome: "Aerodrome",
+  "uniswap-v3": "Uniswap v3",
+};
+
+export function protocolLabel(id: string): string {
+  return PROTOCOL_LABELS[id] ?? id;
+}

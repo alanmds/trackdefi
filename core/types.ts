@@ -82,4 +82,16 @@ export type ChainReader = {
     }[];
     allowFailure: true;
   }): Promise<{ status: "success" | "failure"; result?: unknown; error?: Error }[]>;
+  /**
+   * eth_call simulando uma função de escrita SEM transação (continua 100%
+   * leitura). Usado p/ ler taxas pendentes da Uniswap via collect().
+   * Opcional: adapters devem degradar com aviso quando ausente.
+   */
+  simulateContract?(args: {
+    address: Address;
+    abi: unknown;
+    functionName: string;
+    args?: readonly unknown[];
+    account: Address;
+  }): Promise<{ result: unknown }>;
 };

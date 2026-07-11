@@ -9,8 +9,8 @@
  */
 
 import { formatUnits, type Address } from "viem";
-import type { ChainReader, LpPosition, PositionKind } from "./types";
-import { AerodromeAdapter } from "./adapters/aerodrome/index";
+import type { ChainReader, LpPosition, PositionKind, ProtocolAdapter } from "./types";
+import { buildAdapters } from "./adapters/registry";
 import { CHAIN_SLUG } from "./adapters/aerodrome/config";
 import { fetchUsdPrices } from "./prices/defillama";
 import { orientRange } from "./math/ticks";
@@ -66,7 +66,8 @@ export interface PositionDTO {
 export interface PositionsResponseDTO {
   address: string;
   chain: string;
-  protocol: string;
+  /** protocolos varridos nesta resposta (cada posição diz o seu) */
+  protocols: string[];
   fetchedAt: string;
   scanMs: number;
   totals: {
@@ -102,8 +103,17 @@ export function buildResponse(params: {
   scanMs: number;
   warnings: string[];
   maxPositions?: number;
+  protocols?: string[];
 }): PositionsResponseDTO {
-  const { address, normalized, prices, scanMs, warnings, maxPositions = MAX_POSITIONS_IN_RESPONSE } = params;
+  const {
+    address,
+    normalized,
+    prices,
+    scanMs,
+    warnings,
+    maxPositions = MAX_POSITIONS_IN_RESPONSE,
+    protocols = ["aerodrome"],
+  } = params;
 
   const positions: PositionDTO[] = normalized.map((p) => {
     const p0 = priceOf(prices, p.token0.address);
@@ -192,7 +202,7 @@ export function buildResponse(params: {
   return {
     address,
     chain: "base",
-    protocol: "aerodrome",
+    protocols,
     fetchedAt: new Date().toISOString(),
     scanMs,
     totals,
@@ -202,18 +212,31 @@ export function buildResponse(params: {
   };
 }
 
-/** Orquestração: lê a carteira on-chain, busca preços e monta o DTO. */
+/**
+ * Orquestração: roda TODOS os adapters do registry em paralelo, agrega,
+ * busca preços e monta o DTO. Falha de um protocolo vira warning (resposta
+ * parcial); só falha tudo se TODOS os protocolos falharem.
+ */
 export async function getWalletPositions(
   reader: ChainReader,
   address: Address,
+  adaptersOverride?: ProtocolAdapter[],
 ): Promise<PositionsResponseDTO> {
   const warnings: string[] = [];
-  const adapter = new AerodromeAdapter(reader, { onWarn: (m) => warnings.push(m) });
+  const adapters = adaptersOverride ?? buildAdapters(reader, { onWarn: (m) => warnings.push(m) });
 
   const t0 = Date.now();
-  const raw = await adapter.fetchRawPositions(address);
-  const normalized = await adapter.normalize(raw);
+  const settled = await Promise.allSettled(adapters.map((a) => a.getPositions(address)));
   const scanMs = Date.now() - t0;
+
+  const normalized: LpPosition[] = [];
+  settled.forEach((r, i) => {
+    if (r.status === "fulfilled") normalized.push(...r.value);
+    else warnings.push(`${adapters[i].protocol} indisponível: ${(r.reason as Error)?.message?.split("\n")[0] ?? "erro"}`);
+  });
+  if (settled.length > 0 && settled.every((r) => r.status === "rejected")) {
+    throw new Error(`todos os protocolos falharam: ${warnings.join(" | ")}`);
+  }
 
   const tokenAddrs = normalized.flatMap((p) => [
     p.token0.address,
@@ -222,5 +245,12 @@ export async function getWalletPositions(
   ]);
   const prices = await fetchUsdPrices(CHAIN_SLUG, tokenAddrs, (m) => warnings.push(m));
 
-  return buildResponse({ address, normalized, prices, scanMs, warnings });
+  return buildResponse({
+    address,
+    normalized,
+    prices,
+    scanMs,
+    warnings,
+    protocols: adapters.map((a) => a.protocol),
+  });
 }
