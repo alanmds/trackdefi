@@ -14,4 +14,4 @@ export const SITE_TITLE = `${SITE_NAME} — Liquidity Pool Tracker · Aerodrome,
 
 /** descrição da home (~160 caracteres) */
 export const SITE_DESCRIPTION =
-  "Free LP tracker for Base & Optimism: paste a wallet address to see every Aerodrome, Velodrome & Uniswap v3 pool position — including gauge-staked — with fees.";
+  "Free LP tracker: paste a wallet address to see every Aerodrome, Velodrome & Uniswap v3 position across Base, Ethereum, Arbitrum & Optimism — staked included.";

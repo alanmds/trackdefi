@@ -41,9 +41,9 @@ export default function HowItWorks() {
       <h2>How it works</h2>
       <ol>
         <li>
-          You paste a wallet address. We read Aerodrome&apos;s on-chain data on the Base network to find every position
-          that wallet holds — classic pools, concentrated (Slipstream) positions, and positions staked in gauges that
-          don&apos;t appear as tokens in the wallet.
+          You paste a wallet address. We read the supported exchanges&apos; on-chain data across our networks to find
+          every position that wallet holds — classic pools, concentrated positions, and positions staked in gauges
+          that don&apos;t appear as tokens in the wallet.
         </li>
         <li>
           For each position we compute how much of each token it holds, the pending fees and AERO emissions, and — for
@@ -64,8 +64,9 @@ export default function HowItWorks() {
 
       <h2>Coverage</h2>
       <p>
-        Today: Aerodrome and Uniswap v3 on Base, and Velodrome on Optimism. The app is built so more networks and
-        exchanges can be added without changing how it works for you — see <Link href="/roadmap">the roadmap</Link>.
+        Today: Aerodrome on Base, Velodrome on Optimism, and Uniswap v3 on Base, Ethereum, Arbitrum and Optimism. The
+        app is built so more networks and exchanges can be added without changing how it works for you — see{" "}
+        <Link href="/roadmap">the roadmap</Link>.
       </p>
 
       <p className="prose-back">

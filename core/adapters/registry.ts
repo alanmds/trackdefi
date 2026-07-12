@@ -4,18 +4,24 @@
  * Cada adapter recebe o reader da SUA rede (core/chain.ts).
  */
 
-import type { ProtocolAdapter } from "../types";
+import type { ChainReader, ProtocolAdapter } from "../types";
 import { createReader } from "../chain";
 import { AerodromeAdapter } from "./aerodrome/index";
 import { VELODROME_OPTIMISM } from "./aerodrome/config";
 import { UniswapV3Adapter } from "./uniswap-v3/index";
+import { UNISWAP_V3_CHAINS } from "./uniswap-v3/config";
 
 export function buildAdapters(opts: { onWarn?: (msg: string) => void } = {}): ProtocolAdapter[] {
-  const baseReader = createReader(8453);
-  const opReader = createReader(10);
+  // um reader por rede, compartilhado entre os adapters daquela rede
+  const readers = new Map<number, ChainReader>();
+  const readerFor = (chainId: number) => {
+    if (!readers.has(chainId)) readers.set(chainId, createReader(chainId));
+    return readers.get(chainId)!;
+  };
+
   return [
-    new AerodromeAdapter(baseReader, opts),
-    new UniswapV3Adapter(baseReader, opts),
-    new AerodromeAdapter(opReader, { ...opts, config: VELODROME_OPTIMISM }),
+    new AerodromeAdapter(readerFor(8453), opts),
+    new AerodromeAdapter(readerFor(10), { ...opts, config: VELODROME_OPTIMISM }),
+    ...UNISWAP_V3_CHAINS.map((config) => new UniswapV3Adapter(readerFor(config.chainId), { ...opts, config })),
   ];
 }

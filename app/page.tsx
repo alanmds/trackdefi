@@ -13,8 +13,8 @@ export const metadata: Metadata = {
  * exigência do Google). Perguntas = intenções reais de busca do público-alvo. */
 const FAQ: Array<{ q: string; a: string }> = [
   {
-    q: "How do I track my liquidity pool positions on Base and Optimism?",
-    a: `Paste your wallet address (0x…) in the search box above. ${SITE_NAME} reads the blockchains and lists every LP position that address holds on Aerodrome and Uniswap v3 (Base) and Velodrome (Optimism) — value in USD, pending fees, emissions and price ranges.`,
+    q: "How do I track my liquidity pool positions across networks?",
+    a: `Paste your wallet address (0x…) in the search box above. ${SITE_NAME} reads the blockchains and lists every LP position that address holds on Aerodrome, Velodrome and Uniswap v3 across Base, Optimism, Ethereum and Arbitrum — value in USD, pending fees, emissions and price ranges.`,
   },
   {
     q: "Why don't my staked Aerodrome LP positions show up in my wallet?",
@@ -26,7 +26,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Which exchanges and networks are supported?",
-    a: "Today: Aerodrome and Uniswap v3 on Base, and Velodrome on Optimism — classic pools and concentrated liquidity, staked or not. More networks and exchanges are on the roadmap.",
+    a: "Today: Aerodrome on Base, Velodrome on Optimism, and Uniswap v3 on Base, Ethereum, Arbitrum and Optimism — classic pools and concentrated liquidity, staked or not. More networks and exchanges are on the roadmap.",
   },
   {
     q: `Is ${SITE_NAME} free?`,
@@ -58,19 +58,20 @@ export default function Home() {
           One wallet address.
         </h1>
         <p className="lede">
-          Paste any wallet address and see all of its liquidity pool positions on Base — value, pending fees, emissions
-          and price ranges. Including positions staked in gauges, which most trackers miss.
+          Paste any wallet address and see all of its liquidity pool positions across Base, Optimism, Ethereum and
+          Arbitrum — value, pending fees, emissions and price ranges. Including positions staked in gauges, which most
+          trackers miss.
         </p>
         <SearchForm autoFocus />
         <p className="try-demo">
           No wallet handy? <Link href={`/w/${DEMO_WALLET}`}>Try a demo wallet →</Link>
         </p>
         <div className="coverage">
-          <span className="chip">Base · Aerodrome</span>
-          <span className="chip">Base · Uniswap v3</span>
-          <span className="chip">Optimism · Velodrome</span>
+          <span className="chip">Aerodrome · Base</span>
+          <span className="chip">Velodrome · Optimism</span>
+          <span className="chip">Uniswap v3 · Base, Ethereum, Arbitrum &amp; Optimism</span>
           <Link href="/roadmap" className="chip">
-            More networks <span className="soon">— see the roadmap →</span>
+            More <span className="soon">— see the roadmap →</span>
           </Link>
         </div>
       </section>

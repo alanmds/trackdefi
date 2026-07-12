@@ -253,6 +253,20 @@ feedback de usuários do site no ar (https://trackdefi.vercel.app).
 
 ## Expansões executadas
 
+- [x] **Receita B multi-rede — Uniswap v3 em Ethereum, Arbitrum e Optimism**
+      (13/07/2026, Fable 5). Endereços CONFIRMADOS na doc oficial: ETH/ARB/OP
+      usam as canônicas (factory 0x1F98…F984, NFPM 0xC364…FE88); só a Base
+      difere — a própria doc manda não assumir. `UniV3ChainConfig` +
+      instâncias; chains.ts ganhou Ethereum (1) e Arbitrum (42161) com envs
+      ETHEREUM_RPC_URLS/ARBITRUM_RPC_URLS; registry = 6 adapters em 4 redes
+      (readers compartilhados por rede). PoC (poc/probe-uniswap-chains.ts):
+      coerência NFPM.factory()==factory nas 3 redes + carteiras reais (ETH:
+      baleia de 386 posições em 17,6 s no RPC grátis; ARB/OP: 1 posição
+      cada, ~1–2 s); getLogs do mainnet limita faixa de blocos → sonda tenta
+      1500/300/50. UI/SEO/roadmap: 4 redes (Uniswap multi-rede → Live;
+      Next = Superchain). 68 testes. Ao vivo: carteira de teste, 4 redes em
+      13 s, totais estáveis.
+
 - [x] **Receita A — Velodrome na Optimism** (13/07/2026, Fable 5). PRIMEIRA
       REDE NOVA. PoC-primeiro (poc/probe-velodrome.ts): VELO
       0x9560…88Db VERIFICADO on-chain (symbol()="VELO"); Sugar da OP

@@ -3,7 +3,7 @@
  * rótulo e RPCs. Adicionar rede = uma entrada aqui (Receita A do playbook).
  */
 
-import { base, optimism } from "viem/chains";
+import { arbitrum, base, mainnet, optimism } from "viem/chains";
 import type { Chain } from "viem";
 
 export interface ChainInfo {
@@ -39,6 +39,32 @@ export const CHAINS: Record<number, ChainInfo> = {
       "https://mainnet.optimism.io",
       "https://optimism-rpc.publicnode.com",
       "https://optimism.llamarpc.com",
+    ],
+  },
+  1: {
+    chain: mainnet,
+    label: "Ethereum",
+    priceSlug: "ethereum",
+    explorerUrl: "https://etherscan.io",
+    explorerLabel: "Etherscan",
+    rpcEnv: "ETHEREUM_RPC_URLS",
+    defaultRpcs: [
+      "https://ethereum-rpc.publicnode.com",
+      "https://eth.llamarpc.com",
+      "https://cloudflare-eth.com",
+    ],
+  },
+  42161: {
+    chain: arbitrum,
+    label: "Arbitrum",
+    priceSlug: "arbitrum",
+    explorerUrl: "https://arbiscan.io",
+    explorerLabel: "Arbiscan",
+    rpcEnv: "ARBITRUM_RPC_URLS",
+    defaultRpcs: [
+      "https://arb1.arbitrum.io/rpc",
+      "https://arbitrum-one-rpc.publicnode.com",
+      "https://arbitrum.llamarpc.com",
     ],
   },
 };

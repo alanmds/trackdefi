@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Roadmap — networks & exchanges",
   description:
-    "Where trackdefi is today and where it's going: Aerodrome, Uniswap v3 and Velodrome live now; Uniswap v3 on more networks next; Uniswap v4 and P&L tracking planned.",
+    "Where trackdefi is today and where it's going: Aerodrome, Velodrome and Uniswap v3 live across 4 networks; more Superchain exchanges next; Uniswap v4 and P&L planned.",
   alternates: { canonical: "/roadmap" },
 };
 
@@ -52,6 +52,13 @@ export default function Roadmap() {
             network.
           </span>
         </li>
+        <li>
+          <Status kind="live" />
+          <span>
+            <strong>Ethereum, Arbitrum &amp; Optimism · Uniswap v3</strong> — the Base integration, now across the
+            major networks.
+          </span>
+        </li>
       </ul>
 
       <h2>Next</h2>
@@ -59,8 +66,8 @@ export default function Roadmap() {
         <li>
           <Status kind="next" />
           <span>
-            <strong>Uniswap v3 on Ethereum, Arbitrum and other major networks</strong> — the same integration that is
-            live on Base, network by network.
+            <strong>More Superchain exchanges</strong>
+            {" (Mode, Lisk, Ink and friends) — they share Aerodrome's architecture, so coverage grows fast."}
           </span>
         </li>
       </ul>
@@ -74,13 +81,6 @@ export default function Roadmap() {
             {
               " — the new singleton-and-hooks architecture. Positions and value reuse the engine we already have; reading fees reliably across custom hooks is the harder part, so it follows the v3 rollout."
             }
-          </span>
-        </li>
-        <li>
-          <Status kind="planned" />
-          <span>
-            <strong>More Superchain exchanges</strong>
-            {" (Mode, Lisk, Ink and friends) — they share Aerodrome's architecture, so coverage grows fast."}
           </span>
         </li>
         <li>

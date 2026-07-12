@@ -20,9 +20,11 @@ import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { mapLimit } from "../../util";
 import { cleanSymbol } from "../aerodrome/index";
 import { MAX_UINT128, nfpmAbi, uniFactoryAbi, uniPoolAbi, type UniRawPosition } from "./abi";
-import { MAX_NFTS, UNI_FACTORY, UNI_NFPM } from "./config";
+import { MAX_NFTS, UNISWAP_V3_BASE, type UniV3ChainConfig } from "./config";
 
 export interface UniswapV3Options {
+  /** config da rede (default: Uniswap V3 na Base) */
+  config?: UniV3ChainConfig;
   nfpm?: Address;
   factory?: Address;
   maxNfts?: number;
@@ -31,7 +33,7 @@ export interface UniswapV3Options {
 
 export class UniswapV3Adapter implements ProtocolAdapter {
   readonly protocol = "uniswap-v3";
-  readonly chainId = 8453;
+  readonly chainId: number;
 
   private readonly nfpm: Address;
   private readonly factory: Address;
@@ -42,8 +44,10 @@ export class UniswapV3Adapter implements ProtocolAdapter {
     private readonly reader: ChainReader,
     opts: UniswapV3Options = {},
   ) {
-    this.nfpm = opts.nfpm ?? UNI_NFPM;
-    this.factory = opts.factory ?? UNI_FACTORY;
+    const config = opts.config ?? UNISWAP_V3_BASE;
+    this.chainId = config.chainId;
+    this.nfpm = opts.nfpm ?? config.nfpm;
+    this.factory = opts.factory ?? config.factory;
     this.maxNfts = opts.maxNfts ?? MAX_NFTS;
     this.warn = opts.onWarn ?? (() => {});
   }

@@ -74,13 +74,9 @@ export default function PositionsView({ address }: { address: string }) {
         <div className="wallet-id">
           <h1 title={address}>{shortAddress(address)}</h1>
           <span className="wallet-sub">
-            Base + Optimism ·{" "}
+            Base · Optimism · Ethereum · Arbitrum ·{" "}
             <a href={`https://basescan.org/address/${address}`} target="_blank" rel="noopener noreferrer">
               BaseScan ↗
-            </a>{" "}
-            ·{" "}
-            <a href={`https://optimistic.etherscan.io/address/${address}`} target="_blank" rel="noopener noreferrer">
-              OP Etherscan ↗
             </a>
           </span>
         </div>
@@ -100,7 +96,7 @@ export default function PositionsView({ address }: { address: string }) {
             <div className="spinner" aria-hidden />
             <h2>Scanning the blockchains…</h2>
             <p>
-              Reading Aerodrome (34,000+ pools) and Uniswap v3 on Base, plus Velodrome on Optimism — classic,
+              Reading Aerodrome, Velodrome and Uniswap v3 across Base, Optimism, Ethereum and Arbitrum — classic,
               concentrated and gauge-staked positions.
             </p>
             <Elapsed />
@@ -126,7 +122,10 @@ export default function PositionsView({ address }: { address: string }) {
       {state.phase === "done" && state.data.positions.length === 0 && (
         <div className="state-box">
           <h2>No liquidity positions found</h2>
-          <p>This wallet has no active positions on Aerodrome or Uniswap v3 (Base) nor Velodrome (Optimism) right now.</p>
+          <p>
+            This wallet has no active positions on Aerodrome, Velodrome or Uniswap v3 across Base, Optimism, Ethereum
+            and Arbitrum right now.
+          </p>
           <Link href="/" className="btn">
             Track another wallet
           </Link>
@@ -149,7 +148,7 @@ export default function PositionsView({ address }: { address: string }) {
             <div className="kpi">
               <div className="label">Claimable rewards</div>
               <div className="value">{fmtUsd(state.data.totals.rewardsUsd)}</div>
-              <div className="hint">fees + AERO emissions</div>
+              <div className="hint">fees + emissions</div>
             </div>
             <div className="kpi">
               <div className="label">Positions</div>
