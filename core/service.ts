@@ -9,9 +9,9 @@
  */
 
 import { formatUnits, type Address } from "viem";
-import type { ChainReader, LpPosition, PositionKind, ProtocolAdapter } from "./types";
+import type { LpPosition, PositionKind, ProtocolAdapter } from "./types";
 import { buildAdapters } from "./adapters/registry";
-import { CHAIN_SLUG } from "./adapters/aerodrome/config";
+import { chainInfo } from "./chains";
 import { fetchUsdPrices } from "./prices/defillama";
 import { orientRange } from "./math/ticks";
 
@@ -65,7 +65,8 @@ export interface PositionDTO {
 
 export interface PositionsResponseDTO {
   address: string;
-  chain: string;
+  /** redes varridas nesta resposta (cada posição diz a sua via chainId) */
+  chains: string[];
   /** protocolos varridos nesta resposta (cada posição diz o seu) */
   protocols: string[];
   fetchedAt: string;
@@ -90,8 +91,14 @@ function human(raw: bigint, decimals: number): number {
   return Number(formatUnits(raw, decimals));
 }
 
-function priceOf(prices: Map<string, number>, address: string): number | null {
-  const p = prices.get(address.toLowerCase());
+/** chave de preço multi-rede: o MESMO endereço pode existir em duas chains
+ * (ex.: WETH é 0x4200…0006 na Base E na Optimism) → chave = chainId:endereço */
+export function priceKey(chainId: number, address: string): string {
+  return `${chainId}:${address.toLowerCase()}`;
+}
+
+function priceOf(prices: Map<string, number>, chainId: number, address: string): number | null {
+  const p = prices.get(priceKey(chainId, address));
   return p === undefined ? null : p;
 }
 
@@ -104,6 +111,7 @@ export function buildResponse(params: {
   warnings: string[];
   maxPositions?: number;
   protocols?: string[];
+  chains?: string[];
 }): PositionsResponseDTO {
   const {
     address,
@@ -113,11 +121,12 @@ export function buildResponse(params: {
     warnings,
     maxPositions = MAX_POSITIONS_IN_RESPONSE,
     protocols = ["aerodrome"],
+    chains = ["base"],
   } = params;
 
   const positions: PositionDTO[] = normalized.map((p) => {
-    const p0 = priceOf(prices, p.token0.address);
-    const p1 = priceOf(prices, p.token1.address);
+    const p0 = priceOf(prices, p.chainId, p.token0.address);
+    const p1 = priceOf(prices, p.chainId, p.token1.address);
     const a0 = human(p.amount0Raw, p.token0.decimals);
     const a1 = human(p.amount1Raw, p.token1.decimals);
     const v0 = p0 !== null ? a0 * p0 : null;
@@ -125,7 +134,7 @@ export function buildResponse(params: {
     const valueUsd = v0 !== null && v1 !== null ? v0 + v1 : null;
 
     const rewards: RewardDTO[] = p.rewards.map((r) => {
-      const pr = priceOf(prices, r.token.address);
+      const pr = priceOf(prices, p.chainId, r.token.address);
       const amt = human(r.raw, r.token.decimals);
       return {
         symbol: r.token.symbol,
@@ -201,7 +210,7 @@ export function buildResponse(params: {
 
   return {
     address,
-    chain: "base",
+    chains,
     protocols,
     fetchedAt: new Date().toISOString(),
     scanMs,
@@ -218,12 +227,11 @@ export function buildResponse(params: {
  * parcial); só falha tudo se TODOS os protocolos falharem.
  */
 export async function getWalletPositions(
-  reader: ChainReader,
   address: Address,
   adaptersOverride?: ProtocolAdapter[],
 ): Promise<PositionsResponseDTO> {
   const warnings: string[] = [];
-  const adapters = adaptersOverride ?? buildAdapters(reader, { onWarn: (m) => warnings.push(m) });
+  const adapters = adaptersOverride ?? buildAdapters({ onWarn: (m) => warnings.push(m) });
 
   const t0 = Date.now();
   const settled = await Promise.allSettled(adapters.map((a) => a.getPositions(address)));
@@ -232,18 +240,32 @@ export async function getWalletPositions(
   const normalized: LpPosition[] = [];
   settled.forEach((r, i) => {
     if (r.status === "fulfilled") normalized.push(...r.value);
-    else warnings.push(`${adapters[i].protocol} indisponível: ${(r.reason as Error)?.message?.split("\n")[0] ?? "erro"}`);
+    else
+      warnings.push(
+        `${adapters[i].protocol}@${chainInfo(adapters[i].chainId).label} indisponível: ${(r.reason as Error)?.message?.split("\n")[0] ?? "erro"}`,
+      );
   });
   if (settled.length > 0 && settled.every((r) => r.status === "rejected")) {
     throw new Error(`todos os protocolos falharam: ${warnings.join(" | ")}`);
   }
 
-  const tokenAddrs = normalized.flatMap((p) => [
-    p.token0.address,
-    p.token1.address,
-    ...p.rewards.map((r) => r.token.address),
-  ]);
-  const prices = await fetchUsdPrices(CHAIN_SLUG, tokenAddrs, (m) => warnings.push(m));
+  // preços por rede (o mesmo endereço pode existir em mais de uma chain)
+  const byChain = new Map<number, Set<string>>();
+  for (const p of normalized) {
+    const set = byChain.get(p.chainId) ?? new Set<string>();
+    set.add(p.token0.address);
+    set.add(p.token1.address);
+    for (const r of p.rewards) set.add(r.token.address);
+    byChain.set(p.chainId, set);
+  }
+  const prices = new Map<string, number>();
+  await Promise.all(
+    [...byChain.entries()].map(async ([chainId, addrs]) => {
+      const slug = chainInfo(chainId).priceSlug;
+      const chainPrices = await fetchUsdPrices(slug, [...addrs] as Address[], (m) => warnings.push(m));
+      for (const [addr, price] of chainPrices) prices.set(priceKey(chainId, addr), price);
+    }),
+  );
 
   return buildResponse({
     address,
@@ -251,6 +273,7 @@ export async function getWalletPositions(
     prices,
     scanMs,
     warnings,
-    protocols: adapters.map((a) => a.protocol),
+    protocols: [...new Set(adapters.map((a) => a.protocol))],
+    chains: [...new Set(adapters.map((a) => chainInfo(a.chainId).priceSlug))],
   });
 }

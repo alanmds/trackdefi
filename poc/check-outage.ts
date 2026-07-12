@@ -7,7 +7,9 @@
 
 export {}; // módulo (habilita await no topo do arquivo)
 
-process.env.BASE_RPC_URLS = "http://127.0.0.1:1"; // porta fechada — nada escuta aqui
+// portas fechadas — nada escuta; derruba TODAS as redes do registry
+process.env.BASE_RPC_URLS = "http://127.0.0.1:1";
+process.env.OPTIMISM_RPC_URLS = "http://127.0.0.1:1";
 delete process.env.TRACKDEFI_FIXTURE;
 
 const { GET } = await import("../app/api/positions/route");

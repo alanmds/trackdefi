@@ -74,9 +74,13 @@ export default function PositionsView({ address }: { address: string }) {
         <div className="wallet-id">
           <h1 title={address}>{shortAddress(address)}</h1>
           <span className="wallet-sub">
-            Base · Aerodrome + Uniswap v3 ·{" "}
+            Base + Optimism ·{" "}
             <a href={`https://basescan.org/address/${address}`} target="_blank" rel="noopener noreferrer">
               BaseScan ↗
+            </a>{" "}
+            ·{" "}
+            <a href={`https://optimistic.etherscan.io/address/${address}`} target="_blank" rel="noopener noreferrer">
+              OP Etherscan ↗
             </a>
           </span>
         </div>
@@ -94,10 +98,10 @@ export default function PositionsView({ address }: { address: string }) {
         <>
           <div className="state-box" aria-live="polite">
             <div className="spinner" aria-hidden />
-            <h2>Scanning the blockchain…</h2>
+            <h2>Scanning the blockchains…</h2>
             <p>
-              Reading Aerodrome (34,000+ pools) and Uniswap v3 on Base — classic, concentrated and gauge-staked
-              positions.
+              Reading Aerodrome (34,000+ pools) and Uniswap v3 on Base, plus Velodrome on Optimism — classic,
+              concentrated and gauge-staked positions.
             </p>
             <Elapsed />
           </div>
@@ -122,7 +126,7 @@ export default function PositionsView({ address }: { address: string }) {
       {state.phase === "done" && state.data.positions.length === 0 && (
         <div className="state-box">
           <h2>No liquidity positions found</h2>
-          <p>This wallet has no active Aerodrome or Uniswap v3 positions on Base right now.</p>
+          <p>This wallet has no active positions on Aerodrome or Uniswap v3 (Base) nor Velodrome (Optimism) right now.</p>
           <Link href="/" className="btn">
             Track another wallet
           </Link>

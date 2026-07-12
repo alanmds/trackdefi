@@ -15,7 +15,6 @@
 
 import { readFileSync } from "node:fs";
 import { getAddress, isAddress } from "viem";
-import { createBaseReader } from "../../../core/chain";
 import { getWalletPositions } from "../../../core/service";
 import { FixedWindowLimiter, Semaphore, TtlCache } from "../../../core/guards";
 
@@ -99,7 +98,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   try {
-    const dto = await withTimeout(getWalletPositions(createBaseReader(), address), SCAN_TIMEOUT_MS);
+    const dto = await withTimeout(getWalletPositions(address), SCAN_TIMEOUT_MS);
     const body = JSON.stringify(dto);
     cache.set(cacheKey, body);
     return jsonResponse(body, 200, { "x-cache": "MISS" });

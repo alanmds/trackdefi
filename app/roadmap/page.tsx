@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Roadmap — networks & exchanges",
   description:
-    "Where trackdefi is today and where it's going: Aerodrome and Uniswap v3 on Base live now; Velodrome on Optimism next; more networks, Uniswap v4 and P&L tracking planned.",
+    "Where trackdefi is today and where it's going: Aerodrome, Uniswap v3 and Velodrome live now; Uniswap v3 on more networks next; Uniswap v4 and P&L tracking planned.",
   alternates: { canonical: "/roadmap" },
 };
 
@@ -44,6 +44,14 @@ export default function Roadmap() {
             blockchain.
           </span>
         </li>
+        <li>
+          <Status kind="live" />
+          <span>
+            <strong>Optimism · Velodrome</strong>
+            {" — "}Aerodrome&apos;s sister exchange: staked positions and VELO emissions included. Our first extra
+            network.
+          </span>
+        </li>
       </ul>
 
       <h2>Next</h2>
@@ -51,22 +59,14 @@ export default function Roadmap() {
         <li>
           <Status kind="next" />
           <span>
-            <strong>Optimism · Velodrome</strong>
-            {" — "}Aerodrome&apos;s sister exchange. Our first new network; same engine, so staked positions and
-            emissions come included.
+            <strong>Uniswap v3 on Ethereum, Arbitrum and other major networks</strong> — the same integration that is
+            live on Base, network by network.
           </span>
         </li>
       </ul>
 
       <h2>Planned</h2>
       <ul className="roadmap-list">
-        <li>
-          <Status kind="planned" />
-          <span>
-            <strong>Uniswap v3 on Ethereum, Arbitrum and other major networks</strong> — the same integration that is
-            live on Base, network by network.
-          </span>
-        </li>
         <li>
           <Status kind="planned" />
           <span>

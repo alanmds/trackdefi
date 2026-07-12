@@ -253,6 +253,27 @@ feedback de usuários do site no ar (https://trackdefi.vercel.app).
 
 ## Expansões executadas
 
+- [x] **Receita A — Velodrome na Optimism** (13/07/2026, Fable 5). PRIMEIRA
+      REDE NOVA. PoC-primeiro (poc/probe-velodrome.ts): VELO
+      0x9560…88Db VERIFICADO on-chain (symbol()="VELO"); Sugar da OP
+      (0x3475…74aA, deployments/optimism.env) decodifica com o MESMO struct;
+      5 posições reais da carteira de teste em 1,4 s; fixture salvo.
+      Generalização: `SugarChainConfig` (config.ts) — Aerodrome/Base e
+      Velodrome/OP são instâncias do MESMO adapter; `core/chains.ts` (rede →
+      slug DefiLlama/explorer/RPCs/env) + `createReader(chainId)`;
+      registry monta 3 adapters em 2 redes; service agrega com preços POR
+      REDE (chave chainId:endereço — WETH tem o MESMO endereço 0x4200…0006
+      na Base E na OP, colisão real evitada); DTO: chain→chains[];
+      getWalletPositions(address) cria os readers sozinho. UI: badge de rede
+      + explorer por chain nos cards; textos/SEO/roadmap atualizados
+      (Velodrome → Live; Next = Uniswap v3 multi-rede).
+      65 testes (5 novos). Ao vivo: carteira de teste com 12 posições em
+      2 REDES (7 Base + 5 OP) agregadas em 11,6 s, emissões VELO
+      precificadas, ALM na OP etiquetado; regressão da carteira-gabarito
+      com contraprova Q96 verde. PENDENTE menor: parametrizar validate-batch
+      por chain (a contraprova é a mesma; PoC+invariantes cobriram a OP).
+      OPCIONAL pós-deploy: env OPTIMISM_RPC_URLS na Vercel p/ RPC pago da OP.
+
 - [x] **SEO durável** (12/07/2026, Fable 5, aprovado pelo Alan). Regra do
       Alan respeitada: domínio atual é temporário → executado SÓ o que vive
       no código e não se refaz. `app/site.ts` = identidade única (nome +

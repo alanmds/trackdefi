@@ -1,4 +1,5 @@
 import type { PositionDTO } from "../../core/service";
+import { CHAINS } from "../../core/chains";
 import { fmtAmount, fmtUsd, protocolLabel } from "./format";
 import RangeBar from "./RangeBar";
 
@@ -8,15 +9,17 @@ function kindLabel(p: PositionDTO): string {
 }
 
 export default function PositionCard({ p }: { p: PositionDTO }) {
+  const chain = CHAINS[p.chainId];
+  const explorerUrl = chain?.explorerUrl ?? "https://basescan.org";
   return (
     <article className="pos-card">
       <div className="pos-head">
         <h3 className="pos-title">
           <a
-            href={`https://basescan.org/address/${p.poolAddress}`}
+            href={`${explorerUrl}/address/${p.poolAddress}`}
             target="_blank"
             rel="noopener noreferrer"
-            title="View pool on BaseScan"
+            title={`View pool on ${chain?.explorerLabel ?? "the explorer"}`}
           >
             {p.poolSymbol}
           </a>
@@ -25,6 +28,7 @@ export default function PositionCard({ p }: { p: PositionDTO }) {
       </div>
 
       <div className="badges">
+        <span className="badge">{chain?.label ?? `chain ${p.chainId}`}</span>
         <span className="badge">{protocolLabel(p.protocol)}</span>
         <span className="badge">{kindLabel(p)}</span>
         {p.range &&

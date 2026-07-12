@@ -16,7 +16,7 @@ import type { ChainReader, LpPosition, PositionKind, ProtocolAdapter, TokenInfo 
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { mapLimit } from "../../util";
 import { factoryAbi, poolProbeAbi, sugarAbi, SUGAR_MAX_POSITIONS, type SugarPosition } from "./abi";
-import { AERO, CHAIN_ID, FACTORIES, LP_SUGAR } from "./config";
+import { AERODROME_BASE, CHAIN_ID, type SugarChainConfig } from "./config";
 
 const ZERO: Address = "0x0000000000000000000000000000000000000000";
 
@@ -46,6 +46,8 @@ export interface PoolMeta {
 }
 
 export interface AerodromeOptions {
+  /** config da rede/protocolo Sugar (default: Aerodrome na Base) */
+  config?: SugarChainConfig;
   sugarAddress?: Address;
   factories?: Address[];
   /** janelas de pools varridas em paralelo (default 8) */
@@ -55,10 +57,13 @@ export interface AerodromeOptions {
   onWarn?: (msg: string) => void;
 }
 
+/** Adapter do ecossistema Sugar — atende Aerodrome (Base), Velodrome
+ * (Optimism) e irmãs, trocando só a SugarChainConfig. */
 export class AerodromeAdapter implements ProtocolAdapter {
-  readonly protocol = "aerodrome";
-  readonly chainId = CHAIN_ID;
+  readonly protocol: string;
+  readonly chainId: number;
 
+  private readonly emissionsToken: Address;
   private readonly sugar: Address;
   private readonly factories: Address[];
   private readonly concurrency: number;
@@ -69,8 +74,12 @@ export class AerodromeAdapter implements ProtocolAdapter {
     private readonly reader: ChainReader,
     opts: AerodromeOptions = {},
   ) {
-    this.sugar = opts.sugarAddress ?? LP_SUGAR;
-    this.factories = opts.factories ?? FACTORIES;
+    const config = opts.config ?? AERODROME_BASE;
+    this.protocol = config.protocol;
+    this.chainId = config.chainId;
+    this.emissionsToken = config.emissionsToken;
+    this.sugar = opts.sugarAddress ?? config.sugar;
+    this.factories = opts.factories ?? config.factories;
     this.concurrency = opts.concurrency ?? 8;
     this.poolWindow = opts.poolWindow ?? 200n;
     this.warn = opts.onWarn ?? (() => {});
@@ -101,13 +110,13 @@ export class AerodromeAdapter implements ProtocolAdapter {
   async normalize(raw: SugarPosition[]): Promise<LpPosition[]> {
     if (raw.length === 0) return [];
     const pools = await this.loadPools([...new Set(raw.map((p) => p.lp))]);
-    const tokenAddrs = new Set<Address>([AERO]);
+    const tokenAddrs = new Set<Address>([this.emissionsToken]);
     for (const meta of pools.values()) {
       tokenAddrs.add(meta.token0);
       tokenAddrs.add(meta.token1);
     }
     const tokens = await this.loadTokens([...tokenAddrs]);
-    const aero = tokens.get(AERO)!;
+    const aero = tokens.get(this.emissionsToken)!;
 
     const out: LpPosition[] = [];
     for (const p of raw) {
@@ -116,7 +125,7 @@ export class AerodromeAdapter implements ProtocolAdapter {
         this.warn(`pool ${p.lp} sem metadados — posição ignorada`);
         continue;
       }
-      out.push(toLpPosition(p, pool, tokens, aero));
+      out.push(toLpPosition(p, pool, tokens, aero, this.protocol, this.chainId));
     }
     return out;
   }
@@ -312,6 +321,8 @@ export function toLpPosition(
   pool: PoolMeta,
   tokens: Map<Address, TokenInfo>,
   aero: TokenInfo,
+  protocol = "aerodrome",
+  chainId: number = CHAIN_ID,
 ): LpPosition {
   const token0 = tokens.get(pool.token0) ?? fallbackToken(pool.token0);
   const token1 = tokens.get(pool.token1) ?? fallbackToken(pool.token1);
@@ -337,8 +348,8 @@ export function toLpPosition(
   }
 
   return {
-    protocol: "aerodrome",
-    chainId: CHAIN_ID,
+    protocol,
+    chainId,
     poolAddress: p.lp,
     poolSymbol:
       pool.symbol ??

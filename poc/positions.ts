@@ -11,6 +11,7 @@ import { writeFileSync } from "node:fs";
 import { getAddress, isAddress } from "viem";
 import { createBaseReader } from "../core/chain";
 import { AerodromeAdapter } from "../core/adapters/aerodrome/index";
+import { CHAINS } from "../core/chains";
 import { getWalletPositions, type PositionDTO } from "../core/service";
 
 function usd(n: number | null): string {
@@ -42,15 +43,14 @@ async function main() {
     process.exit(1);
   }
   const account = getAddress(input);
-  const reader = createBaseReader();
 
-  console.log(`\ntrackdefi — Base (caminho completo de produção)`);
+  console.log(`\ntrackdefi — caminho completo de produção (todas as redes)`);
   console.log(`Carteira: ${account}\n`);
-  console.log("Varrendo todos os protocolos do registry...");
+  console.log("Varrendo todos os protocolos/redes do registry...");
 
-  const dto = await getWalletPositions(reader, account);
+  const dto = await getWalletPositions(account);
   console.log(
-    `Concluído em ${(dto.scanMs / 1000).toFixed(1)} s — ${dto.totalPositions} posição(ões) [${dto.protocols.join(", ")}]\n`,
+    `Concluído em ${(dto.scanMs / 1000).toFixed(1)} s — ${dto.totalPositions} posição(ões) [${dto.protocols.join(", ")}] em [${dto.chains.join(", ")}]\n`,
   );
   for (const w of dto.warnings) console.warn(`  aviso: ${w}`);
 
@@ -60,7 +60,8 @@ async function main() {
   }
 
   dto.positions.forEach((p, i) => {
-    console.log(`── Posição ${i + 1}: ${p.poolSymbol} [${p.protocol}]${p.positionId ? ` (NFT #${p.positionId})` : ""}`);
+    const chain = CHAINS[p.chainId]?.label ?? p.chainId;
+    console.log(`── Posição ${i + 1}: ${p.poolSymbol} [${p.protocol} · ${chain}]${p.positionId ? ` (NFT #${p.positionId})` : ""}`);
     console.log(
       `   Tipo: ${kindLabel(p)}${p.staked ? " · EM STAKE no gauge" : ""}${p.managedByAlm ? " · via ALM" : ""}`,
     );
@@ -89,7 +90,7 @@ async function main() {
   console.log(`Conferir: https://trackdefi.vercel.app/w/${account}\n`);
 
   if (wantJson) {
-    const adapter = new AerodromeAdapter(reader);
+    const adapter = new AerodromeAdapter(createBaseReader());
     const raw = await adapter.fetchRawPositions(account);
     const file = `poc/fixture-${account.slice(0, 10)}.json`;
     writeFileSync(

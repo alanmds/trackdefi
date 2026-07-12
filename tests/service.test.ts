@@ -58,11 +58,12 @@ function normalizedFixture(): LpPosition[] {
   ];
 }
 
+// chaves multi-rede: chainId:endereço (posições do fixture são da Base/8453)
 const PRICES = new Map<string, number>([
-  [WETH.address.toLowerCase(), 1800],
-  [USDC.address.toLowerCase(), 1],
-  [AEROTK.address.toLowerCase(), 0.5],
-  [CBBTC.address.toLowerCase(), 64000],
+  [`8453:${WETH.address.toLowerCase()}`, 1800],
+  [`8453:${USDC.address.toLowerCase()}`, 1],
+  [`8453:${AEROTK.address.toLowerCase()}`, 0.5],
+  [`8453:${CBBTC.address.toLowerCase()}`, 64000],
   // cbXEN de propósito ausente
 ]);
 
@@ -77,7 +78,7 @@ describe("buildResponse", () => {
   const bySymbol = (s: string) => dto.positions.find((p) => p.poolSymbol === s)!;
 
   it("metadados básicos e 4 posições", () => {
-    expect(dto.chain).toBe("base");
+    expect(dto.chains).toEqual(["base"]);
     expect(dto.protocols).toEqual(["aerodrome"]);
     expect(dto.scanMs).toBe(1234);
     expect(dto.positions).toHaveLength(4);

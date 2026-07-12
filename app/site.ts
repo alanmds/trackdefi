@@ -10,8 +10,8 @@ export const SITE_NAME = "trackdefi";
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://trackdefi.vercel.app").replace(/\/$/, "");
 
 /** título da home (≤ 70 caracteres p/ não truncar no Google) */
-export const SITE_TITLE = `${SITE_NAME} — Liquidity Pool Tracker for Base · Aerodrome & Uniswap v3`;
+export const SITE_TITLE = `${SITE_NAME} — Liquidity Pool Tracker · Aerodrome, Velodrome & Uniswap v3`;
 
 /** descrição da home (~160 caracteres) */
 export const SITE_DESCRIPTION =
-  "Free LP tracker for Base: paste a wallet address to see every Aerodrome & Uniswap v3 liquidity pool position — including gauge-staked — with fees and ranges.";
+  "Free LP tracker for Base & Optimism: paste a wallet address to see every Aerodrome, Velodrome & Uniswap v3 pool position — including gauge-staked — with fees.";

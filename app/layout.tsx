@@ -83,7 +83,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </span>
             <span>Not financial advice. Verify data on-chain before acting. Prices by DefiLlama.</span>
             <span>
-              Coverage: Base · Aerodrome &amp; Uniswap v3 — <Link href="/roadmap">see the roadmap</Link>.
+              Coverage: Base (Aerodrome &amp; Uniswap v3) + Optimism (Velodrome) —{" "}
+              <Link href="/roadmap">see the roadmap</Link>.
             </span>
           </div>
         </footer>

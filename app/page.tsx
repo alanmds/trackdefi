@@ -13,8 +13,8 @@ export const metadata: Metadata = {
  * exigência do Google). Perguntas = intenções reais de busca do público-alvo. */
 const FAQ: Array<{ q: string; a: string }> = [
   {
-    q: "How do I track my liquidity pool positions on Base?",
-    a: `Paste your wallet address (0x…) in the search box above. ${SITE_NAME} reads the Base blockchain and lists every LP position that address holds on Aerodrome and Uniswap v3 — value in USD, pending fees, emissions and price ranges.`,
+    q: "How do I track my liquidity pool positions on Base and Optimism?",
+    a: `Paste your wallet address (0x…) in the search box above. ${SITE_NAME} reads the blockchains and lists every LP position that address holds on Aerodrome and Uniswap v3 (Base) and Velodrome (Optimism) — value in USD, pending fees, emissions and price ranges.`,
   },
   {
     q: "Why don't my staked Aerodrome LP positions show up in my wallet?",
@@ -26,7 +26,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Which exchanges and networks are supported?",
-    a: "Today: Aerodrome and Uniswap v3 on the Base network — classic pools and concentrated liquidity, staked or not. More networks and exchanges are on the roadmap.",
+    a: "Today: Aerodrome and Uniswap v3 on Base, and Velodrome on Optimism — classic pools and concentrated liquidity, staked or not. More networks and exchanges are on the roadmap.",
   },
   {
     q: `Is ${SITE_NAME} free?`,
@@ -68,6 +68,7 @@ export default function Home() {
         <div className="coverage">
           <span className="chip">Base · Aerodrome</span>
           <span className="chip">Base · Uniswap v3</span>
+          <span className="chip">Optimism · Velodrome</span>
           <Link href="/roadmap" className="chip">
             More networks <span className="soon">— see the roadmap →</span>
           </Link>

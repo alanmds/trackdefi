@@ -1,30 +1,32 @@
 /**
- * Fábrica do cliente de leitura da Base (viem). Fonte única de RPC para a CLI
- * e para a API. RPC pago (Alchemy/QuickNode) entra por env sem tocar o código:
- * BASE_RPC_URLS="https://...,https://..." (a chave fica só no servidor).
+ * Fábrica dos clientes de leitura (viem), um por rede. Fonte única de RPC
+ * para a CLI e para a API. RPC pago entra por env sem tocar o código
+ * (ex.: BASE_RPC_URLS / OPTIMISM_RPC_URLS = "https://...,https://...").
+ * A chave fica só no servidor, nunca no navegador.
  */
 
 import { createPublicClient, fallback, http } from "viem";
-import { base } from "viem/chains";
+import { chainInfo } from "./chains";
 import type { ChainReader } from "./types";
 
-const DEFAULT_RPCS = [
-  "https://mainnet.base.org",
-  "https://base-rpc.publicnode.com",
-  "https://base.llamarpc.com",
-];
-
-export function baseRpcUrls(): string[] {
-  const env = process.env.BASE_RPC_URLS?.split(",")
+export function rpcUrls(chainId: number): string[] {
+  const info = chainInfo(chainId);
+  const env = process.env[info.rpcEnv]
+    ?.split(",")
     .map((s) => s.trim())
     .filter(Boolean);
-  return env && env.length > 0 ? env : DEFAULT_RPCS;
+  return env && env.length > 0 ? env : info.defaultRpcs;
 }
 
-export function createBaseReader(): ChainReader {
+export function createReader(chainId: number): ChainReader {
   const client = createPublicClient({
-    chain: base,
-    transport: fallback(baseRpcUrls().map((url) => http(url, { timeout: 30_000 }))),
+    chain: chainInfo(chainId).chain,
+    transport: fallback(rpcUrls(chainId).map((url) => http(url, { timeout: 30_000 }))),
   });
   return client as unknown as ChainReader;
+}
+
+/** compatibilidade com scripts existentes */
+export function createBaseReader(): ChainReader {
+  return createReader(8453);
 }

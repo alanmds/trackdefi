@@ -39,6 +39,7 @@ export function shortAddress(addr: string): string {
 
 const PROTOCOL_LABELS: Record<string, string> = {
   aerodrome: "Aerodrome",
+  velodrome: "Velodrome",
   "uniswap-v3": "Uniswap v3",
 };
 

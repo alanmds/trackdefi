@@ -144,7 +144,10 @@ async function validateWallet(address: Address): Promise<boolean> {
   const scanMs = Date.now() - t0;
 
   const tokens = normalized.flatMap((p) => [p.token0.address, p.token1.address, ...p.rewards.map((r) => r.token.address)]);
-  const prices = await fetchUsdPrices(CHAIN_SLUG, tokens, (m) => warnings.push(m));
+  const raw_prices = await fetchUsdPrices(CHAIN_SLUG, tokens, (m) => warnings.push(m));
+  // chaves de preço agora são multi-rede: chainId:endereço (bateria = Base/8453)
+  const prices = new Map<string, number>();
+  for (const [addr, price] of raw_prices) prices.set(`8453:${addr}`, price);
   const dto = buildResponse({ address, normalized, prices, scanMs, warnings });
 
   console.log(
