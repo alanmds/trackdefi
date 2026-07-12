@@ -23,9 +23,9 @@ export default function Home() {
         <div className="coverage">
           <span className="chip">Base · Aerodrome</span>
           <span className="chip">Base · Uniswap v3</span>
-          <span className="chip">
-            More networks <span className="soon">— coming</span>
-          </span>
+          <Link href="/roadmap" className="chip">
+            More networks <span className="soon">— see the roadmap →</span>
+          </Link>
         </div>
       </section>
 

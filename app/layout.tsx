@@ -53,7 +53,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               phrases, and cannot move funds. <Link href="/how-it-works">How it works &amp; why it&apos;s safe →</Link>
             </span>
             <span>Not financial advice. Verify data on-chain before acting. Prices by DefiLlama.</span>
-            <span>Coverage: Base · Aerodrome &amp; Uniswap v3 — more networks coming.</span>
+            <span>
+              Coverage: Base · Aerodrome &amp; Uniswap v3 — <Link href="/roadmap">see the roadmap</Link>.
+            </span>
           </div>
         </footer>
         <Analytics />

@@ -593,6 +593,35 @@ button {
   margin-top: 36px;
 }
 
+.roadmap-list {
+  list-style: none;
+  padding-left: 0 !important;
+}
+
+.roadmap-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.roadmap-list .badge {
+  flex: none;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+.roadmap-updated {
+  color: var(--ink-3);
+  font-size: 13px;
+  margin-top: 28px;
+}
+
+a.chip:hover {
+  background: var(--card-2);
+  text-decoration: none;
+  border-color: var(--border-strong);
+}
+
 .scan-warnings {
   font-size: 13px;
   color: var(--warn);
