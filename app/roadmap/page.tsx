@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Roadmap — trackdefi",
-  description: "Where trackdefi is today and where it's going: networks, exchanges and features.",
+  title: "Roadmap — networks & exchanges",
+  description:
+    "Where trackdefi is today and where it's going: Aerodrome and Uniswap v3 on Base live now; Velodrome on Optimism next; more networks, Uniswap v4 and P&L tracking planned.",
+  alternates: { canonical: "/roadmap" },
 };
 
 function Status({ kind }: { kind: "live" | "next" | "planned" | "exploring" }) {

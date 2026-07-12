@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "How it works & why it's safe — trackdefi",
-  description: "How trackdefi reads your positions, and why it can never touch your funds.",
+  title: "How it works & why it's safe",
+  description:
+    "How trackdefi reads your LP positions straight from the Base blockchain — no login, no wallet connection, no keys — and why it can never touch your funds.",
+  alternates: { canonical: "/how-it-works" },
 };
 
 export default function HowItWorks() {

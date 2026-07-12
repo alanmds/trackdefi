@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "./site";
 
 /**
- * Permite indexar a landing e a página institucional; bloqueia a varredura
+ * Permite indexar a landing e as páginas institucionais; bloqueia a varredura
  * das páginas de carteira (infinitas, dinâmicas e caras de gerar) e da API.
  */
 export default function robots(): MetadataRoute.Robots {
@@ -11,5 +12,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: ["/", "/how-it-works", "/roadmap"],
       disallow: ["/w/", "/api/"],
     },
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

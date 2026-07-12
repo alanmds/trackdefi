@@ -8,7 +8,9 @@ type Props = { params: Promise<{ address: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { address } = await params;
   const label = isAddress(address) ? `${address.slice(0, 6)}…${address.slice(-4)}` : "wallet";
-  return { title: `${label} — trackdefi` };
+  // páginas de carteira são infinitas/dinâmicas: fora do índice do Google
+  // (o robots.txt bloqueia a varredura; isto cobre links externos diretos)
+  return { title: label, robots: { index: false, follow: false } };
 }
 
 export default async function WalletPage({ params }: Props) {

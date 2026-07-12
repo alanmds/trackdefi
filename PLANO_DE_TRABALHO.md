@@ -253,6 +253,22 @@ feedback de usuários do site no ar (https://trackdefi.vercel.app).
 
 ## Expansões executadas
 
+- [x] **SEO durável** (12/07/2026, Fable 5, aprovado pelo Alan). Regra do
+      Alan respeitada: domínio atual é temporário → executado SÓ o que vive
+      no código e não se refaz. `app/site.ts` = identidade única (nome +
+      NEXT_PUBLIC_SITE_URL); títulos/canonicals/sitemap/robots/JSON-LD
+      (WebApplication + FAQPage) derivam dele. FAQ de 5 perguntas na landing
+      (= intenções reais de busca; a nº 2 "staked positions not showing" é o
+      diferencial). /w/ com noindex. **SEO.md** = mapa de palavras-chave,
+      posicionamento vs Revert/Metrix e CHECKLIST pós-domínio-definitivo
+      (Search Console, sitemap submit, backlinks Base/DefiLlama, OG image) —
+      NÃO executar antes do domínio final.
+- [x] **Roadmap público** (12/07/2026): /roadmap + link no selo da landing;
+      Uniswap v4 em Planned (fees por hooks = parte difícil, após rollout
+      v3); sem GitHub (expunha repo pessoal). NOTA técnica: JSX do Next
+      engole espaço após tag quando o texto seguinte tem entidade HTML —
+      usar {" "} explícito (3 casos corrigidos).
+
 - [x] **Receita B — Uniswap V3 na Base** (11/07/2026, Fable 5). Backup prévio
       em `backups/2026-07-11_fases0-7_completas` + tag git
       `fases-0-7-completas`. Entregas: `core/math/tickmath.ts` (port exato do

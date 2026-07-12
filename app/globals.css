@@ -289,6 +289,49 @@ button {
   color: var(--ink-2);
 }
 
+/* FAQ da landing */
+
+.faq {
+  max-width: 720px;
+  margin: 8px auto 48px;
+}
+
+.faq h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 24px;
+  text-align: center;
+  margin: 0 0 16px;
+}
+
+.faq-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 13px 16px;
+  list-style-position: inside;
+}
+
+.faq-item summary:hover {
+  color: var(--accent);
+}
+
+.faq-item p {
+  margin: 0;
+  padding: 0 16px 14px;
+  color: var(--ink-2);
+  font-size: 14.5px;
+}
+
 /* ---------------------------------------------------------- wallet page */
 
 .wallet-head {
