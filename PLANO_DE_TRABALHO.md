@@ -253,6 +253,19 @@ feedback de usuários do site no ar (https://trackdefi.vercel.app).
 
 ## Expansões executadas
 
+- [x] **Playbook v2 — reestruturação por custo-benefício** (14/07/2026,
+      Fable 5, a pedido do Alan). Core declarado COMPLETO; tudo agora é
+      melhoria. PLAYBOOK_EXPANSAO.md reescrito com tabela de priorização
+      (1º APR/Receita C, 2º Uniswap v4/Receita D, Superchain rebaixada a
+      encaixe) e receitas novas C–F. PoC do APR (poc/probe-yields*.ts):
+      DefiLlama cobre Uniswap (769 pools) e Aerodrome (416), mas
+      **Velodrome/OP = 0**; casamento é por tokens+tick spacing (sem
+      endereço no dataset; WETH/USDC = 9 candidatos; TVL ínfimo mostra APR
+      absurdo) → política "número honesto ou —" com maior-TVL + pisos/tetos.
+      apyBaseInception só na Uniswap; média 30d (apyMean30d) disponível.
+      Idade do pool: created_at do Sugar (precisa ABI publicada — pendência
+      antiga) + PoolCreated na Uniswap. Implementação da Receita C: PRÓXIMA.
+
 - [x] **Receita B multi-rede — Uniswap v3 em Ethereum, Arbitrum e Optimism**
       (13/07/2026, Fable 5). Endereços CONFIRMADOS na doc oficial: ETH/ARB/OP
       usam as canônicas (factory 0x1F98…F984, NFPM 0xC364…FE88); só a Base

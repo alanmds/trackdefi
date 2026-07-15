@@ -1,153 +1,182 @@
-# Playbook de Expansão — trackdefi
+# Playbook de Melhorias — trackdefi (v2)
 
-> Fase 7 do plano (10/07/2026, Fable 5). Como adicionar redes e protocolos ao
-> trackdefi sem retrabalho. Este documento transforma a expansão em receitas
-> mecânicas: um Claude (ou dev) numa sessão futura deve conseguir executá-las
-> começando do zero de contexto.
+> v1 (Fase 7, 10/07/2026) era o playbook de *expansão de cobertura*.
+> **v2 (14/07/2026):** revisado com o core dado por COMPLETO — daqui em diante
+> tudo é melhoria incremental, priorizada por custo-benefício. Inclui a
+> Receita C (APR) com os achados honestos do PoC de 14/07/2026 e a Receita D
+> (Uniswap v4) com avaliação técnica realista.
 
-## O princípio (relembrando a regra inviolável)
+## O que "core completo" significa
 
-Todo código específico de protocolo vive atrás da interface `ProtocolAdapter`
-(`core/types.ts`): entra um endereço, sai `LpPosition[]` normalizado.
-API, preços, UI e validação não conhecem protocolo nenhum — consomem o modelo
-normalizado. **Expandir = escrever um adapter novo + registrá-lo.**
+No ar e validado: 4 redes (Base, Optimism, Ethereum, Arbitrum) · 3 protocolos
+(Aerodrome, Velodrome, Uniswap v3) · posições clássicas + concentradas +
+em stake com emissões · preços multi-rede · API com cache/limites · UI
+completa · 68 testes · bateria com contraprova matemática · roadmap público ·
+SEO técnico durável. Nenhuma melhoria abaixo exige mudar essa fundação — a
+interface `ProtocolAdapter` e o registry absorvem tudo.
 
-### O contrato de comportamento de um adapter (obrigatório)
+## Princípios (imutáveis, valem para toda melhoria)
 
-Todo adapter novo DEVE:
+1. **PoC primeiro**: sonda em `poc/` prova a viabilidade ANTES de tocar no
+   site. Endereços/APIs confirmados em fonte oficial, nunca de memória.
+2. **Número honesto ou "—"**: nunca exibir valor que pode estar errado.
+   Dado ambíguo, ausente ou suspeito → travessão.
+3. Todo adapter novo cumpre o contrato de comportamento (BigInt cru, staked
+   incluído, `cleanSymbol`, `onWarn`, paginação sem perda silenciosa,
+   fixture + testes + bateria).
+4. Publicar (`git push`) só com aprovação do Alan; antes: typecheck + testes
+   + build; depois: `validate-live`.
+5. Conteúdo público novo (páginas/textos) também passa pela aprovação do Alan.
 
-1. Devolver `LpPosition[]` com valores monetários em **BigInt cru** (unidades
-   do token); float só existe na borda de exibição.
-2. Incluir posições **em stake/depositadas em farms** — é o diferencial do
-   produto. Se o protocolo tem gauge/farm, o adapter cobre.
-3. Passar todo símbolo de token/pool por `cleanSymbol()` (contratos de
-   terceiros são input hostil).
-4. Reportar problemas não-fatais via `onWarn` (nunca lançar por pool quebrado;
-   pular e avisar).
-5. Ser seguro contra **truncamento e paginação**: nenhuma chamada pode perder
-   posições silenciosamente (ver a proteção de janela do adapter Aerodrome).
-6. NÃO buscar preços — preço é camada separada (`core/prices`), por design
-   ("nunca inventar preço" vive num lugar só).
-7. Vir com: fixture congelado de carteira real (`--json`), testes unitários de
-   mapeamento, e passar na bateria `poc/validate-batch.ts`.
+## Priorização por custo-benefício (14/07/2026)
 
-## As costuras mono-protocolo de hoje (tocar ao adicionar o nº 2)
+| # | Melhoria | Receita | Custo | Benefício | Depende de |
+|---|---|---|---|---|---|
+| 1 | **APR & idade dos pools** | C | 1–2 sessões | ALTO — o nº que todo LP olha primeiro; beneficia 100% dos usuários já | nada |
+| 2 | **Uniswap v4** | D | 2–4 sessões | MÉDIO-ALTO e crescendo com a migração de TVL p/ v4 | melhor após C |
+| 3 | Domínio definitivo + checklist SEO.md | — | baixo (ação do Alan) | ALTO — destrava ranking e monetização | decisão do Alan |
+| 4 | Monetização técnica (tip jar, /support, slots, widget LI.FI) | ebook | baixo por item | receita | domínio (maioria) |
+| 5 | Superchain: +redes Velodrome (Mode, Ink, Unichain, Soneium, Fraxtal; depois cauda) | A | ~½ sessão/rede | BAIXO-MÉDIO — TVLs pequenos; soma à narrativa "10 redes" | nada |
+| 6 | Alertas de fora-da-faixa | E (esboço) | médio-alto | ALTO — âncora do futuro "Pro" | infra de notificação |
+| 7 | PnL pessoal + perda impermanente | F (esboço) | ALTO (indexador) | ALTO — diferencial do revert.finance | indexador |
 
-Levantamento exato de onde o código assume "Aerodrome na Base" (10/07/2026):
+**Ordem recomendada: 1 → 2**, com 3 e 4 correndo em paralelo quando o Alan
+decidir o domínio. 5 entra como "encaixe" quando sobrar meia sessão. 6 e 7
+esperam tração/monetização.
 
-| Arquivo | O que assume hoje | O que vira |
-|---|---|---|
-| `core/service.ts` | instancia `AerodromeAdapter` direto; DTO top-level fixa `chain:"base"`, `protocol:"aerodrome"`; um só slug de preço | **registry** de adapters; varre todos com `Promise.allSettled` (falha de um protocolo vira warning, não derruba a resposta); top-level ganha `scopes: [{chain, protocol, scanMs, ok}]`; tokens agrupados por chain para o DefiLlama |
-| `core/chain.ts` | um reader fixo da Base; env `BASE_RPC_URLS` | mapa `chainId → reader`; env `RPC_URLS_<CHAIN>` (manter `BASE_RPC_URLS` como sinônimo) |
-| `core/adapters/aerodrome/config.ts` | constantes soltas | struct `SugarChainConfig` (ver Receita A) |
-| `app/api/positions/route.ts` | nada a mudar no MVP | opcional: `?chains=`/`?protocols=` (default: todos); cache key continua o endereço |
-| `app/ui/PositionCard.tsx` + `PositionsView.tsx` | links fixos `basescan.org`; sem badge de rede/protocolo | mapa `chainId → explorer`; badges "Base · Aerodrome" no card (o DTO já carrega `protocol`/`chainId` por posição — previsto desde a Fase 2) |
-| `poc/validate-batch.ts` / `validate-live.ts` | carteiras da Base | aceitar escopo por argumento; gabaritos por rede |
+---
 
-Nada disso precisa ser feito antecipadamente — a Receita A inclui essas
-mudanças no passo a passo. (Refatorar antes de ter o segundo caso concreto
-seria especulação.)
+## Receita A — nova rede do ecossistema Sugar (PROVADA)
 
-## Receita A — nova REDE do ecossistema Sugar (~1 sessão)
+Provada na Velodrome/Optimism em 1 sessão (13/07/2026). Adapter é o mesmo;
+muda só a `SugarChainConfig` (config.ts) + rede em `core/chains.ts`.
 
-**Descoberta da Fase 7:** o repo `velodrome-finance/sugar` tem deployments em
-**12 redes** (conferido em 10/07/2026): base, optimism, celo, fraxtal, ink,
-lisk, metall2, mode, soneium, superseed, swell, unichain. O adapter Aerodrome
-já fala "Sugar" — parametrizado, ele vira adapter de TODAS elas.
-**Velodrome na Optimism é o multi-rede de menor custo que existe para nós.**
+1. `deployments/<chain>.env` do repo velodrome-finance/sugar → endereços +
+   carteira de teste.
+2. Instância de `SugarChainConfig` (emissionsToken VERIFICADO on-chain via
+   `symbol()`) + entrada em `chains.ts` + registro no registry.
+3. PoC (`poc/probe-velodrome.ts` como modelo) ANTES de tocar no site.
+4. Textos/SEO/roadmap + bateria + validate-live.
 
-Passos:
+Redes restantes (12 no repo, 2 cobertas): prioridade Mode, Ink, Unichain,
+Soneium, Fraxtal; cauda Lisk, Swell, Metal L2, Superseed, Celo.
+Armadilhas conhecidas: struct/versão do Sugar pode variar POR CHAIN (o PoC
+pega); grafias de símbolo idem.
 
-1. **Endereços**: baixar `deployments/<chain>.env` do repo sugar (raw
-   GitHub). Anotar `LP_SUGAR_ADDRESS_<id>`, `V2_FACTORIES`/`CL_FACTORIES`,
-   e a carteira `TEST_ADDRESS_<id>` (o repo dá uma de teste por chain!).
-   Token de emissões: **VELO na Optimism** (`0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db`
-   — CONFIRMAR), AERO só na Base — vira campo de config, sai o hardcode.
-2. **Generalizar a config**: transformar `core/adapters/aerodrome/config.ts`
-   em `SugarChainConfig { chainId, protocolId, priceSlug, sugar, factories,
-   emissionsToken, explorerUrl, rpcs }`. Aerodrome/Base = instância 1;
-   Velodrome/OP = instância 2. O `index.ts` do adapter recebe a config no
-   construtor (mexer o mínimo na lógica — ela foi validada com contraprova).
-3. **Costuras**: aplicar a tabela acima (registry no service, readers por
-   chain, badges/explorer na UI).
-4. **PoC primeiro** (padrão que deu certo na Fase 1): rodar a CLI na chain
-   nova com a carteira de teste do repo ANTES de mexer no site; salvar
-   fixture `--json`. Se o struct do Sugar divergir nessa chain, é aqui que
-   aparece (a decodificação falha alto — Fase 1 provou que versões variam
-   por deployment).
-5. **Testes**: duplicar a suíte de mapeamento com o fixture novo (barato).
-6. **Bateria**: `validate-batch` na chain nova (a contraprova Q96 funciona
-   igual — mesma matemática) + conferência visual em velodrome.finance com
-   2+ carteiras reais (garimpar com `find-wallets.ts` apontado para o NFPM
-   da chain).
-7. **Deploy + validate-live** com gabarito da chain nova.
+## Receita B — Uniswap v3 em rede nova (PROVADA)
 
-**Armadilhas conhecidas** (aprendidas nas fases 1–5): versão do contrato
-publicado ≠ branch main (sempre validar decodificação ao vivo); grafias de
-struct podem variar POR CHAIN; `positionsUnstakedConcentrated` + `positions`
-+ dedupe é o padrão seguro em todas; contagem de pools varia (34k na Base —
-dimensionar a varredura pela soma das factories, como já fazemos).
+Provada em ETH/ARB/OP numa fração de sessão (13/07/2026): instância de
+`UniV3ChainConfig` + rede em `chains.ts`. ETH/ARB/OP usam endereços
+canônicos; a Base difere — SEMPRE confirmar na doc oficial (ela mesma avisa
+para não assumir). PoC de coerência: `NFPM.factory() == factory` da config
+(`poc/probe-uniswap-chains.ts`). getLogs no mainnet limita faixa de blocos —
+sonda usa faixas decrescentes.
 
-## Receita B — novo PROTOCOLO: Uniswap V3 na Base (~2–3 sessões)
+## Receita C — APR & idade dos pools (PoC FEITO em 14/07/2026)
 
-Valida o multi-protocolo de verdade (protocolo sem Sugar). ~80% da matemática
-já existe (`core/math/liquidity.ts`, testada com contraprova na Fase 5).
+**Objetivo:** em cada card: APR atual (taxas + emissões separadas), média de
+30 dias e idade do pool. **Fora do escopo (honesto):** média exata "desde a
+gênese" para Aerodrome/Velodrome e PnL pessoal (→ Receita F).
 
-1. **Endereços na Base** (CONFIRMAR em docs.uniswap.org/contracts antes de
-   usar — mesmo padrão "candidato + confirmação" da Fase 0): factory
-   `0x33128a8fC17869897dcE68Ed026d694621f6FDfD`, NFPM
-   `0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1`.
-2. **Enumeração** (barata, sem varrer pools!): `NFPM.balanceOf(owner)` →
-   `tokenOfOwnerByIndex` → `positions(tokenId)` em multicall paginado.
-3. **Amounts**: `amountsForLiquidity()` nossa + `slot0` do pool
-   (`factory.getPool(token0, token1, fee)`). Aqui NOSSA matemática é o
-   caminho primário — e ela já está pronta e testada.
-4. **Fees pendentes**: truque padrão — simular `collect(tokenId, max, max)`
-   com `eth_call` em nome do dono (viem `simulateContract` com
-   `account: owner`); devolve os fees sem transação nenhuma (continua 100%
-   leitura). Plano B se algum RPC recusar: matemática de `feeGrowthInside`
-   (mais difícil — só se necessário).
-5. **Staking**: Uniswap V3 não tem gauges (staking é raro/externo) →
-   `staked: false` sempre; `emissions` vazio. Range/NFT idênticos ao que a
-   UI já exibe.
-6. **Contraprova**: nossa matemática é o primário, então a contraprova vira
-   a comparação com app.uniswap.org (2+ carteiras, manual) + invariantes da
-   bateria.
-7. Registry, fixture, testes, badge na UI, deploy, validate-live.
+### O que o PoC provou (poc/probe-yields.ts e probe-yields2.ts)
 
-**Modelo recomendado**: passos 3–4 e a validação com **Fable 5** (mesma
-lógica das fases 2/5 — matemática financeira sutil); o resto Opus 4.8 executa
-bem com este playbook.
+- **Fonte:** `yields.llama.fi/pools` (grátis, sem chave; ~15.400 pools;
+  payload >10 MB → baixar no servidor, no máx. 1×/hora, e indexar).
+- **Cobertura verificada:** `uniswap-v3` 769 pools nas nossas redes ✓;
+  `aerodrome-slipstream` 267 + `aerodrome-v1` 149 ✓; **Velodrome na
+  Optimism: ZERO** (velodrome-v2/v3 existem no dataset mas sem pools OP) —
+  lacuna real.
+- **Campos úteis:** `apy`, `apyBase` (taxas), `apyReward` (emissões),
+  `apyMean30d` (média 30d REAL), `count` (dias de dados), `tvlUsd`,
+  `poolMeta` (ex.: "CL100 - 0.0217%"), `underlyingTokens`, `rewardTokens`.
+  `apyBaseInception` (desde a criação) na prática só vem para Uniswap;
+  na Aerodrome veio **null**.
+- **O risco central — casamento ambíguo:** o dataset NÃO traz o endereço do
+  pool (só ID interno). Casa-se por `chain + project + par de tokens +
+  poolMeta/tick spacing`. Medido: WETH/USDC na Base = **9 candidatos**;
+  USDC/cbBTC = 8; pools de TVL ínfimo exibem APRs absurdos (ex.: 28.350%).
+  Casar errado = mostrar número ridículo → viola o princípio nº 2.
 
-## Ordem recomendada rumo às 10 redes
+### Política adotada (aprovação implícita do princípio "honesto ou —")
 
-| # | Expansão | Receita | Custo | O que valida |
-|---|---|---|---|---|
-| 1 | **Velodrome · Optimism** | A | ~1 sessão | multi-REDE + registry/costuras |
-| 2 | **Uniswap V3 · Base** | B | 2–3 sessões | multi-PROTOCOLO (maior TVL do mundo) |
-| 3 | Uniswap V3 · Ethereum, Arbitrum, Optimism, Polygon | B parametrizada | ~1 sessão/rede | mesmas addresses em quase todas |
-| 4 | Demais redes Sugar (Mode, Lisk, …) | A | ~½ sessão/rede | cauda longa conforme demanda |
-| 5 | Protocolos líderes por rede (PancakeSwap/BNB…) | B adaptada | caso a caso | conforme tração/pedidos |
+- Desambiguar por: rede + protocolo (slug map: aerodrome-slipstream/v1,
+  uniswap-v3) + conjunto de tokens + tick spacing extraído do `poolMeta`;
+  entre os que sobrarem, o de **maior TVL**.
+- Mostrar "—" quando: sem candidato · empate não resolvido · `tvlUsd` abaixo
+  de um piso (ex.: US$ 10 mil) · APR acima de um teto de sanidade (ex.:
+  1.000% a.a. vira "—" com aviso) · **Velodrome (toda)** enquanto a lacuna
+  existir.
+- Rotular a fonte no card: "APR · DefiLlama" (dado de terceiro, transparência).
+- **Follow-up opcional (+1 sessão):** APR de emissões da Aerodrome/Velodrome
+  calculado por NÓS via Sugar (`emissions` × preço ÷ TVL em stake) — fecha a
+  lacuna da Velodrome e dá contraprova do `apyReward` da DefiLlama.
 
-Depois de 1+2: **2 redes, 3 protocolos** — e as duas receitas provadas cobrem
-o caminho inteiro até o objetivo das 10 redes.
+### Idade do pool (independente da DefiLlama)
 
-## Definition of done (qualquer expansão)
+- Aerodrome/Velodrome: campo `created_at` do struct Lp do Sugar — exige a
+  ABI EXATA do contrato publicado (pendência conhecida desde a Fase 1;
+  baixar do BaseScan/OP Etherscan, contrato verificado).
+- Uniswap: evento `PoolCreated` da factory (1 getLogs por pool, cachear).
 
-- [ ] Fixture congelado de carteira real + testes de mapeamento passando
-- [ ] Bateria `validate-batch` verde (invariantes + contraprova aplicável)
-- [ ] Conferência visual contra o site oficial do protocolo (2+ carteiras)
-- [ ] Varredura < 10 s no servidor (medir em produção, não em dev)
-- [ ] Badge de rede/protocolo + link de explorer corretos na UI
-- [ ] `validate-live` verde após o deploy
-- [ ] PLANO_DE_TRABALHO.md e este playbook atualizados com o que se aprendeu
+### Passos de execução (1–2 sessões)
 
-## Riscos que crescem com a escala (monitorar, não resolver já)
+1. `core/yields/defillama.ts`: download + índice em memória com TTL de 1 h
+   (chave: `chainId|project|token0|token1|spacing`), matching puro e testável.
+2. Fixture congelado com os 9 candidatos reais de WETH/USDC → testes da
+   desambiguação (maior TVL, piso, teto, empate → "—").
+3. DTO: `apr { current, base, reward, mean30d, source } | null` e
+   `poolCreatedAt | null` por posição; totais NÃO mudam.
+4. UI: linha discreta no card (APR à direita do símbolo; idade no rodapé do
+   card); tooltip com base/reward/média.
+5. `validate-batch`: checagens de sanidade (APR ≤ teto, casamento estável).
+6. Aprovação do Alan (muda conteúdo público) → deploy → validate-live.
 
-- **Cota de RPC** multiplicada por rede → cache por escopo e, se preciso,
-  chave paga por chain (`RPC_URLS_<CHAIN>` já previsto).
-- **Tempo total** = soma das redes → varrer redes em paralelo no service
-  (o `mapLimit` já existe) e considerar resposta parcial progressiva.
-- **Tokens sem preço** em redes menores → já tratado ("—", nunca estimar).
-- **Versões de contrato divergindo por chain** → o passo "PoC primeiro" de
-  cada receita existe exatamente para isso.
+## Receita D — Uniswap v4 (avaliação honesta)
+
+**Quando fazer:** após a Receita C. Gatilho objetivo: usuários com posições
+v4 aparecendo (pedidos/warnings) ou TVL da v4 relevante frente à v3 nas
+nossas redes. O benefício cresce com a migração; o custo não diminui
+esperando — mas o C beneficia todo mundo JÁ.
+
+**O que reusa (barato):** TickMath/Q96 (`core/math/` prontos e testados),
+enumeração por NFT (padrão similar), registry/UI/DTO (zero mudança),
+Receita B como molde de processo.
+
+**O que é genuinamente novo/difícil (por ordem de risco):**
+1. **Leitura de estado**: v4 é um singleton (`PoolManager`) — posições vivem
+   no `PositionManager` (ERC-721) e o estado do pool é lido via contrato
+   `StateView` (padrão novo de leitura; PoC dedicado).
+2. **Taxas pendentes**: NÃO existe `collect()` simulável como na v3. Caminho:
+   matemática de `feeGrowthInside` (determinística, nosso estilo, mas mais
+   código + testes com vetores reais).
+3. **Hooks**: cada pool pode ter lógica própria de taxa. Política honesta:
+   pool com hook não-padrão → fees "—" (e badge "hooked pool"), amounts
+   sempre corretos (não dependem do hook).
+
+**Fases:** PoC de leitura (1 sessão) → motor amounts+fees (1–2) → validação/
+UI/deploy (1). Endereços por rede: confirmar SEMPRE na doc oficial
+(developers.uniswap.org), como na Receita B.
+
+## Receita E — alertas de fora-da-faixa (esboço)
+
+Âncora do futuro "Pro" (ebook, cap. 7). Exige: guardar inscrições (carteira +
+canal), verificador agendado (cron da Vercel), canal de entrega (e-mail via
+Resend ou Telegram bot). Decisões de produto antes de codar: canal, limites
+do grátis, privacidade (armazenar endereço = primeira base de dados nossa).
+
+## Receita F — PnL pessoal + perda impermanente (esboço)
+
+O grande diferencial do revert.finance. Exige INDEXADOR (histórico de
+eventos por posição: depósitos, retiradas, coletas, preços na época).
+Caminhos: subgraph próprio · Envio/Ponder self-hosted · APIs históricas
+pagas. É o maior projeto pós-core (≥ 2 semanas de sessões) — só iniciar com
+tração comprovada e, idealmente, monetização cobrindo custos de infra.
+
+## Definition of done (qualquer melhoria)
+
+- [ ] PoC em `poc/` provou a premissa antes do código de produção
+- [ ] Fixture + testes das decisões sutis (desambiguação, sanidade, bordas)
+- [ ] Bateria `validate-batch` verde; typecheck + testes + build verdes
+- [ ] Conteúdo público aprovado pelo Alan antes do push
+- [ ] `validate-live` verde pós-deploy
+- [ ] PLANO_DE_TRABALHO.md e este playbook atualizados com o aprendido
