@@ -253,6 +253,29 @@ feedback de usuários do site no ar (https://trackdefi.vercel.app).
 
 ## Expansões executadas
 
+- [x] **Receita C — APR & idade dos pools (parte APR)** (17/07/2026, Fable 5).
+      APR do POOL (via DefiLlama yields.llama.fi) em cada card: atual, taxas,
+      emissões, média 30d, com rótulo "DefiLlama". `core/yields/defillama.ts`
+      = índice em memória (cache 1 h) + casamento por rede+protocolo+par de
+      tokens+tick spacing/fee, política "número honesto ou —" (piso TVL US$ 10
+      mil, teto 1.000% a.a., regra de dominância 10x). DTO ganhou `apr` por
+      posição; download em paralelo com a varredura (falha → "—").
+      **BUG CORRIGIDO nesta sessão:** no dataset a Optimism se chama "OP
+      Mainnet", não "Optimism" — era isso que fazia a Velodrome parecer "sem
+      cobertura" no PoC de 14/07. Novo campo `chains.yieldsLabel`. Cobertura
+      REAL (medida 17/07): Aerodrome/Base ✓ (415 pools), Velodrome/OP ✓ (110),
+      Uniswap v3 Ethereum ✓ (558) + Arbitrum ✓ (206). LACUNA REAL: a DefiLlama
+      NÃO indexa Uniswap v3 na Base nem na OP → esses mostram "—" honesto
+      (follow-up: calcular por nós via feeGrowth+gauge, ~1 sessão).
+      Verificação: 83 testes (fixture real congelado + linhas Velodrome/OP),
+      typecheck+build verdes, validate-batch verde nas 3 carteiras, render
+      confirmado na UI (fixture). AINDA FORA: idade do pool (created_at) —
+      próxima parte da Receita C.
+      AMBIENTE: nesta sessão descoberto que `npm install` não roda dentro do
+      Google Drive (TAR_ENTRY_ERROR) → trabalho migrou p/ pasta local
+      `C:\Users\Pc\Documents\Claude aplicacoes\trackdefi`, com G: virando
+      backup espelhado. Ver CLAUDE.md/COMO_RETOMAR.md.
+
 - [x] **Playbook v2 — reestruturação por custo-benefício** (14/07/2026,
       Fable 5, a pedido do Alan). Core declarado COMPLETO; tudo agora é
       melhoria. PLAYBOOK_EXPANSAO.md reescrito com tabela de priorização

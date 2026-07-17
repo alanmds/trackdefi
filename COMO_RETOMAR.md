@@ -6,6 +6,37 @@ quando você clonar o projeto no computador novo.
 
 ---
 
+## ⚠️ REGRA DE OURO: trabalhar no LOCAL, fazer BACKUP no Drive
+
+Aprendido em 17/07/2026: **não se roda projeto Node dentro do Google Drive**.
+O `npm install` do zero falha lá (erros `TAR_ENTRY_ERROR` na extração de
+milhares de arquivos) e o Drive nem aceita atalhos (junction/symlink). O mesmo
+vale para OneDrive/Dropbox.
+
+**Como fica a organização:**
+
+- **`C:\Users\Pc\Documents\Claude aplicacoes\trackdefi`** — a **pasta local de
+  trabalho**. É aqui que o Claude Code abre a sessão, que os comandos rodam e
+  que se faz commit.
+- **`G:\Meu Drive\Claude aplicacoes\trackdefi`** — **backup no Google Drive**.
+  Depois de cada modificação, a pasta local é espelhada aqui (`robocopy`).
+  Guarda também `ebook/`, `backups/` e `gemini/` (que não vão ao GitHub de
+  propósito). Nunca rodar `npm` aqui.
+- GitHub (https://github.com/alanmds/trackdefi) — a **ponte entre
+  computadores**. `git push` (com sua aprovação) leva; `git pull` traz.
+
+**Para montar em OUTRO computador (trabalho remoto):**
+
+```
+git clone https://github.com/alanmds/trackdefi.git
+cd trackdefi
+npm install
+npm test
+```
+
+(Qualquer pasta LOCAL serve — só não use pasta de nuvem sincronizada como
+pasta de trabalho.)
+
 ## A) Por que aparece "MeusGastos_v2" no topo (a confusão)
 
 A sessão atual do Claude Code foi aberta na pasta **MeusGastos_v2** (outro
@@ -19,7 +50,8 @@ carrega sozinho e os comandos rodam no lugar certo.
 
 1. Clique em **"Nova sessão"** (canto superior esquerdo).
 2. O app pede/permite escolher a **pasta de trabalho** — aponte para:
-   `C:\Users\Pc\Documents\Claude aplicacoes\trackdefi`
+   `C:\Users\Pc\Documents\Claude aplicacoes\trackdefi` (a pasta local; ver
+   REGRA DE OURO acima)
 3. Pronto: o topo passa a mostrar **trackdefi**. Diga "leia o CLAUDE.md e o
    plano e vamos continuar" — o Claude se situa em segundos.
 
@@ -37,6 +69,8 @@ O código está seguro no GitHub. No computador novo:
    cd trackdefi
    npm install
    ```
+   (Sempre em pasta LOCAL, nunca dentro de Google Drive/OneDrive — ver a
+   REGRA DE OURO no topo.)
 3. Abra a pasta `trackdefi` no Claude Code (passo B) e continue.
 
 **Não viaja pelo GitHub (só neste computador):** a pasta `ebook/` e os

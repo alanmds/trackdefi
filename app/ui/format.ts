@@ -37,6 +37,12 @@ export function shortAddress(addr: string): string {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
 
+/** percentual de APR: null → "—"; 2 casas até 10%, 1 casa acima */
+export function fmtPct(n: number | null | undefined): string {
+  if (n === null || n === undefined || !Number.isFinite(n)) return "—";
+  return `${n.toLocaleString("en-US", { maximumFractionDigits: Math.abs(n) < 10 ? 2 : 1 })}%`;
+}
+
 const PROTOCOL_LABELS: Record<string, string> = {
   aerodrome: "Aerodrome",
   velodrome: "Velodrome",

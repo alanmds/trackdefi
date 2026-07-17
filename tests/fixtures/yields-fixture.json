@@ -1,0 +1,432 @@
+{
+  "capturedAt": "2026-07-15T20:06:06.129Z",
+  "note": "subconjunto real de yields.llama.fi/pools para testes de casamento",
+  "aeroWethUsdc": [
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "WETH-USDC",
+      "tvlUsd": 8815019,
+      "apy": 139.27767,
+      "apyBase": 7.70902,
+      "apyReward": 131.56865,
+      "apyMean30d": 66.29009,
+      "count": 361,
+      "poolMeta": "CL100 - 0.0217%",
+      "underlyingTokens": [
+        "0x4200000000000000000000000000000000000006",
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      ],
+      "pool": "10137e20-efbc-4e15-a733-17ecb52c48e8"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-v1",
+      "symbol": "WETH-USDC",
+      "tvlUsd": 7689902,
+      "apy": 10.59059,
+      "apyBase": 0.73251,
+      "apyReward": 9.85808,
+      "apyMean30d": 13.39276,
+      "count": 354,
+      "poolMeta": null,
+      "underlyingTokens": [
+        "0x4200000000000000000000000000000000000006",
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      ],
+      "pool": "e8cb4dbb-9e66-4cfa-9c77-407118b128a0"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "WETH-USDC",
+      "tvlUsd": 3080377,
+      "apy": 710.5538,
+      "apyBase": null,
+      "apyReward": 710.5538,
+      "apyMean30d": 239.59272,
+      "count": 83,
+      "poolMeta": "CL50 - 0.0728%",
+      "underlyingTokens": [
+        "0x4200000000000000000000000000000000000006",
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      ],
+      "pool": "1328ac9d-9939-4719-a85a-114935209e08"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "WETH-USDC",
+      "tvlUsd": 294850,
+      "apy": 0,
+      "apyBase": null,
+      "apyReward": 0,
+      "apyMean30d": 0,
+      "count": 159,
+      "poolMeta": "CL50 - 0.0175%",
+      "underlyingTokens": [
+        "0x4200000000000000000000000000000000000006",
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      ],
+      "pool": "7b79a74a-12a8-4b4a-925b-0583d3c3a658"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "WETH-USDC",
+      "tvlUsd": 175403,
+      "apy": 0,
+      "apyBase": null,
+      "apyReward": 0,
+      "apyMean30d": 0,
+      "count": 85,
+      "poolMeta": "CL500 - 2%",
+      "underlyingTokens": [
+        "0x4200000000000000000000000000000000000006",
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      ],
+      "pool": "24f5fb00-be58-4ea3-96eb-6df15e4b0d9d"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "WETH-USDC",
+      "tvlUsd": 165888,
+      "apy": 1.66824,
+      "apyBase": 1.66824,
+      "apyReward": 0,
+      "apyMean30d": 6.06777,
+      "count": 318,
+      "poolMeta": "CL1 - 0.008%",
+      "underlyingTokens": [
+        "0x4200000000000000000000000000000000000006",
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      ],
+      "pool": "dfbc5d80-9b09-4810-b55b-a52dea7af4aa"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "WETH-USDC",
+      "tvlUsd": 114456,
+      "apy": 9697.88683,
+      "apyBase": null,
+      "apyReward": 9697.88683,
+      "apyMean30d": 14503.40191,
+      "count": 90,
+      "poolMeta": "CL1 - 0.008%",
+      "underlyingTokens": [
+        "0x4200000000000000000000000000000000000006",
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      ],
+      "pool": "80739318-c205-4177-9207-3c4322925ac6"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-v1",
+      "symbol": "WETH-USDC",
+      "tvlUsd": 24623,
+      "apy": 4.50005,
+      "apyBase": 2.2664,
+      "apyReward": 2.23365,
+      "apyMean30d": 4.42733,
+      "count": 354,
+      "poolMeta": null,
+      "underlyingTokens": [
+        "0x4200000000000000000000000000000000000006",
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      ],
+      "pool": "290c5357-973a-45a0-bee2-e715374f9441"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "WETH-USDC",
+      "tvlUsd": 10891,
+      "apy": 68.37541,
+      "apyBase": 54.81707,
+      "apyReward": 13.55833,
+      "apyMean30d": 74.83355,
+      "count": 342,
+      "poolMeta": "CL2000 - 0.0472%",
+      "underlyingTokens": [
+        "0x4200000000000000000000000000000000000006",
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      ],
+      "pool": "a3a55e11-b864-4ff2-9fc3-68d1b7e7fc46"
+    }
+  ],
+  "aeroUsdcCbbtc": [
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "USDC-CBBTC",
+      "tvlUsd": 8922160,
+      "apy": 83.24764,
+      "apyBase": 52.84026,
+      "apyReward": 30.40738,
+      "apyMean30d": 96.55447,
+      "count": 361,
+      "poolMeta": "CL100 - 0.003%",
+      "underlyingTokens": [
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+      ],
+      "pool": "ff82c362-dea1-4946-b3b1-92ebd5100b1e"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "USDC-CBBTC",
+      "tvlUsd": 5238812,
+      "apy": 286.90934,
+      "apyBase": 270.79911,
+      "apyReward": 16.11023,
+      "apyMean30d": 319.93746,
+      "count": 361,
+      "poolMeta": "CL2000 - 0.0332%",
+      "underlyingTokens": [
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+      ],
+      "pool": "bf599ba2-97ae-48bb-9fd0-4f647ad7a832"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "USDC-CBBTC",
+      "tvlUsd": 3984194,
+      "apy": 272.12426,
+      "apyBase": null,
+      "apyReward": 272.12426,
+      "apyMean30d": 262.16275,
+      "count": 83,
+      "poolMeta": "CL50 - 0.013%",
+      "underlyingTokens": [
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+      ],
+      "pool": "6f1786fc-a22f-4c46-91cd-d3792479bdc2"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "USDC-CBBTC",
+      "tvlUsd": 874575,
+      "apy": 22.6361,
+      "apyBase": null,
+      "apyReward": 22.6361,
+      "apyMean30d": 25.80194,
+      "count": 194,
+      "poolMeta": "CL500 - 0.1512%",
+      "underlyingTokens": [
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+      ],
+      "pool": "a733ab8d-f4c2-4b67-b001-dc4f9c35926d"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "USDC-CBBTC",
+      "tvlUsd": 720710,
+      "apy": 5081.53887,
+      "apyBase": null,
+      "apyReward": 5081.53887,
+      "apyMean30d": 11299.33154,
+      "count": 90,
+      "poolMeta": "CL1 - 0.0163%",
+      "underlyingTokens": [
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+      ],
+      "pool": "c0675357-219a-42b5-b6cc-079cef869cf5"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-v1",
+      "symbol": "USDC-CBBTC",
+      "tvlUsd": 252144,
+      "apy": 16.75273,
+      "apyBase": null,
+      "apyReward": 16.75273,
+      "apyMean30d": 6.27982,
+      "count": 293,
+      "poolMeta": null,
+      "underlyingTokens": [
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+      ],
+      "pool": "c8d3b4b7-1bad-4b91-bd9e-179b4155e6fb"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "USDC-CBBTC",
+      "tvlUsd": 45039,
+      "apy": 7313.00147,
+      "apyBase": null,
+      "apyReward": 7313.00147,
+      "apyMean30d": 28350.35472,
+      "count": 221,
+      "poolMeta": "CL1 - 0.01%",
+      "underlyingTokens": [
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+      ],
+      "pool": "79870f46-4aa1-4dd3-a989-f429317c4de8"
+    },
+    {
+      "chain": "Base",
+      "project": "aerodrome-slipstream",
+      "symbol": "USDC-CBBTC",
+      "tvlUsd": 14999,
+      "apy": 1.86618,
+      "apyBase": 1.86618,
+      "apyReward": 0,
+      "apyMean30d": 2.10956,
+      "count": 177,
+      "poolMeta": "CL1 - 0.0118%",
+      "underlyingTokens": [
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+      ],
+      "pool": "3e9f5b64-1ada-4e73-ae20-3ce2a61cbf58"
+    }
+  ],
+  "uniEthWethUsdc": [
+    {
+      "chain": "Ethereum",
+      "project": "uniswap-v3",
+      "symbol": "USDC-WETH",
+      "tvlUsd": 95082441,
+      "apy": 26.94477,
+      "apyBase": 26.94477,
+      "apyReward": null,
+      "apyMean30d": 13.51003,
+      "count": 1541,
+      "poolMeta": "0.05%",
+      "underlyingTokens": [
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+      ],
+      "pool": "665dc8bc-c79d-4800-97f7-304bf368e547"
+    },
+    {
+      "chain": "Ethereum",
+      "project": "uniswap-v3",
+      "symbol": "USDC-WETH",
+      "tvlUsd": 20766196,
+      "apy": 13.40053,
+      "apyBase": 13.40053,
+      "apyReward": null,
+      "apyMean30d": 20.44142,
+      "count": 1541,
+      "poolMeta": "0.3%",
+      "underlyingTokens": [
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+      ],
+      "pool": "49717ee2-9808-4288-b76d-e658195b7979"
+    },
+    {
+      "chain": "Ethereum",
+      "project": "uniswap-v3",
+      "symbol": "USDC-WETH",
+      "tvlUsd": 4405357,
+      "apy": 45.35889,
+      "apyBase": 45.35889,
+      "apyReward": null,
+      "apyMean30d": 29.88719,
+      "count": 1336,
+      "poolMeta": "0.01%",
+      "underlyingTokens": [
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+      ],
+      "pool": "8b3ed515-5e6f-449a-9b64-25113cda7a29"
+    },
+    {
+      "chain": "Ethereum",
+      "project": "uniswap-v3",
+      "symbol": "USDC-WETH",
+      "tvlUsd": 710103,
+      "apy": 5.196,
+      "apyBase": 5.196,
+      "apyReward": null,
+      "apyMean30d": 6.39401,
+      "count": 1541,
+      "poolMeta": "1%",
+      "underlyingTokens": [
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+      ],
+      "pool": "61d9b656-e4e8-4b6b-8659-06131995b499"
+    }
+  ],
+  "veloOptimismCount": 110,
+  "uniswapPoolsPerChain": {
+    "Ethereum": 562,
+    "Arbitrum": 207,
+    "Polygon": 195,
+    "BSC": 201,
+    "Avalanche": 42,
+    "Monad": 5,
+    "Celo": 45,
+    "Bob": 4
+  },
+  "veloOpWethUsdc": [
+    {
+      "chain": "OP Mainnet",
+      "project": "velodrome-v3",
+      "symbol": "USDC-WETH",
+      "tvlUsd": 2474514,
+      "apy": 71.84703,
+      "apyBase": null,
+      "apyReward": 71.84703,
+      "apyMean30d": 62.97389,
+      "count": 238,
+      "poolMeta": "CL100 - 0.038%",
+      "underlyingTokens": [
+        "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+        "0x4200000000000000000000000000000000000006"
+      ],
+      "pool": "9f744f5f-f6d6-4f37-afc7-166c06a94080"
+    },
+    {
+      "chain": "OP Mainnet",
+      "project": "velodrome-v3",
+      "symbol": "USDC-WETH",
+      "tvlUsd": 238067,
+      "apy": 239.7501,
+      "apyBase": null,
+      "apyReward": 239.7501,
+      "apyMean30d": 453.74201,
+      "count": 79,
+      "poolMeta": "CL50 - 0.05%",
+      "underlyingTokens": [
+        "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+        "0x4200000000000000000000000000000000000006"
+      ],
+      "pool": "97d1d418-3f4e-4eec-9408-0185d4324ba3"
+    },
+    {
+      "chain": "OP Mainnet",
+      "project": "velodrome-v2",
+      "symbol": "WETH-USDC",
+      "tvlUsd": 33180,
+      "apy": 8.53781,
+      "apyBase": null,
+      "apyReward": 8.53781,
+      "apyMean30d": 9.67392,
+      "count": 1091,
+      "poolMeta": "volatile - 0.3%",
+      "underlyingTokens": [
+        "0x4200000000000000000000000000000000000006",
+        "0x7F5c764cBc14f9669B88837ca1490cCa17c31607"
+      ],
+      "pool": "b20115b4-1f3b-47d7-a395-e17db00e4a60"
+    }
+  ],
+  "veloOpCapturedAt": "2026-07-17T18:14:54.160Z"
+}

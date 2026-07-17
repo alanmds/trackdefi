@@ -1,10 +1,12 @@
-/**
+﻿/**
  * PoC da etapa A (APR & idade): a API de rendimentos da DefiLlama cobre nossos
  * pools? Qual e a CHAVE para casar o dado dela com o endereco do nosso pool?
  *
  *   npx tsx poc/probe-yields.ts
  */
 
+
+export {}; // arquivo-script: evita colisao de escopo global no tsc
 // pools reais conhecidos (carteira 0x05963CdC + demo), para testar o casamento
 const KNOWN: Record<string, string> = {
   "0x9D14ff91AE2c6e3D1A760542248B6c7F206894b0": "CL1-USDC/cbBTC (Aerodrome/Base)",

@@ -73,6 +73,11 @@ async function main() {
         `   Faixa: ${price(p.range.lower)} – ${price(p.range.upper)} ${p.range.quoteLabel} → ${p.range.inRange ? "✅ NA FAIXA" : "⚠️ FORA DA FAIXA"}`,
       );
     }
+    if (p.apr) {
+      console.log(
+        `   APR do pool: ${p.apr.current.toFixed(2)}% a.a. (taxas ${p.apr.base?.toFixed(2) ?? "—"}% + emissões ${p.apr.reward?.toFixed(2) ?? "—"}%) · média 30d ${p.apr.mean30d?.toFixed(2) ?? "—"}% · ${p.apr.source}`,
+      );
+    }
     if (p.rewards.length > 0) {
       const parts = p.rewards.map(
         (r) => `${amt(r.amount)} ${r.symbol}${r.kind === "emission" ? " (emissões)" : ""}`,

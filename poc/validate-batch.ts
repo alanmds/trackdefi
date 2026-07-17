@@ -72,6 +72,11 @@ export function dtoInvariants(dto: PositionsResponseDTO): Check[] {
       const inside = p.range.current >= p.range.lower && p.range.current < p.range.upper;
       if (inside !== p.range.inRange) issues.push(`${p.poolSymbol}: inRange inconsistente com preços exibidos`);
     }
+    if (p.apr) {
+      // Receita C: APR exibido tem que passar nos guardas de sanidade
+      if (!(p.apr.current >= 0 && p.apr.current <= 1000)) issues.push(`${p.poolSymbol}: APR fora do teto (${p.apr.current}%)`);
+      if (p.apr.mean30d !== null && !Number.isFinite(p.apr.mean30d)) issues.push(`${p.poolSymbol}: média 30d não-finita`);
+    }
   }
 
   const truncated = dto.totalPositions > dto.positions.length;

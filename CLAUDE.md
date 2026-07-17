@@ -8,6 +8,21 @@ https://trackdefi.vercel.app · repo: https://github.com/alanmds/trackdefi
 Idioma de trabalho: **português**. Site: **inglês**. Dono: Alan (Rio de
 Janeiro, não-programador). Windows.
 
+## Ambiente (regra desde 17/07/2026)
+- **Pasta de trabalho LOCAL: `C:\Users\Pc\Documents\Claude aplicacoes\trackdefi`**
+  — é aqui que se edita, roda testes/build e faz commits.
+- **Backup: `G:\Meu Drive\Claude aplicacoes\trackdefi`** (Google Drive). Após
+  CADA modificação, espelhar a pasta local no backup (`robocopy`). O backup
+  guarda também `ebook/`, `backups/`, `gemini/` (que ficam fora do GitHub).
+- ARMADILHA: **não rodar `npm` dentro do Google Drive** — o `npm install` do
+  zero falha lá (erros `TAR_ENTRY_ERROR` na extração paralela) e o Drive não
+  aceita junction/symlink. Por isso trabalha-se no disco local e o Drive é só
+  backup.
+- Caminho tem espaços ("Claude aplicacoes") → no Windows, alguns comandos
+  precisam de aspas ou do caminho curto 8.3 (o `.claude/launch.json` já usa).
+- Trabalho remoto / outro PC: `git clone` para uma pasta LOCAL + `npm
+  install`. Ver COMO_RETOMAR.md.
+
 ## Leia primeiro (a memória real do projeto)
 - `PLANO_DE_TRABALHO.md` — histórico de todas as fases/expansões e decisões.
 - `PLAYBOOK_EXPANSAO.md` — receitas para adicionar rede/protocolo (Receita A =

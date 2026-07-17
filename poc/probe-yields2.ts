@@ -1,9 +1,11 @@
-/**
+﻿/**
  * PoC-A parte 2: (1) cobertura da Velodrome; (2) casar POR CONJUNTO DE TOKENS
  * (ja que o endereco do pool nao esta no dataset) e medir o problema de
  * desambiguacao (mesma dupla de tokens em varios fee tiers).
  */
 
+
+export {}; // arquivo-script: evita colisao de escopo global no tsc
 const USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913".toLowerCase();
 const WETH = "0x4200000000000000000000000000000000000006".toLowerCase();
 const CBBTC = "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf".toLowerCase();

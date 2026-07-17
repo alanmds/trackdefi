@@ -13,6 +13,7 @@ import type { LpPosition, PositionKind, ProtocolAdapter } from "./types";
 import { buildAdapters } from "./adapters/registry";
 import { chainInfo } from "./chains";
 import { fetchUsdPrices } from "./prices/defillama";
+import { getYieldsIndex, type YieldsIndex } from "./yields/defillama";
 import { orientRange } from "./math/ticks";
 
 export interface TokenAmountDTO {
@@ -46,6 +47,15 @@ export interface RangeDTO {
   quoteLabel: string;
 }
 
+/** APR do POOL (propriedade do pool, não ganho pessoal) — fonte externa */
+export interface AprDTO {
+  current: number;
+  base: number | null;
+  reward: number | null;
+  mean30d: number | null;
+  source: string;
+}
+
 export interface PositionDTO {
   protocol: string;
   chainId: number;
@@ -61,6 +71,8 @@ export interface PositionDTO {
   valueUsd: number | null;
   rewardsUsd: number | null;
   range: RangeDTO | null;
+  /** null = sem dado confiável (UI mostra "—"); nunca chutamos */
+  apr: AprDTO | null;
 }
 
 export interface PositionsResponseDTO {
@@ -112,6 +124,7 @@ export function buildResponse(params: {
   maxPositions?: number;
   protocols?: string[];
   chains?: string[];
+  yields?: YieldsIndex | null;
 }): PositionsResponseDTO {
   const {
     address,
@@ -122,6 +135,7 @@ export function buildResponse(params: {
     maxPositions = MAX_POSITIONS_IN_RESPONSE,
     protocols = ["aerodrome"],
     chains = ["base"],
+    yields = null,
   } = params;
 
   const positions: PositionDTO[] = normalized.map((p) => {
@@ -195,6 +209,21 @@ export function buildResponse(params: {
       valueUsd,
       rewardsUsd,
       range,
+      apr: yields
+        ? (() => {
+            const m = yields.match({
+              chainId: p.chainId,
+              protocol: p.protocol,
+              kind: p.kind,
+              poolSymbol: p.poolSymbol,
+              token0: p.token0.address,
+              token1: p.token1.address,
+            });
+            return m
+              ? { current: m.current, base: m.base, reward: m.reward, mean30d: m.mean30d, source: m.source }
+              : null;
+          })()
+        : null,
     };
   });
 
@@ -234,6 +263,8 @@ export async function getWalletPositions(
   const adapters = adaptersOverride ?? buildAdapters({ onWarn: (m) => warnings.push(m) });
 
   const t0 = Date.now();
+  // APR (DefiLlama) baixa em paralelo com a varredura on-chain; falha vira "—"
+  const yieldsPromise = getYieldsIndex((m) => warnings.push(m));
   const settled = await Promise.allSettled(adapters.map((a) => a.getPositions(address)));
   const scanMs = Date.now() - t0;
 
@@ -275,5 +306,6 @@ export async function getWalletPositions(
     warnings,
     protocols: [...new Set(adapters.map((a) => a.protocol))],
     chains: [...new Set(adapters.map((a) => chainInfo(a.chainId).priceSlug))],
+    yields: await yieldsPromise,
   });
 }

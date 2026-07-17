@@ -11,6 +11,11 @@ export interface ChainInfo {
   label: string;
   /** slug da DefiLlama (coins.llama.fi) */
   priceSlug: string;
+  /**
+   * nome da rede no dataset yields.llama.fi — NÃO é igual ao label
+   * (ex.: Optimism = "OP Mainnet" lá). Conferir no dataset ao adicionar rede.
+   */
+  yieldsLabel: string;
   explorerUrl: string;
   explorerLabel: string;
   /** env que injeta RPC(s) pagos, separados por vírgula */
@@ -23,6 +28,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     chain: base,
     label: "Base",
     priceSlug: "base",
+    yieldsLabel: "Base",
     explorerUrl: "https://basescan.org",
     explorerLabel: "BaseScan",
     rpcEnv: "BASE_RPC_URLS",
@@ -32,6 +38,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     chain: optimism,
     label: "Optimism",
     priceSlug: "optimism",
+    yieldsLabel: "OP Mainnet",
     explorerUrl: "https://optimistic.etherscan.io",
     explorerLabel: "OP Etherscan",
     rpcEnv: "OPTIMISM_RPC_URLS",
@@ -45,6 +52,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     chain: mainnet,
     label: "Ethereum",
     priceSlug: "ethereum",
+    yieldsLabel: "Ethereum",
     explorerUrl: "https://etherscan.io",
     explorerLabel: "Etherscan",
     rpcEnv: "ETHEREUM_RPC_URLS",
@@ -58,6 +66,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     chain: arbitrum,
     label: "Arbitrum",
     priceSlug: "arbitrum",
+    yieldsLabel: "Arbitrum",
     explorerUrl: "https://arbiscan.io",
     explorerLabel: "Arbiscan",
     rpcEnv: "ARBITRUM_RPC_URLS",

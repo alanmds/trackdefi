@@ -72,20 +72,28 @@ para não assumir). PoC de coerência: `NFPM.factory() == factory` da config
 (`poc/probe-uniswap-chains.ts`). getLogs no mainnet limita faixa de blocos —
 sonda usa faixas decrescentes.
 
-## Receita C — APR & idade dos pools (PoC FEITO em 14/07/2026)
+## Receita C — APR & idade dos pools (APR IMPLEMENTADO 17/07/2026)
 
 **Objetivo:** em cada card: APR atual (taxas + emissões separadas), média de
 30 dias e idade do pool. **Fora do escopo (honesto):** média exata "desde a
 gênese" para Aerodrome/Velodrome e PnL pessoal (→ Receita F).
 
+**STATUS:** parte APR ENTREGUE e no ar (`core/yields/defillama.ts`, DTO `apr`,
+UI). Idade do pool ainda pendente (ver seção abaixo).
+
 ### O que o PoC provou (poc/probe-yields.ts e probe-yields2.ts)
 
 - **Fonte:** `yields.llama.fi/pools` (grátis, sem chave; ~15.400 pools;
   payload >10 MB → baixar no servidor, no máx. 1×/hora, e indexar).
-- **Cobertura verificada:** `uniswap-v3` 769 pools nas nossas redes ✓;
-  `aerodrome-slipstream` 267 + `aerodrome-v1` 149 ✓; **Velodrome na
-  Optimism: ZERO** (velodrome-v2/v3 existem no dataset mas sem pools OP) —
-  lacuna real.
+- **Cobertura REAL (recontada 17/07/2026):** Aerodrome/Base ✓ (415 pools),
+  Velodrome/OP ✓ (110), Uniswap v3 Ethereum ✓ (558) + Arbitrum ✓ (206).
+  CORREÇÃO do achado de 14/07: a Velodrome NÃO era lacuna — no dataset a
+  Optimism se chama **"OP Mainnet"**, não "Optimism"; o casamento usava o
+  label errado. Agora `chains.yieldsLabel` resolve. **LACUNA REAL que
+  sobra:** a DefiLlama não indexa **Uniswap v3 na Base nem na OP** (só tem v2
+  e v4 lá) → esses pools mostram "—" honesto até fazermos o cálculo próprio
+  (feeGrowth + gauge; follow-up ~1 sessão). Base do Aerodrome (o DEX
+  dominante da rede) está coberta.
 - **Campos úteis:** `apy`, `apyBase` (taxas), `apyReward` (emissões),
   `apyMean30d` (média 30d REAL), `count` (dias de dados), `tvlUsd`,
   `poolMeta` (ex.: "CL100 - 0.0217%"), `underlyingTokens`, `rewardTokens`.
@@ -102,10 +110,9 @@ gênese" para Aerodrome/Velodrome e PnL pessoal (→ Receita F).
 - Desambiguar por: rede + protocolo (slug map: aerodrome-slipstream/v1,
   uniswap-v3) + conjunto de tokens + tick spacing extraído do `poolMeta`;
   entre os que sobrarem, o de **maior TVL**.
-- Mostrar "—" quando: sem candidato · empate não resolvido · `tvlUsd` abaixo
-  de um piso (ex.: US$ 10 mil) · APR acima de um teto de sanidade (ex.:
-  1.000% a.a. vira "—" com aviso) · **Velodrome (toda)** enquanto a lacuna
-  existir.
+- Mostrar "—" quando: sem candidato · empate não resolvido (dominância < 10x)
+  · `tvlUsd` abaixo de um piso (US$ 10 mil) · APR acima do teto de sanidade
+  (1.000% a.a.) · **Uniswap v3 na Base/OP** (lacuna real do dataset).
 - Rotular a fonte no card: "APR · DefiLlama" (dado de terceiro, transparência).
 - **Follow-up opcional (+1 sessão):** APR de emissões da Aerodrome/Velodrome
   calculado por NÓS via Sugar (`emissions` × preço ÷ TVL em stake) — fecha a
