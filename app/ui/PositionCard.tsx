@@ -42,18 +42,35 @@ export default function PositionCard({ p }: { p: PositionDTO }) {
         {p.positionId && <span className="badge">NFT #{p.positionId}</span>}
       </div>
 
-      {p.apr && (
+      {p.range && !p.range.inRange ? (
+        // fora do range o rendimento CORRENTE é zero: sem taxas novas e, em
+        // stake (Aerodrome/Velodrome), emissões pausadas — o APR do pool vira
+        // referência do que a liquidez NO range está pagando
         <div
-          className="apr-line"
-          title={`Pool APR — fees: ${fmtPct(p.apr.base)} · rewards: ${fmtPct(p.apr.reward)} · 30d average: ${fmtPct(p.apr.mean30d)}. Property of the pool, not your personal return. Source: ${p.apr.source}.`}
+          className="apr-line apr-zero"
+          title={`Out of range: this position is earning no swap fees right now${p.staked ? " and gauge emissions are paused" : ""}. Fees already accrued stay claimable.${p.apr ? ` In-range liquidity in this pool is averaging ${fmtPct(p.apr.current)}/yr (${p.apr.source}).` : ""}`}
         >
           <span className="apr-main">
-            Pool APR <b>{fmtPct(p.apr.current)}</b>
+            Earning now <b>0%</b>
           </span>
           <span className="apr-sub">
-            30d avg {fmtPct(p.apr.mean30d)} · {p.apr.source}
+            {p.apr ? `pool in-range avg ${fmtPct(p.apr.current)} · ${p.apr.source}` : "out of range"}
           </span>
         </div>
+      ) : (
+        p.apr && (
+          <div
+            className="apr-line"
+            title={`Pool APR — fees: ${fmtPct(p.apr.base)} · rewards: ${fmtPct(p.apr.reward)} · 30d average: ${fmtPct(p.apr.mean30d)}. Property of the pool, not your personal return. Source: ${p.apr.source}.`}
+          >
+            <span className="apr-main">
+              Pool APR <b>{fmtPct(p.apr.current)}</b>
+            </span>
+            <span className="apr-sub">
+              30d avg {fmtPct(p.apr.mean30d)} · {p.apr.source}
+            </span>
+          </div>
+        )
       )}
 
       <div className="token-rows">

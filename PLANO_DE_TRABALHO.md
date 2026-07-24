@@ -253,6 +253,33 @@ feedback de usuários do site no ar (https://trackdefi.vercel.app).
 
 ## Expansões executadas
 
+- [x] **APR da posição — Fase 0: "Earning now 0%" fora do range** (19/07/2026,
+      Fable 5, a pedido do Alan). Decisão de produto: o APR existe para apoiar
+      DECISÃO (rebalancear, lucratividade, metas) — e posição concentrada fora
+      do range rende 0% AGORA (sem taxas novas; em stake Aerodrome/Velodrome,
+      emissões também pausadas). O card passou a refletir isso: fora do range
+      → linha "Earning now 0%" (cor de alerta) com o APR do pool rebaixado a
+      referência ("pool in-range avg X% · DefiLlama"; sem dado → "out of
+      range"); dentro do range → "Pool APR" como antes. Só UI
+      (PositionCard.tsx + globals.css), DTO intacto (usa range.inRange).
+      Plano completo em 4 fases no PLAYBOOK (Receita C2); próximas: PoC do
+      APR pessoal de emissões (rewardRate do gauge) e do fee APR corrente
+      (volumeUsd1d × share da liquidez ativa).
+      ACHADOS 19/07: `volumeUsd1d`/`volumeUsd7d` EXISTEM no dataset grátis
+      da DefiLlama (viabiliza o fee APR); `/poolsOld` (traria endereço do
+      pool) virou PAGO; a DefiLlama AGORA indexa Uniswap v3 na Base (APR
+      visto ao vivo em WETH/USDC 0.3% e WETH/BRETT 1% na Base — a "lacuna
+      real" de 17/07 fechou sozinha; OP ainda a conferir); o dataset tem
+      linhas DUPLICADAS mortas do mesmo pool CL (CL200-WETH/VELO: gêmeo com
+      APY 0 anula a dominância → dedupe pendente, entra na Receita C2).
+      Verificação: typecheck + 83 testes + build verdes; validate-batch verde
+      (3 carteiras); confirmação ao vivo (localhost:3100) nas carteiras
+      0x8cad…45F8 (fora do range COM referência de pool; dentro do range
+      inalterado) e 0x0596…75aC (fora do range SEM dado → "out of range").
+      AMBIENTE: Node v24.18.0 LTS instalado via winget nesta máquina; pasta
+      local de trabalho agora é `D:\Documents\Claude aplicacoes\trackdefi`
+      (backup segue em G:).
+
 - [x] **Receita C — APR & idade dos pools (parte APR)** (17/07/2026, Fable 5).
       APR do POOL (via DefiLlama yields.llama.fi) em cada card: atual, taxas,
       emissões, média 30d, com rótulo "DefiLlama". `core/yields/defillama.ts`

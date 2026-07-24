@@ -138,6 +138,45 @@ UI). Idade do pool ainda pendente (ver seção abaixo).
 5. `validate-batch`: checagens de sanidade (APR ≤ teto, casamento estável).
 6. Aprovação do Alan (muda conteúdo público) → deploy → validate-live.
 
+## Receita C2 — APR da posição, "rendendo agora" (Fase 0 ENTREGUE 19/07/2026)
+
+**Motivação (Alan, 19/07/2026):** o APR do pool sozinho não apoia decisão de
+rebalanceamento/lucratividade. O número que importa é o da POSIÇÃO: fora do
+range, o rendimento corrente é **0%** (sem taxas novas; em stake
+Aerodrome/Velodrome as emissões também pausam) — e nem o revert.finance
+acerta isso. "Total APR desde a entrada" (PnL) continua sendo a Receita F.
+
+**Fases (~3 sessões no total):**
+
+- **Fase 0 — ENTREGUE (19/07/2026):** card honesto só com `range.inRange`:
+  fora do range → "Earning now 0%" (alerta) e o APR do pool rebaixado a
+  referência ("pool in-range avg X%"); sem dado → "out of range"; dentro do
+  range → "Pool APR" como antes. Só UI, DTO intacto.
+- **Fase 1 — PoC emissões pessoais:** `rewardRate` do gauge × share da
+  liquidez em stake × preço ÷ valor da posição = APR de emissões EXATO.
+  Contraprova: acúmulo real de `earned` em minutos. Confirmar on-chain que
+  gauge CL não paga liquidez fora do range.
+- **Fase 2 — PoC fee APR corrente (estimativa rotulada):**
+  `volumeUsd1d × fee tier × (L_pos ÷ liquidez ativa do pool) ÷ valor × 365`.
+  `volumeUsd1d`/`volumeUsd7d` CONFIRMADOS no dataset grátis (19/07/2026).
+  Liquidez ativa = `liquidity()` por pool (multicall). Guardas: piso de
+  volume, teto de sanidade, senão "—". Validar contra o revert.finance
+  (carteira 0x8cadb20A4811f363Dadb863A190708bEd26245F8).
+- **Fase 3 — produção:** motor puro `core/yields/positionApr.ts` + DTO
+  `earning { nowPct, feesPct, emissionsPct, method } | null` (o `apr` do pool
+  vira referência) + UI + fixtures/testes + bateria.
+
+**Achados de 19/07/2026 (afetam a Receita C também):**
+- A DefiLlama passou a indexar **Uniswap v3 na Base** (APR visto ao vivo em
+  pools Base/uniswap-v3) — a "lacuna real" de 17/07 fechou; OP a conferir.
+- `/poolsOld` (que traria o endereço do pool) agora exige plano PAGO — o
+  casamento por forma continua sendo o caminho.
+- O dataset tem linhas DUPLICADAS mortas do MESMO pool CL (par+spacing
+  identificam um único pool on-chain; caso real: CL200-WETH/VELO na OP com
+  gêmeo de APY 0 e TVL menor que anula a dominância). Dedupe pendente:
+  descartar duplicata com APY 0 quando existe irmã com APY > 0 — implementar
+  junto com a Fase 3 (patch pronto já foi validado em 19/07: 86 testes).
+
 ## Receita D — Uniswap v4 (avaliação honesta)
 
 **Quando fazer:** após a Receita C. Gatilho objetivo: usuários com posições

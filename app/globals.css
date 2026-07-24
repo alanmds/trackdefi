@@ -519,6 +519,11 @@ button {
   white-space: nowrap;
 }
 
+/* fora do range: o rendimento corrente é zero (destaque de alerta) */
+.apr-line.apr-zero .apr-main b {
+  color: var(--warn);
+}
+
 .token-rows {
   display: grid;
   gap: 6px;
