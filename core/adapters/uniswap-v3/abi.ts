@@ -20,6 +20,7 @@ export const uniFactoryAbi = parseAbi([
 
 export const uniPoolAbi = parseAbi([
   "function slot0() view returns (uint160 sqrtPriceX96, int24 tick, uint16 observationIndex, uint16 observationCardinality, uint16 observationCardinalityNext, uint8 feeProtocol, bool unlocked)",
+  "function liquidity() view returns (uint128)",
 ]);
 
 /** posição crua do NFPM (na ordem do retorno de positions()) */

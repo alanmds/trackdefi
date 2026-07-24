@@ -77,6 +77,14 @@ export function dtoInvariants(dto: PositionsResponseDTO): Check[] {
       if (!(p.apr.current >= 0 && p.apr.current <= 1000)) issues.push(`${p.poolSymbol}: APR fora do teto (${p.apr.current}%)`);
       if (p.apr.mean30d !== null && !Number.isFinite(p.apr.mean30d)) issues.push(`${p.poolSymbol}: média 30d não-finita`);
     }
+    if (p.earning) {
+      // Receita C2: "rendendo agora" também passa nos guardas
+      if (!(p.earning.nowPct >= 0 && p.earning.nowPct <= 1000)) issues.push(`${p.poolSymbol}: earning fora do teto (${p.earning.nowPct}%)`);
+      for (const c of [p.earning.feePct, p.earning.emissionPct]) {
+        if (c !== null && !Number.isFinite(c)) issues.push(`${p.poolSymbol}: componente de earning não-finito`);
+      }
+      if (p.range && !p.range.inRange && p.earning.nowPct !== 0) issues.push(`${p.poolSymbol}: fora do range mas earning ≠ 0`);
+    }
   }
 
   const truncated = dto.totalPositions > dto.positions.length;

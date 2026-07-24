@@ -11,6 +11,29 @@ function kindLabel(p: PositionDTO): string {
 export default function PositionCard({ p }: { p: PositionDTO }) {
   const chain = CHAINS[p.chainId];
   const explorerUrl = chain?.explorerUrl ?? "https://basescan.org";
+
+  // "rendendo agora" (Receita C2): número da POSIÇÃO; APR do pool vira referência
+  const e = p.earning;
+  const poolRef = p.apr ? ` · pool ${fmtPct(p.apr.current)}` : "";
+  let earningSub = "";
+  let earningTip = "";
+  if (e && e.nowPct === 0) {
+    earningSub = `out of range${poolRef}`;
+    earningTip =
+      `Out of range: this position is earning no swap fees right now` +
+      `${p.staked ? " and gauge emissions are paused" : ""}. Fees already accrued stay claimable.` +
+      (p.apr ? ` In-range liquidity in this pool averages ${fmtPct(p.apr.current)}/yr (${p.apr.source}).` : "");
+  } else if (e) {
+    const parts: string[] = [];
+    if (e.feePct !== null) parts.push(`fees ${fmtPct(e.feePct)}`);
+    if (e.emissionPct !== null) parts.push(`emissions ${fmtPct(e.emissionPct)}`);
+    earningSub = `${parts.join(" + ")}${poolRef}`;
+    earningTip =
+      `Estimated yield THIS position is earning right now (${parts.join(" + ") || fmtPct(e.nowPct)}).` +
+      (p.apr ? ` Pool average of all in-range liquidity: ${fmtPct(p.apr.current)}/yr (${p.apr.source}).` : "") +
+      ` Estimate from live pool data — not a realized return.`;
+  }
+
   return (
     <article className="pos-card">
       <div className="pos-head">
@@ -42,20 +65,13 @@ export default function PositionCard({ p }: { p: PositionDTO }) {
         {p.positionId && <span className="badge">NFT #{p.positionId}</span>}
       </div>
 
-      {p.range && !p.range.inRange ? (
-        // fora do range o rendimento CORRENTE é zero: sem taxas novas e, em
-        // stake (Aerodrome/Velodrome), emissões pausadas — o APR do pool vira
-        // referência do que a liquidez NO range está pagando
-        <div
-          className="apr-line apr-zero"
-          title={`Out of range: this position is earning no swap fees right now${p.staked ? " and gauge emissions are paused" : ""}. Fees already accrued stay claimable.${p.apr ? ` In-range liquidity in this pool is averaging ${fmtPct(p.apr.current)}/yr (${p.apr.source}).` : ""}`}
-        >
+      {e ? (
+        // "rendendo agora" da POSIÇÃO (taxas + emissões); 0 fora do range
+        <div className={`apr-line${e.nowPct === 0 ? " apr-zero" : ""}`} title={earningTip}>
           <span className="apr-main">
-            Earning now <b>0%</b>
+            Earning now <b>{fmtPct(e.nowPct)}</b>
           </span>
-          <span className="apr-sub">
-            {p.apr ? `pool in-range avg ${fmtPct(p.apr.current)} · ${p.apr.source}` : "out of range"}
-          </span>
+          <span className="apr-sub">{earningSub}</span>
         </div>
       ) : (
         p.apr && (

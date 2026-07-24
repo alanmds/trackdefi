@@ -15,7 +15,7 @@ import { erc20Abi, type Address } from "viem";
 import type { ChainReader, LpPosition, PositionKind, ProtocolAdapter, TokenInfo } from "../../types";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { mapLimit } from "../../util";
-import { factoryAbi, poolProbeAbi, sugarAbi, SUGAR_MAX_POSITIONS, type SugarPosition } from "./abi";
+import { factoryAbi, gaugeAbi, poolProbeAbi, sugarAbi, SUGAR_MAX_POSITIONS, type SugarPosition } from "./abi";
 import { AERODROME_BASE, CHAIN_ID, type SugarChainConfig } from "./config";
 
 const ZERO: Address = "0x0000000000000000000000000000000000000000";
@@ -43,6 +43,14 @@ export interface PoolMeta {
   symbol: string | null;
   token0: Address;
   token1: Address;
+  /** pool.liquidity(): liquidez ativa no tick (CL) — p/ APR de taxas */
+  activeLiquidity?: bigint | null;
+  /** pool.stakedLiquidity(): liquidez em stake ativa (CL) — p/ APR de emissões */
+  poolStakedLiquidity?: bigint | null;
+  /** gauge do pool (CL) */
+  gauge?: Address | null;
+  /** gauge.rewardRate(): token de emissão por segundo (preenchido em 2º passo) */
+  emissionRatePerSec?: bigint | null;
 }
 
 export interface AerodromeOptions {
@@ -220,6 +228,8 @@ export class AerodromeAdapter implements ProtocolAdapter {
   // ------------------------------------------------------------- metadados
 
   private async loadPools(lps: Address[]): Promise<Map<Address, PoolMeta>> {
+    // multicall de METADADOS (inalterada: quem falha aqui perde a posição, então
+    // NÃO a engrossamos com sondas de APR — essas vão numa 2ª chamada isolada)
     const PROBES = ["token0", "token1", "tickSpacing", "stable", "symbol", "slot0"] as const;
     const res = await this.reader.multicall({
       contracts: lps.flatMap((lp) =>
@@ -265,7 +275,46 @@ export class AerodromeAdapter implements ProtocolAdapter {
         });
       }
     });
+
+    await this.loadAprInputs(out);
     return out;
+  }
+
+  /**
+   * 2ª chamada ISOLADA (só pools CL): liquidez ativa, liquidez em stake e gauge
+   * → depois rewardRate(). Insumos do APR "rendendo agora" (Receita C2). Falha
+   * aqui degrada só o APR (vira "—"), NUNCA derruba a posição.
+   */
+  private async loadAprInputs(pools: Map<Address, PoolMeta>): Promise<void> {
+    const ZERO_ADDR: Address = "0x0000000000000000000000000000000000000000";
+    const cl = [...pools.entries()].filter(([, m]) => m.kind === "concentrated");
+    if (cl.length === 0) return;
+
+    const FNS = ["liquidity", "stakedLiquidity", "gauge"] as const;
+    const res = await this.reader.multicall({
+      contracts: cl.flatMap(([lp]) => FNS.map((fn) => ({ address: lp, abi: poolProbeAbi, functionName: fn }))),
+      allowFailure: true,
+    });
+    cl.forEach(([, m], i) => {
+      const liquidity = res[i * FNS.length];
+      const stakedLiquidity = res[i * FNS.length + 1];
+      const gauge = res[i * FNS.length + 2];
+      m.activeLiquidity = liquidity.status === "success" ? (liquidity.result as bigint) : null;
+      m.poolStakedLiquidity = stakedLiquidity.status === "success" ? (stakedLiquidity.result as bigint) : null;
+      const g = gauge.status === "success" ? (gauge.result as Address) : null;
+      m.gauge = g && g !== ZERO_ADDR ? g : null;
+    });
+
+    // rewardRate() dos gauges (só pools CL com gauge)
+    const withGauge = cl.map(([, m]) => m).filter((m) => m.gauge != null);
+    if (withGauge.length === 0) return;
+    const rates = await this.reader.multicall({
+      contracts: withGauge.map((m) => ({ address: m.gauge as Address, abi: gaugeAbi, functionName: "rewardRate" })),
+      allowFailure: true,
+    });
+    withGauge.forEach((m, i) => {
+      if (rates[i].status === "success") m.emissionRatePerSec = rates[i].result as bigint;
+    });
   }
 
   private async loadTokens(addrs: Address[]): Promise<Map<Address, TokenInfo>> {
@@ -347,6 +396,19 @@ export function toLpPosition(
     };
   }
 
+  // insumos do APR "rendendo agora" (Receita C2) — só CL
+  const earningInputs = isCL
+    ? {
+        // L da posição p/ taxas = total ativo (stake não impede o LP de ganhar fees)
+        liquidity: p.liquidity + p.staked,
+        activeLiquidity: pool.activeLiquidity ?? null,
+        stakedLiquidity: p.staked,
+        poolStakedLiquidity: pool.poolStakedLiquidity ?? null,
+        emissionRatePerSec: pool.emissionRatePerSec ?? null,
+        emissionToken: pool.gauge ? aero : null,
+      }
+    : undefined;
+
   return {
     protocol,
     chainId,
@@ -364,6 +426,7 @@ export function toLpPosition(
     amount1Raw: p.amount1 + p.staked1,
     rewards,
     range,
+    earningInputs,
   };
 }
 

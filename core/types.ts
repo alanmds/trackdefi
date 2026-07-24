@@ -54,6 +54,29 @@ export interface LpPosition {
   rewards: RewardAmount[];
   /** null para pools clássicos */
   range: RangeInfo | null;
+  /**
+   * Insumos on-chain para o APR "rendendo agora" da posição (Receita C2).
+   * Só as posições concentradas trazem; adapter que não coleta deixa ausente
+   * e o `earning` do DTO degrada (fee "—" ou só a parte disponível).
+   */
+  earningInputs?: EarningInputsOnchain;
+}
+
+/** Números on-chain que o service combina com preços + APR do pool para o
+ *  APR "rendendo agora" (ver core/yields/positionApr.ts). */
+export interface EarningInputsOnchain {
+  /** L da posição (taxas) — unidades cruas */
+  liquidity: bigint | null;
+  /** pool.liquidity(): liquidez ativa no tick corrente */
+  activeLiquidity: bigint | null;
+  /** L em stake da posição (emissões) */
+  stakedLiquidity: bigint | null;
+  /** pool.stakedLiquidity(): liquidez em stake ativa do pool */
+  poolStakedLiquidity: bigint | null;
+  /** gauge.rewardRate(): token de emissão por segundo (unidades cruas) */
+  emissionRatePerSec: bigint | null;
+  /** token de emissão do gauge (para o service buscar o preço) */
+  emissionToken: TokenInfo | null;
 }
 
 export interface ProtocolAdapter {

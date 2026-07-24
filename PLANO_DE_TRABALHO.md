@@ -253,6 +253,30 @@ feedback de usuários do site no ar (https://trackdefi.vercel.app).
 
 ## Expansões executadas
 
+- [x] **APR da posição "rendendo agora" — Receita C2, Fases 1–3** (19/07/2026,
+      Fable 5, a pedido do Alan; aguarda aprovação p/ push). O card agora mostra
+      o APR da POSIÇÃO, não a média do pool. Motor puro `core/yields/positionApr.ts`
+      (`computeEarning`, 12 testes com números reais dos PoCs). Fora do range →
+      0%. Em range: TAXAS por `feeAPR = apyBase × (L_pos/L_ativa) × (TVL/valor)`
+      (a concentração faz a posição render 1–3,5× o apyBase do pool; usa o
+      apyBase+TVL que o match() da DefiLlama já dá, pois `volume×fee==apyBase×TVL/365`
+      medido EXATO) + EMISSÕES por `rewardRate_gauge × (L_staked_pos/pool.stakedLiquidity)
+      × ano × preço ÷ valor` (on-chain; o apyReward da DefiLlama é lixo em pool
+      CL1 de TVL baixo — 6012% medido). DTO ganhou `earning {nowPct, feePct,
+      emissionPct}`; `LpPosition.earningInputs` carrega os números on-chain.
+      Adapters: Uniswap lê `pool.liquidity()` (fee share); Aerodrome lê
+      liquidity/stakedLiquidity/gauge + `gauge.rewardRate()` numa multicall
+      ISOLADA da de metadados (falha só apaga o APR, nunca derruba a posição —
+      correção após a multicall engrossada perder posições na carteira-lixeira).
+      PoCs: `poc/probe-emissions.ts` (8.91% single-shot vs 12.38% realizado;
+      ABI do gauge confirmada on-chain) e `poc/probe-fee-apr.ts` (bate com o
+      revert.finance: WETH/USDC 0.05% ETH ~45% nos dois; e posição CL em stake
+      acumula taxas E emissões). Verificação: typecheck + 95 testes + build +
+      validate-batch (guarda de earning) + render ao vivo em 0x0596 (emissões
+      13,3%) e 0x8cad (fees 44,5% vs pool 12,7%). Bug de infra: vitest rodava
+      cópias de `.claude/worktrees/` → exclude corrigido. FORA: PnL desde a
+      entrada = Receita F (indexador).
+
 - [x] **APR da posição — Fase 0: "Earning now 0%" fora do range** (19/07/2026,
       Fable 5, a pedido do Alan). Decisão de produto: o APR existe para apoiar
       DECISÃO (rebalancear, lucratividade, metas) — e posição concentrada fora

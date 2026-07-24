@@ -138,7 +138,7 @@ UI). Idade do pool ainda pendente (ver seção abaixo).
 5. `validate-batch`: checagens de sanidade (APR ≤ teto, casamento estável).
 6. Aprovação do Alan (muda conteúdo público) → deploy → validate-live.
 
-## Receita C2 — APR da posição, "rendendo agora" (Fase 0 ENTREGUE 19/07/2026)
+## Receita C2 — APR da posição, "rendendo agora" (COMPLETA 19/07/2026)
 
 **Motivação (Alan, 19/07/2026):** o APR do pool sozinho não apoia decisão de
 rebalanceamento/lucratividade. O número que importa é o da POSIÇÃO: fora do
@@ -146,36 +146,49 @@ range, o rendimento corrente é **0%** (sem taxas novas; em stake
 Aerodrome/Velodrome as emissões também pausam) — e nem o revert.finance
 acerta isso. "Total APR desde a entrada" (PnL) continua sendo a Receita F.
 
-**Fases (~3 sessões no total):**
+**STATUS: Fases 0–3 ENTREGUES** (aguardando aprovação do Alan p/ push).
+Motor puro `core/yields/positionApr.ts`; DTO `earning { nowPct, feePct,
+emissionPct } | null`; insumos on-chain em `LpPosition.earningInputs`;
+UI "Earning now X%" com breakdown e o APR do pool como referência.
 
-- **Fase 0 — ENTREGUE (19/07/2026):** card honesto só com `range.inRange`:
-  fora do range → "Earning now 0%" (alerta) e o APR do pool rebaixado a
-  referência ("pool in-range avg X%"); sem dado → "out of range"; dentro do
-  range → "Pool APR" como antes. Só UI, DTO intacto.
-- **Fase 1 — PoC emissões pessoais:** `rewardRate` do gauge × share da
-  liquidez em stake × preço ÷ valor da posição = APR de emissões EXATO.
-  Contraprova: acúmulo real de `earned` em minutos. Confirmar on-chain que
-  gauge CL não paga liquidez fora do range.
-- **Fase 2 — PoC fee APR corrente (estimativa rotulada):**
-  `volumeUsd1d × fee tier × (L_pos ÷ liquidez ativa do pool) ÷ valor × 365`.
-  `volumeUsd1d`/`volumeUsd7d` CONFIRMADOS no dataset grátis (19/07/2026).
-  Liquidez ativa = `liquidity()` por pool (multicall). Guardas: piso de
-  volume, teto de sanidade, senão "—". Validar contra o revert.finance
-  (carteira 0x8cadb20A4811f363Dadb863A190708bEd26245F8).
-- **Fase 3 — produção:** motor puro `core/yields/positionApr.ts` + DTO
-  `earning { nowPct, feesPct, emissionsPct, method } | null` (o `apr` do pool
-  vira referência) + UI + fixtures/testes + bateria.
+- **Fase 0 (UI honesta com `range.inRange`)** — substituída pela Fase 3
+  (agora data-driven via DTO `earning`).
+- **Fase 1 — emissões pessoais (PoC `poc/probe-emissions.ts`):** PROVADO.
+  `emissionAPR = rewardRate_gauge × (L_staked_pos / pool.stakedLiquidity) ×
+  ANO × preço ÷ valor`. ABI confirmada no contrato publicado: `pool.gauge()`,
+  `pool.stakedLiquidity()`, `pool.liquidity()`, `gauge.rewardRate()`,
+  `gauge.earned(account,tokenId)`. Medido 8.91% single-shot vs 12.38%
+  realizado (contraprova por delta de `earned`); pool CL1 (1 tick) tem
+  liquidez ativa MUITO volátil → o número single-shot oscila 5–13% entre
+  leituras, honesto como estimativa instantânea. **apyReward da DefiLlama é
+  LIXO nesses pools (6012% medido)** → cálculo on-chain é obrigatório.
+- **Fase 2 — fee APR corrente (PoC `poc/probe-fee-apr.ts`):** PROVADO.
+  Simplificação-chave: como `volume×fee == apyBase×TVL/365` (coerência interna
+  medida EXATA), usa-se o apyBase+TVL que o `match()` já devolve, sem plumbar
+  volumeUsd1d/feeTier: `feeAPR = apyBase × (L_pos/L_ativa) × (TVL/valor)`.
+  Multiplicador de concentração medido ×1.0 a ×3.5 em posições reais; bate com
+  o revert.finance (WETH/USDC 0.05% ETH ~45% nos dois). **Descoberta:** posição
+  CL em stake na Aerodrome acumula TAXAS **e** emissões (medido) → somar.
+- **Fase 3 — produção:** `computeEarning` puro (12 testes com números do PoC);
+  adapters coletam L da posição + `pool.liquidity()`/`stakedLiquidity()` +
+  `gauge.rewardRate()` numa multicall ISOLADA (falha só apaga o APR, nunca
+  derruba a posição); service combina com preços; UI mostra "Earning now".
+  Verificação: typecheck + 95 testes + build + validate-batch (com guarda de
+  earning) + render ao vivo nas carteiras 0x0596 (emissões) e 0x8cad (fees).
 
-**Achados de 19/07/2026 (afetam a Receita C também):**
-- A DefiLlama passou a indexar **Uniswap v3 na Base** (APR visto ao vivo em
-  pools Base/uniswap-v3) — a "lacuna real" de 17/07 fechou; OP a conferir.
-- `/poolsOld` (que traria o endereço do pool) agora exige plano PAGO — o
-  casamento por forma continua sendo o caminho.
-- O dataset tem linhas DUPLICADAS mortas do MESMO pool CL (par+spacing
-  identificam um único pool on-chain; caso real: CL200-WETH/VELO na OP com
-  gêmeo de APY 0 e TVL menor que anula a dominância). Dedupe pendente:
-  descartar duplicata com APY 0 quando existe irmã com APY > 0 — implementar
-  junto com a Fase 3 (patch pronto já foi validado em 19/07: 86 testes).
+**Fora do escopo (segue como Receita F):** "total APR desde a entrada" com PnL
+e perda impermanente — precisa de indexador.
+
+**Achados de 19/07/2026:**
+- A DefiLlama passou a indexar **Uniswap v3 na Base** (fee APR visto ao vivo);
+  a "lacuna real" de 17/07 fechou; OP a conferir.
+- `/poolsOld` (endereço do pool) agora exige plano PAGO.
+- O dataset tem linhas DUPLICADAS mortas do MESMO pool CL (CL200-WETH/VELO na
+  OP: gêmeo de APY 0 e TVL menor anula a dominância). Dedupe do apyReward do
+  pool: patch validado em 19/07 (86 testes) foi REVERTIDO a pedido do Alan —
+  retomar quando ele quiser mexer no APR do pool.
+- **Bug de infra corrigido:** o vitest rodava cópias de `.claude/worktrees/`
+  (inflava a contagem de testes) — exclude ajustado no vitest.config.ts.
 
 ## Receita D — Uniswap v4 (avaliação honesta)
 

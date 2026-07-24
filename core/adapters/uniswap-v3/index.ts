@@ -104,6 +104,15 @@ export class UniswapV3Adapter implements ProtocolAdapter {
           priceUpper: tickToPrice0In1(p.tickUpper, token0.decimals, token1.decimals),
           priceCurrent: tickToPrice0In1(pool.tick, token0.decimals, token1.decimals),
         },
+        // Uniswap não tem gauge → só taxas (emissões nulas)
+        earningInputs: {
+          liquidity: p.liquidity,
+          activeLiquidity: pool.activeLiquidity,
+          stakedLiquidity: null,
+          poolStakedLiquidity: null,
+          emissionRatePerSec: null,
+          emissionToken: null,
+        },
       });
     }
     return out;
@@ -216,16 +225,26 @@ export class UniswapV3Adapter implements ProtocolAdapter {
       }
     });
 
-    const slotResults = await this.reader.multicall({
-      contracts: found.map((f) => ({ address: f.address, abi: uniPoolAbi, functionName: "slot0" })),
+    const poolResults = await this.reader.multicall({
+      contracts: found.flatMap((f) => [
+        { address: f.address, abi: uniPoolAbi, functionName: "slot0" },
+        { address: f.address, abi: uniPoolAbi, functionName: "liquidity" },
+      ]),
       allowFailure: true,
     });
 
-    const out = new Map<string, { address: Address; sqrtPriceX96: bigint; tick: number }>();
-    slotResults.forEach((r, i) => {
-      if (r.status !== "success") return;
-      const s = r.result as readonly unknown[];
-      out.set(found[i].key, { address: found[i].address, sqrtPriceX96: s[0] as bigint, tick: Number(s[1]) });
+    const out = new Map<string, { address: Address; sqrtPriceX96: bigint; tick: number; activeLiquidity: bigint | null }>();
+    found.forEach((f, i) => {
+      const slot = poolResults[i * 2];
+      const liq = poolResults[i * 2 + 1];
+      if (slot.status !== "success") return;
+      const s = slot.result as readonly unknown[];
+      out.set(f.key, {
+        address: f.address,
+        sqrtPriceX96: s[0] as bigint,
+        tick: Number(s[1]),
+        activeLiquidity: liq.status === "success" ? (liq.result as bigint) : null,
+      });
     });
     return out;
   }

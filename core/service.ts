@@ -14,6 +14,7 @@ import { buildAdapters } from "./adapters/registry";
 import { chainInfo } from "./chains";
 import { fetchUsdPrices } from "./prices/defillama";
 import { getYieldsIndex, type YieldsIndex } from "./yields/defillama";
+import { computeEarning } from "./yields/positionApr";
 import { orientRange } from "./math/ticks";
 
 export interface TokenAmountDTO {
@@ -56,6 +57,16 @@ export interface AprDTO {
   source: string;
 }
 
+/** APR "rendendo agora" da POSIÇÃO (Receita C2) — 0 fora do range; null = "—" */
+export interface EarningDTO {
+  /** taxas + emissões que ESTA posição rende agora; 0 fora do range */
+  nowPct: number;
+  /** componente de taxas de swap; null = sem dado confiável */
+  feePct: number | null;
+  /** componente de emissões do gauge (staked); null = não se aplica */
+  emissionPct: number | null;
+}
+
 export interface PositionDTO {
   protocol: string;
   chainId: number;
@@ -73,6 +84,8 @@ export interface PositionDTO {
   range: RangeDTO | null;
   /** null = sem dado confiável (UI mostra "—"); nunca chutamos */
   apr: AprDTO | null;
+  /** APR "rendendo agora" da posição (Receita C2); null = "—" ou não se aplica */
+  earning: EarningDTO | null;
 }
 
 export interface PositionsResponseDTO {
@@ -178,6 +191,42 @@ export function buildResponse(params: {
       };
     }
 
+    // APR do POOL (DefiLlama) — casa uma vez; reusado no "rendendo agora"
+    const m = yields
+      ? yields.match({
+          chainId: p.chainId,
+          protocol: p.protocol,
+          kind: p.kind,
+          poolSymbol: p.poolSymbol,
+          token0: p.token0.address,
+          token1: p.token1.address,
+        })
+      : null;
+    const apr: AprDTO | null = m
+      ? { current: m.current, base: m.base, reward: m.reward, mean30d: m.mean30d, source: m.source }
+      : null;
+
+    // APR "rendendo agora" da POSIÇÃO (Receita C2) — só concentradas
+    let earning: EarningDTO | null = null;
+    if (p.range) {
+      const ei = p.earningInputs;
+      const emToken = ei?.emissionToken ?? null;
+      earning = computeEarning({
+        inRange: p.range.inRange,
+        valueUsd,
+        poolFeeAprPct: m?.base ?? null,
+        poolTvlUsd: m?.tvlUsd ?? null,
+        posLiquidity: ei?.liquidity ?? null,
+        activeLiquidity: ei?.activeLiquidity ?? null,
+        staked: p.staked,
+        rewardRatePerSec: ei?.emissionRatePerSec ?? null,
+        posStakedLiquidity: ei?.stakedLiquidity ?? null,
+        poolStakedLiquidity: ei?.poolStakedLiquidity ?? null,
+        emissionPriceUsd: emToken ? priceOf(prices, p.chainId, emToken.address) : null,
+        emissionDecimals: emToken?.decimals ?? 18,
+      });
+    }
+
     return {
       protocol: p.protocol,
       chainId: p.chainId,
@@ -209,21 +258,8 @@ export function buildResponse(params: {
       valueUsd,
       rewardsUsd,
       range,
-      apr: yields
-        ? (() => {
-            const m = yields.match({
-              chainId: p.chainId,
-              protocol: p.protocol,
-              kind: p.kind,
-              poolSymbol: p.poolSymbol,
-              token0: p.token0.address,
-              token1: p.token1.address,
-            });
-            return m
-              ? { current: m.current, base: m.base, reward: m.reward, mean30d: m.mean30d, source: m.source }
-              : null;
-          })()
-        : null,
+      apr,
+      earning,
     };
   });
 
@@ -287,6 +323,9 @@ export async function getWalletPositions(
     set.add(p.token0.address);
     set.add(p.token1.address);
     for (const r of p.rewards) set.add(r.token.address);
+    // token de emissão do gauge: pode não estar nos rewards (0 pendente) e é
+    // necessário para o APR de emissões "rendendo agora"
+    if (p.earningInputs?.emissionToken) set.add(p.earningInputs.emissionToken.address);
     byChain.set(p.chainId, set);
   }
   const prices = new Map<string, number>();
