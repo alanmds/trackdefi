@@ -32,8 +32,9 @@ Janeiro, não-programador). Windows.
 - `PLANO_DE_TRABALHO.md` — histórico de todas as fases/expansões e decisões.
 - `PLAYBOOK_EXPANSAO.md` — receitas para adicionar rede/protocolo (Receita A =
   ecossistema Sugar; Receita B = Uniswap).
-- `SEO.md` — estratégia + checklist que só roda no **domínio definitivo**
-  (o domínio atual `*.vercel.app` é TEMPORÁRIO).
+- `privado/SEO.md` — estratégia + checklist que só roda no **domínio
+  definitivo** (o atual `*.vercel.app` é TEMPORÁRIO). CONFIDENCIAL — saiu do
+  GitHub em 25/07/2026; sincroniza via Drive.
 - `ebook/` (gitignored, local) — plano de monetização (material interno).
 
 ## Estado atual (jul/2026)
@@ -57,7 +58,10 @@ Velodrome, Uniswap v3). Roadmap público em `/roadmap`.
 4. **TypeScript fixado em 5.x** — TS 7 quebra a integração do Next 16.
 5. Preço tem chave multi-rede `chainId:endereço` (WETH tem o mesmo endereço
    em várias redes). Nunca inventar preço: sem preço → mostra "—".
-6. Gitignored de propósito: `backups/`, `ebook/`, `gemini/`.
+6. Gitignored de propósito: `privado/`, `backups/`, `ebook/`, `gemini/` e
+   `SEO.md`. **Todo arquivo confidencial novo vai em `privado/`** — nunca na
+   raiz (o repo é PÚBLICO). Essas pastas sincronizam entre computadores via
+   Drive (`npm run salvar` / `npm run retomar`), não via git.
 
 ## Comandos
 - `npm run dev` (lento p/ varredura) · `npm run build && npm run start` (mede

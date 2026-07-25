@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd /c .\\scripts\\backup-auto.cmd",
+            "shell": "powershell",
+            "timeout": 300,
+            "statusMessage": "Backup automatico para o Google Drive..."
+          }
+        ]
+      }
+    ]
+  }
+}

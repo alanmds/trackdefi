@@ -12,6 +12,14 @@ set "DRIVE=G:\Meu Drive\Claude aplicacoes\trackdefi"
 echo.
 echo === trackdefi: retomar ===
 
+rem -- Migracao unica (25/07/2026): SEO.md virou confidencial e saiu do
+rem -- GitHub; se ainda existir na raiz, vai para privado\ antes do pull.
+if exist SEO.md (
+    if not exist privado mkdir privado
+    move /Y SEO.md privado\SEO.md >nul
+    echo Migracao: SEO.md movido para privado\
+)
+
 echo.
 echo [1/3] git pull - baixando o codigo mais recente do GitHub...
 git pull --ff-only
@@ -23,10 +31,11 @@ call npm install --no-audit --no-fund
 if errorlevel 1 goto :npmfail
 
 echo.
-echo [3/3] Trazendo pastas privadas do Drive: ebook, gemini, backups...
+echo [3/3] Trazendo pastas privadas do Drive: privado, ebook, gemini, backups...
 if not exist "%DRIVE%" goto :nodrive
-for %%D in (ebook gemini backups) do (
-    if exist "%DRIVE%\%%D" robocopy "%DRIVE%\%%D" "%%D" /E /NJH /NJS /NDL /NFL /NP >nul
+rem /XO = so copia se a versao do Drive for mais nova (o mais novo vence)
+for %%D in (privado ebook gemini backups) do (
+    if exist "%DRIVE%\%%D" robocopy "%DRIVE%\%%D" "%%D" /E /XO /NJH /NJS /NDL /NFL /NP >nul
 )
 goto :done
 

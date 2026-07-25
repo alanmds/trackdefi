@@ -22,12 +22,13 @@ if not exist "%DRIVE%" (
 
 echo.
 echo [1/2] Espelhando o codigo no Drive...
-robocopy . "%DRIVE%" /MIR /XD node_modules .next .git worktrees ebook backups gemini /NJH /NJS /NDL /NFL /NP >nul
+robocopy . "%DRIVE%" /MIR /XD node_modules .next .git worktrees privado ebook backups gemini /NJH /NJS /NDL /NFL /NP >nul
 if errorlevel 8 goto :rcfail
 
-echo [2/2] Copiando pastas privadas para o Drive: ebook, gemini, backups...
-for %%D in (ebook gemini backups) do (
-    if exist "%%D" robocopy "%%D" "%DRIVE%\%%D" /E /NJH /NJS /NDL /NFL /NP >nul
+echo [2/2] Copiando pastas privadas para o Drive: privado, ebook, gemini, backups...
+rem /XO = so copia se a versao local for mais nova (o mais novo vence)
+for %%D in (privado ebook gemini backups) do (
+    if exist "%%D" robocopy "%%D" "%DRIVE%\%%D" /E /XO /NJH /NJS /NDL /NFL /NP >nul
 )
 
 echo.

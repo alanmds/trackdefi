@@ -9,7 +9,7 @@ assim ele existe em qualquer computador onde você clonar o projeto.
 | Peça | Papel | Regra |
 |---|---|---|
 | **GitHub** (github.com/alanmds/trackdefi) | É por aqui que o **código** viaja entre computadores (`git push` leva, `git pull` traz). | Push na `main` = site publicado na hora. Trabalho no meio → push numa **branch**. |
-| **Google Drive** (`G:\Meu Drive\Claude aplicacoes\trackdefi`) | **Backup** + pastas privadas que não vão ao GitHub (`ebook/`, `gemini/`, `backups/`). | **Nunca** trabalhar nem rodar `npm` dentro do Drive (o `npm install` quebra lá). |
+| **Google Drive** (`G:\Meu Drive\Claude aplicacoes\trackdefi`) | **Backup** + pastas privadas que não vão ao GitHub (`privado/`, `ebook/`, `gemini/`, `backups/`). | **Nunca** trabalhar nem rodar `npm` dentro do Drive (o `npm install` quebra lá). |
 | **Pasta local** (uma em cada computador) | Onde se trabalha de verdade: Claude Code, comandos, commits. | Neste PC: `C:\Users\Pc\Documents\Claude aplicacoes\trackdefi`. No outro: `D:\Documents\Claude aplicacoes\trackdefi`. |
 
 > A peça que sincroniza o código é o **GitHub**, não o Drive. O que não foi
@@ -24,8 +24,9 @@ npm run retomar
 ```
 
 O script faz tudo: `git pull` (traz o código mais novo do GitHub),
-`npm install` (atualiza dependências) e copia `ebook/`, `gemini/` e
-`backups/` do Drive para a pasta local. No fim mostra o estado do git.
+`npm install` (atualiza dependências) e copia `privado/`, `ebook/`,
+`gemini/` e `backups/` do Drive para a pasta local (só o que for mais novo).
+No fim mostra o estado do git.
 
 Depois é só dizer ao Claude: **"leia o CLAUDE.md e o PLANO_DE_TRABALHO.md e
 vamos continuar"** — ele se situa sozinho.
@@ -46,6 +47,19 @@ npm run salvar
 
 O script espelha a pasta local no Drive (código + pastas privadas) e **avisa
 se ficou algo fora do GitHub** — se avisar, volte ao passo 1.
+
+> **Rede de segurança:** ao fechar uma sessão do Claude Code, um hook roda o
+> backup para o Drive sozinho (`.claude/settings.json` → `backup-auto.cmd`).
+> Mesmo assim, rode o `salvar` ao sair — é ele que mostra o aviso do git.
+
+## 🔒 Arquivos confidenciais
+
+O repositório do GitHub é **PÚBLICO**. Regra: **todo arquivo que não pode ser
+público vai na pasta `privado/`** (gitignored; ex.: `privado/SEO.md`). Ela
+sincroniza entre computadores **pelo Drive** (salvar/retomar, o mais novo
+vence) — por isso, edite arquivos privados num computador de cada vez e rode
+o `salvar` antes de trocar. `ebook/`, `gemini/` e `backups/` seguem a mesma
+lógica.
 
 ## 🆕 Computador NOVO (primeira vez)
 
