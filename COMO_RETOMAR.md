@@ -10,7 +10,7 @@ assim ele existe em qualquer computador onde você clonar o projeto.
 |---|---|---|
 | **GitHub** (github.com/alanmds/trackdefi) | É por aqui que o **código** viaja entre computadores (`git push` leva, `git pull` traz). | Push na `main` = site publicado na hora. Trabalho no meio → push numa **branch**. |
 | **Google Drive** (`G:\Meu Drive\Claude aplicacoes\trackdefi`) | **Backup** + pastas privadas que não vão ao GitHub (`privado/`, `ebook/`, `gemini/`, `backups/`). | **Nunca** trabalhar nem rodar `npm` dentro do Drive (o `npm install` quebra lá). |
-| **Pasta local** (uma em cada computador) | Onde se trabalha de verdade: Claude Code, comandos, commits. | Neste PC: `C:\Users\Pc\Documents\Claude aplicacoes\trackdefi`. No outro: `D:\Documents\Claude aplicacoes\trackdefi`. |
+| **Pasta local** (uma em cada computador) | Onde se trabalha de verdade: Claude Code, comandos, commits. | Computador 1: `C:\Users\Pc\Documents\Claude aplicacoes\trackdefi`. Computador 2: `D:\Documents\Claude aplicacoes\trackdefi`. |
 
 > A peça que sincroniza o código é o **GitHub**, não o Drive. O que não foi
 > para o GitHub **não aparece** no outro computador.
@@ -51,27 +51,6 @@ se ficou algo fora do GitHub** — se avisar, volte ao passo 1.
 > **Rede de segurança:** ao fechar uma sessão do Claude Code, um hook roda o
 > backup para o Drive sozinho (`.claude/settings.json` → `backup-auto.cmd`).
 > Mesmo assim, rode o `salvar` ao sair — é ele que mostra o aviso do git.
-
-## ⚠️ Migração única no computador 2 (D:\Documents\...) — 25/07/2026
-
-Passo que se faz **uma vez só**, na primeira vez que o computador 2 for
-usado depois de 25/07/2026. Motivo: o SEO.md saiu do GitHub e virou
-`privado/SEO.md`, e a versão mais nova dele existe só no disco de lá — um
-`git pull` direto passaria por cima. Abra o Claude Code **na pasta de lá** e
-peça a ele para fazer a migração (o texto pronto está no fim desta seção).
-
-A sequência segura é: **1)** conferir o `git status` (pode haver outros
-arquivos modificados lá que ninguém commitou); **2)** mover o `SEO.md` da
-raiz para `privado/`; **3)** resolver o que o status mostrar; **4)**
-`git pull`; **5)** `npm install`.
-
-O histórico do git **não** foi reescrito (ficou como pendência), então um
-`git pull` normal funciona — **não** use `git reset --hard`, ele apagaria o
-trabalho não commitado que estiver lá.
-
-Quando terminar, **apague esta seção do arquivo** — ela serve uma vez só e
-depois vira informação velha que confunde (foi o que aconteceu com a versão
-anterior deste guia).
 
 ## 🔒 Arquivos confidenciais
 
