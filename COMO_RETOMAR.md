@@ -54,16 +54,24 @@ se ficou algo fora do GitHub** — se avisar, volte ao passo 1.
 
 ## ⚠️ Migração única no computador 2 (D:\Documents\...) — 25/07/2026
 
-O SEO.md saiu do GitHub e o histórico foi reescrito. No computador 2, a
-versão mais nova do SEO.md existe só no disco. **Antes de trabalhar lá**,
-diga ao Claude Code:
+Passo que se faz **uma vez só**, na primeira vez que o computador 2 for
+usado depois de 25/07/2026. Motivo: o SEO.md saiu do GitHub e virou
+`privado/SEO.md`, e a versão mais nova dele existe só no disco de lá — um
+`git pull` direto passaria por cima. Abra o Claude Code **na pasta de lá** e
+peça a ele para fazer a migração (o texto pronto está no fim desta seção).
 
-> "Leia o COMO_RETOMAR.md no GitHub: mova o SEO.md para privado/, faça
-> git fetch + git reset --hard origin/main e npm install."
+A sequência segura é: **1)** conferir o `git status` (pode haver outros
+arquivos modificados lá que ninguém commitou); **2)** mover o `SEO.md` da
+raiz para `privado/`; **3)** resolver o que o status mostrar; **4)**
+`git pull`; **5)** `npm install`.
 
-Isso preserva o SEO.md novo (vai para `privado/`) e alinha o git com o
-histórico reescrito (um `git pull` normal falharia). Depois disso, apague
-esta seção.
+O histórico do git **não** foi reescrito (ficou como pendência), então um
+`git pull` normal funciona — **não** use `git reset --hard`, ele apagaria o
+trabalho não commitado que estiver lá.
+
+Quando terminar, **apague esta seção do arquivo** — ela serve uma vez só e
+depois vira informação velha que confunde (foi o que aconteceu com a versão
+anterior deste guia).
 
 ## 🔒 Arquivos confidenciais
 
