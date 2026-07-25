@@ -3,13 +3,13 @@
  * status, cache, invariantes do DTO e a presença das posições conhecidas
  * da carteira-gabarito (validada pelo Alan contra a Aerodrome).
  *
- *   npx tsx poc/validate-live.ts https://trackdefi.vercel.app
+ *   npx tsx poc/validate-live.ts https://trackdefi.app
  */
 
 import type { PositionsResponseDTO } from "../core/service";
 import { dtoInvariants, type Check } from "./validate-batch";
 
-const BASE = (process.argv[2] ?? "https://trackdefi.vercel.app").replace(/\/$/, "");
+const BASE = (process.argv[2] ?? "https://trackdefi.app").replace(/\/$/, "");
 
 // gabarito: carteira do Alan, conferida visualmente contra a Aerodrome (Fase 1)
 const REF_WALLET = "0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC";

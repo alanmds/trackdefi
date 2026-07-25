@@ -249,7 +249,8 @@ testar antes de entregar, não expandir escopo sem perguntar.
 
 ═══ PLANO ORIGINAL 100% CONCLUÍDO (fases 0–7) em 10/07/2026 ═══
 Próximos passos são as expansões do PLAYBOOK_EXPANSAO.md, priorizadas pelo
-feedback de usuários do site no ar (https://trackdefi.vercel.app).
+feedback de usuários do site no ar (https://trackdefi.app — o
+`trackdefi.vercel.app` dos registros abaixo era o domínio de 10/07 a 24/07).
 
 ## Expansões executadas
 

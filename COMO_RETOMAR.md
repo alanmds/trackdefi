@@ -99,4 +99,4 @@ navegador.
 | Ver posições de uma carteira | `npm run poc -- 0xENDERECO` |
 | Bateria de validação (antes de release) | `npx tsx poc/validate-batch.ts` |
 | Publicar (após sua aprovação) | `git push` (Vercel republica em ~1 min) |
-| Conferir produção após deploy | `npx tsx poc/validate-live.ts https://trackdefi.vercel.app` |
+| Conferir produção após deploy | `npx tsx poc/validate-live.ts https://trackdefi.app` |

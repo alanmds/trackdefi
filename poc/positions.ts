@@ -92,7 +92,7 @@ async function main() {
     `TOTAL em pools:   ${usd(dto.totals.valueUsd)}${dto.totals.positionsWithoutPrice ? `  (+ ${dto.totals.positionsWithoutPrice} sem preço)` : ""}`,
   );
   console.log(`TOTAL a receber:  ${usd(dto.totals.rewardsUsd)}`);
-  console.log(`Conferir: https://trackdefi.vercel.app/w/${account}\n`);
+  console.log(`Conferir: https://trackdefi.app/w/${account}\n`);
 
   if (wantJson) {
     const adapter = new AerodromeAdapter(createBaseReader());

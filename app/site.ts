@@ -2,12 +2,17 @@
  * Identidade do site num LUGAR SÓ (estratégia anti-retrabalho de SEO):
  * quando o domínio definitivo e/ou o nome mudarem, editar AQUI (e setar
  * NEXT_PUBLIC_SITE_URL na Vercel) — todos os metadados, canonicals,
- * sitemap e dados estruturados se atualizam sozinhos. Ver SEO.md.
+ * sitemap e dados estruturados se atualizam sozinhos. Ver privado/SEO.md.
  */
 
 export const SITE_NAME = "trackdefi";
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://trackdefi.vercel.app").replace(/\/$/, "");
+/**
+ * Domínio definitivo desde 24/07/2026. A Vercel deve ter
+ * NEXT_PUBLIC_SITE_URL=https://trackdefi.app (Production) — este valor é só a
+ * rede de segurança para quando a variável não estiver setada.
+ */
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://trackdefi.app").replace(/\/$/, "");
 
 /** título da home (≤ 70 caracteres p/ não truncar no Google) */
 export const SITE_TITLE = `${SITE_NAME} — Liquidity Pool Tracker · Aerodrome, Velodrome & Uniswap v3`;
