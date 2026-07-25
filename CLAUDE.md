@@ -32,6 +32,8 @@ Janeiro, não-programador). Windows.
 - `PLANO_DE_TRABALHO.md` — histórico de todas as fases/expansões e decisões.
 - `PLAYBOOK_EXPANSAO.md` — receitas para adicionar rede/protocolo (Receita A =
   ecossistema Sugar; Receita B = Uniswap).
+- `privado/PENDENCIAS.md` — o que o Alan adiou, por tópico. Ler ao retomar e
+  perguntar se algo dali entra na sessão.
 - `privado/SEO.md` — estratégia + checklist que só roda no **domínio
   definitivo** (o atual `*.vercel.app` é TEMPORÁRIO). CONFIDENCIAL — saiu do
   GitHub em 25/07/2026; sincroniza via Drive.
