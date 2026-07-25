@@ -52,6 +52,19 @@ se ficou algo fora do GitHub** — se avisar, volte ao passo 1.
 > backup para o Drive sozinho (`.claude/settings.json` → `backup-auto.cmd`).
 > Mesmo assim, rode o `salvar` ao sair — é ele que mostra o aviso do git.
 
+## ⚠️ Migração única no computador 2 (D:\Documents\...) — 25/07/2026
+
+O SEO.md saiu do GitHub e o histórico foi reescrito. No computador 2, a
+versão mais nova do SEO.md existe só no disco. **Antes de trabalhar lá**,
+diga ao Claude Code:
+
+> "Leia o COMO_RETOMAR.md no GitHub: mova o SEO.md para privado/, faça
+> git fetch + git reset --hard origin/main e npm install."
+
+Isso preserva o SEO.md novo (vai para `privado/`) e alinha o git com o
+histórico reescrito (um `git pull` normal falharia). Depois disso, apague
+esta seção.
+
 ## 🔒 Arquivos confidenciais
 
 O repositório do GitHub é **PÚBLICO**. Regra: **todo arquivo que não pode ser
