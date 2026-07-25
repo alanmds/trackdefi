@@ -10,7 +10,9 @@
     "poc": "tsx poc/positions.ts",
     "check-api": "tsx poc/check-api.ts",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "retomar": "scripts\\retomar.cmd",
+    "salvar": "scripts\\salvar.cmd"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

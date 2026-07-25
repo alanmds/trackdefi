@@ -12,8 +12,13 @@ Janeiro, não-programador). Windows.
 - **Pasta de trabalho LOCAL: `C:\Users\Pc\Documents\Claude aplicacoes\trackdefi`**
   — é aqui que se edita, roda testes/build e faz commits.
 - **Backup: `G:\Meu Drive\Claude aplicacoes\trackdefi`** (Google Drive). Após
-  CADA modificação, espelhar a pasta local no backup (`robocopy`). O backup
-  guarda também `ebook/`, `backups/`, `gemini/` (que ficam fora do GitHub).
+  CADA modificação, espelhar a pasta local no backup — usar `npm run salvar`
+  (scripts/salvar.cmd). O backup guarda também `ebook/`, `backups/`,
+  `gemini/` (que ficam fora do GitHub).
+- **Troca de computador:** `npm run retomar` ao chegar (git pull + npm
+  install + pastas privadas do Drive); `npm run salvar` ao sair. O Alan
+  trabalha em 2 PCs (aqui: `C:\Users\Pc\Documents\...`; no outro:
+  `D:\Documents\...`); o código viaja pelo GitHub. Ver COMO_RETOMAR.md.
 - ARMADILHA: **não rodar `npm` dentro do Google Drive** — o `npm install` do
   zero falha lá (erros `TAR_ENTRY_ERROR` na extração paralela) e o Drive não
   aceita junction/symlink. Por isso trabalha-se no disco local e o Drive é só
