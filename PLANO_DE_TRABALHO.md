@@ -268,9 +268,27 @@ feedback de usuários do site no ar (https://trackdefi.app — o
       usá-lo e o `url` sai do openGraph do layout (um og:url herdado apontaria
       toda página para a home). Conferido no preview: cada página com o seu
       og:title/og:description/og:url. 95 testes ok, build verde.
-      PENDENTE (Parte F da S0): **não existe OG image** — o card sai sem
-      imagem e o `twitter:card` segue `summary`; quando a imagem existir,
-      virar `summary_large_image`.
+- [x] **OG image, ícone do iOS e carteira-gabarito nova** (25/07/2026, Opus 5,
+      Computador 1 — fecha a Parte F da fase S0 do SEO).
+      **OG image**: `app/opengraph-image.tsx`, 1200×630 gerada em tempo de
+      build (PNG estático, custo zero em produção), na paleta do site
+      (`#ffdead`/`#2e2013`) e com a marca dos dois anéis do `icon.svg`. Fonte
+      padrão do `next/og` de propósito: Inter/Fraunces exigiriam baixar .ttf
+      no build. ARMADILHA: o arquivo sozinho **só vale para a home** — quem
+      declara o próprio `openGraph` substitui o objeto inteiro e leva a
+      imagem junto; por isso ela é declarada em `pageMetadata()`. `twitter:card`
+      subiu para `summary_large_image`.
+      **Ícone do iOS**: `app/apple-icon.tsx` (180×180) — não existia; sem ele
+      o Safari usa uma miniatura ilegível da página ao salvar na tela de
+      início. Sem canto arredondado (o iOS aplica a máscara).
+      **`validate-live` — carteira-gabarito trocada**: era a do Alan com dois
+      NFTs fixados pelo id, e ele retirou a `1774608` → o teste falhava e a
+      falha parecia bug do site. Agora usa `0x892Ff98a…` (carteira de teste do
+      repo sugar, que é a demo da landing): 12 posições, 2 protocolos, 2 redes,
+      clássicas + concentradas, em stake e fora, e casos sem preço. E cobra
+      **cobertura por classe** em vez de ids específicos — ids voltariam a
+      envelhecer, e o que quebra de verdade quando um adapter regride é a
+      classe inteira sumir. 18 verificações, todas verdes contra produção.
 
 - [x] **APR da posição "rendendo agora" — Receita C2, Fases 1–3** (19/07/2026,
       Fable 5, a pedido do Alan; aguarda aprovação p/ push). O card agora mostra

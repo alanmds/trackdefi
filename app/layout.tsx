@@ -38,7 +38,9 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: {
-    card: "summary",
+    // large_image porque o card SEMPRE tem imagem: as páginas indexáveis a
+    // declaram em pageMetadata(), e as demais herdam app/opengraph-image.tsx.
+    card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
   },

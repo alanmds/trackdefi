@@ -25,6 +25,21 @@ export const SITE_DESCRIPTION =
 const titleFor = (title?: string) => (title ? `${title} — ${SITE_NAME}` : SITE_TITLE);
 
 /**
+ * Card de compartilhamento, gerado por `app/opengraph-image.tsx`.
+ *
+ * Precisa ser declarado AQUI, e não só pelo arquivo: o Next atribui a imagem
+ * do arquivo aos metadados do segmento, mas uma página que declara o próprio
+ * `openGraph` substitui o objeto inteiro — e leva a imagem junto. Foi o que
+ * aconteceu em 25/07/2026: só a home saía com imagem.
+ */
+const OG_IMAGE = {
+  url: "/opengraph-image",
+  width: 1200,
+  height: 630,
+  alt: `${SITE_NAME} — liquidity pool tracker`,
+};
+
+/**
  * Metadados de UMA página. Toda página do site deve usar isto.
  *
  * Existe porque o Next **substitui o objeto `openGraph`/`twitter` inteiro**
@@ -56,7 +71,14 @@ export function pageMetadata({
     ...(title ? { title } : {}),
     description: desc,
     alternates: { canonical: path },
-    openGraph: { title: full, description: desc, siteName: SITE_NAME, type: "website", url: path },
-    twitter: { card: "summary", title: full, description: desc },
+    openGraph: {
+      title: full,
+      description: desc,
+      siteName: SITE_NAME,
+      type: "website",
+      url: path,
+      images: [OG_IMAGE],
+    },
+    twitter: { card: "summary_large_image", title: full, description: desc, images: [OG_IMAGE] },
   };
 }
