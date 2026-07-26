@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SearchForm from "./ui/SearchForm";
-import { SITE_NAME } from "./site";
+import { pageMetadata, SITE_NAME } from "./site";
 
 const DEMO_WALLET = "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-};
+export const metadata: Metadata = pageMetadata({ path: "/" });
 
 /** FAQ visível abaixo + dados estruturados correspondentes (mesmo conteúdo,
  * exigência do Google). Perguntas = intenções reais de busca do público-alvo. */

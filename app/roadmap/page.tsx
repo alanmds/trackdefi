@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMetadata } from "../site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/roadmap",
   title: "Roadmap — networks & exchanges",
   description:
     "Where trackdefi is today and where it's going: Aerodrome, Velodrome and Uniswap v3 live across 4 networks; more Superchain exchanges next; Uniswap v4 and P&L planned.",
-  alternates: { canonical: "/roadmap" },
-};
+});
 
 function Status({ kind }: { kind: "live" | "next" | "planned" | "exploring" }) {
   const map = {

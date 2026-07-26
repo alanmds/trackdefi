@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMetadata } from "../site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/how-it-works",
   title: "How it works & why it's safe",
   description:
     "How trackdefi reads your LP positions straight from the Base blockchain — no login, no wallet connection, no keys — and why it can never touch your funds.",
-  alternates: { canonical: "/how-it-works" },
-};
+});
 
 export default function HowItWorks() {
   return (

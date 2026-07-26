@@ -2,8 +2,8 @@
 
 Rastreador público e read-only de posições em pools de liquidez: cola o
 endereço da carteira (0x…), sem login, e vê todas as posições. **NO AR:**
-https://trackdefi.app (domínio próprio desde ~24/07/2026; o
-`trackdefi.vercel.app` ainda responde) · repo:
+https://trackdefi.app (domínio próprio desde ~24/07/2026; `www`,
+`trackdefi.xyz` e `trackdefi.vercel.app` redirecionam 308 para ele) · repo:
 https://github.com/alanmds/trackdefi (push na `main` → deploy automático).
 
 ⚠️ **Configuração de painel não vive no repo.** Domínio, variáveis de

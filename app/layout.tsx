@@ -27,12 +27,15 @@ export const metadata: Metadata = {
     "concentrated liquidity",
     "wallet address",
   ],
+  /* Padrão para páginas sem metadados próprios (ex.: /w/<endereço>, que o
+     robots.txt já bloqueia). As páginas indexáveis montam o seu com
+     pageMetadata() — sem `url` aqui, porque um og:url herdado apontaria toda
+     página para a home. */
   openGraph: {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     siteName: SITE_NAME,
     type: "website",
-    url: SITE_URL,
   },
   twitter: {
     card: "summary",

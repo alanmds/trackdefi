@@ -254,6 +254,24 @@ feedback de usuários do site no ar (https://trackdefi.app — o
 
 ## Expansões executadas
 
+- [x] **Card de compartilhamento por página** (25/07/2026, Opus 5, Computador 1;
+      aguarda aprovação p/ push). Achado durante a conferência da fase S0 do
+      SEO: as 3 páginas indexáveis serviam o **mesmo** card — og:title,
+      og:description, og:url e twitter:* eram todos da HOME. Causa: o Next
+      **substitui o objeto `openGraph`/`twitter` inteiro** quando uma página o
+      redefine (não faz merge campo a campo), então as subpáginas, que só
+      declaravam `title`/`description`/`canonical`, herdavam o openGraph do
+      layout intocado. Efeito: colar o link do /roadmap no X/Discord/Telegram
+      mostrava a home. Entrega: `pageMetadata()` em `app/site.ts` — monta
+      title, description, canonical, openGraph e twitter juntos, com
+      **canonical e og:url sempre no mesmo endereço**; as 3 páginas passam a
+      usá-lo e o `url` sai do openGraph do layout (um og:url herdado apontaria
+      toda página para a home). Conferido no preview: cada página com o seu
+      og:title/og:description/og:url. 95 testes ok, build verde.
+      PENDENTE (Parte F da S0): **não existe OG image** — o card sai sem
+      imagem e o `twitter:card` segue `summary`; quando a imagem existir,
+      virar `summary_large_image`.
+
 - [x] **APR da posição "rendendo agora" — Receita C2, Fases 1–3** (19/07/2026,
       Fable 5, a pedido do Alan; aguarda aprovação p/ push). O card agora mostra
       o APR da POSIÇÃO, não a média do pool. Motor puro `core/yields/positionApr.ts`
