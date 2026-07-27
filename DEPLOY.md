@@ -1,75 +1,93 @@
 # Publicar o trackdefi (grátis, na Vercel)
 
-Guia passo a passo para o Alan. Os passos com **[VOCÊ]** só você pode fazer
-(criam contas ou usam suas credenciais). Os com **[CLAUDE]** o Claude Code
-executa para você quando você pedir.
+**O site já está no ar em https://trackdefi.app**, hospedado na Vercel no plano
+gratuito. Custo: R$ 0.
 
-Tudo aqui usa o plano gratuito. Custo: R$ 0.
-
----
-
-## Parte 1 — Colocar o código no GitHub
-
-1. **[VOCÊ] Criar uma conta no GitHub.** Acesse https://github.com/signup e
-   crie uma conta gratuita (guarde e-mail e senha num gerenciador de senhas).
-
-2. **[VOCÊ] Criar um repositório vazio.** Em https://github.com/new:
-   - **Repository name:** `trackdefi`
-   - Deixe **Public** (ou Private, tanto faz para a Vercel).
-   - **NÃO** marque "Add a README", ".gitignore" nem "license" (o projeto já tem).
-   - Clique **Create repository**.
-   - Copie a URL que aparece, algo como `https://github.com/SEU_USUARIO/trackdefi.git`.
-
-3. **[CLAUDE] Enviar o código.** Me mande essa URL e eu configuro o repositório
-   remoto e faço o `push`. No primeiro envio, uma janela do Windows vai pedir
-   para você entrar na sua conta GitHub — **essa autenticação é sua**; conclua
-   no navegador que abrir. (Login por navegador; nunca cole senha no terminal.)
+Este documento tem duas partes: como o deploy funciona **hoje** (parte 1) e o
+passo a passo original de instalação do zero (parte 2), útil para quem quiser
+publicar a própria cópia.
 
 ---
 
-## Parte 2 — Publicar na Vercel
+## Parte 1 — Como funciona hoje
 
-4. **[VOCÊ] Criar conta na Vercel entrando com o GitHub.** Em
-   https://vercel.com/signup, escolha **Continue with GitHub** e autorize.
-   Isso conecta as duas contas — é o caminho mais simples.
+**Deploy é `git push` na branch `main`.** A Vercel republica sozinha em ~1 min.
+Não há botão a apertar nem build manual.
 
-5. **[VOCÊ] Importar o projeto.**
-   - No painel da Vercel, clique **Add New… → Project**.
-   - Encontre `trackdefi` na lista e clique **Import**.
-   - A Vercel detecta Next.js sozinha. **Não mude nada** nas configurações.
-   - Clique **Deploy** e espere ~1–2 min.
-   - No fim, você recebe uma URL tipo `https://trackdefi.vercel.app` — está no ar!
+Antes de qualquer push:
+
+```bash
+npm run typecheck && npm test && npm run build
+```
+
+Depois do deploy, validar a produção pela HTTP:
+
+```bash
+npx tsx poc/validate-live.ts https://trackdefi.app
+```
+
+### O que está configurado no painel da Vercel
+
+Nada disto vive no repositório — só existe no painel:
+
+| Item | Estado |
+|---|---|
+| Domínio principal | `trackdefi.app` |
+| Redirecionamentos 308 | `www.trackdefi.app`, `trackdefi.xyz`, `www.trackdefi.xyz` e `trackdefi.vercel.app` apontam para o principal |
+| `NEXT_PUBLIC_SITE_URL` | `https://trackdefi.app` (Production) |
+| Web Analytics | ligado (sem cookies) |
+| `BASE_RPC_URLS` | **não configurado** — ver abaixo |
+
+> ⚠️ Os redirecionamentos do `trackdefi.xyz` precisam continuar de pé: existe
+> uma "mudança de endereço" registrada no Google Search Console que depende
+> deles.
+
+### Opcional: RPC dedicado
+
+Hoje a varredura leva ~3 s em produção com RPCs públicos, então não é
+necessário. Se um dia ficar lento:
+
+1. Crie uma conta grátis em https://alchemy.com, um app na rede **Base**, e
+   copie a **HTTPS URL**.
+2. Vercel → projeto → **Settings → Environment Variables** → **Name:**
+   `BASE_RPC_URLS` · **Value:** a URL (várias separadas por vírgula) → **Save**.
+3. **Deployments** → **Redeploy** no último deploy (variável só vale com deploy
+   novo).
+
+A chave fica só no servidor; nunca chega ao navegador.
 
 ---
 
-## Parte 3 — Ajustes recomendados (opcionais, no painel da Vercel)
+## Parte 2 — Instalar do zero (histórico)
 
-6. **[VOCÊ] Deixar a busca mais rápida (RPC dedicado).** Sem isto o site
-   funciona, mas cada busca leva ~15 s e pode estourar o limite de tempo da
-   Vercel em carteiras grandes.
-   - Crie uma conta grátis em https://alchemy.com, faça um app na rede **Base**
-     e copie a **HTTPS URL**.
-   - Na Vercel: projeto → **Settings → Environment Variables** → adicione
-     **Name:** `BASE_RPC_URLS`  **Value:** a URL da Alchemy → **Save**.
-   - Vá em **Deployments** e clique **Redeploy** no último deploy.
+Feito em 10/07/2026. Mantido para quem quiser publicar a própria cópia.
 
-7. **[VOCÊ] Ligar as estatísticas sem cookies.** Projeto → aba **Analytics** →
-   **Enable**. Pronto: passa a contar visitas sem cookies nem dados pessoais
-   (o código já está no site).
+### GitHub
+
+1. Crie uma conta em https://github.com/signup.
+2. Em https://github.com/new: nome `trackdefi`, **Public**, e **não** marque
+   README/.gitignore/license (o projeto já tem).
+3. `git remote add origin <URL>` e `git push -u origin main`. A autenticação
+   abre no navegador — nunca cole senha no terminal.
+
+### Vercel
+
+4. Em https://vercel.com/signup, **Continue with GitHub** e autorize.
+5. Painel → **Add New… → Project** → encontre `trackdefi` → **Import**.
+6. A Vercel detecta Next.js sozinha. **Não mude nada.** → **Deploy** (~1–2 min).
+7. Sai uma URL `*.vercel.app`. Para usar domínio próprio: **Settings → Domains**,
+   com o apex como **Primary** e os demais como **Redirect (308)**. Depois,
+   setar `NEXT_PUBLIC_SITE_URL` com o endereço final e redeployar.
+
+### Estatísticas
+
+8. Projeto → aba **Analytics** → **Enable**. O componente já está no layout;
+   sem o clique no painel ele não coleta.
 
 ---
-
-## Depois de publicar
-
-- **[CLAUDE] Validar em produção:** me diga a URL final e eu rodo a bateria de
-  validação contra o site no ar.
-- Cada vez que você aprovar uma mudança e pedir para eu enviar (`git push`), a
-  Vercel republica sozinha em ~1 min.
-- **Domínio próprio** (ex.: `trackdefi.xyz`) fica para depois de validar — dá
-  para apontar um domínio comprado para a Vercel em Settings → Domains.
 
 ## Limitações conhecidas do plano grátis
 
-- Funções da Vercel têm teto de tempo. Carteiras com **milhares** de posições de
-  spam podem passar do limite e mostrar um erro honesto de timeout — é um caso
-  patológico raro, aceitável no MVP. O RPC dedicado (passo 6) reduz muito isso.
+Funções da Vercel têm teto de tempo. Carteiras com **milhares** de posições
+(quase sempre spam de airdrop) podem passar do limite e receber um erro honesto
+de timeout — caso patológico raro. O RPC dedicado reduz muito isso.

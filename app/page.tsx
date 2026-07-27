@@ -16,7 +16,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Why don't my staked Aerodrome LP positions show up in my wallet?",
-    a: `When you stake a position in an Aerodrome gauge to earn AERO, the LP token (or NFT) moves into the gauge contract, so wallets and most portfolio trackers stop showing it. ${SITE_NAME} reads the gauges directly, so staked positions appear with their pending AERO emissions.`,
+    a: `When you stake a position in an Aerodrome gauge to earn AERO, the LP token (or NFT) moves into the gauge contract, so wallets and most portfolio trackers stop showing it. ${SITE_NAME} reads the gauges directly, so staked positions appear with their pending AERO emissions. The same applies to Velodrome gauges on Optimism, with VELO.`,
   },
   {
     q: "Do I need to connect my wallet or create an account?",
@@ -85,8 +85,8 @@ export default function Home() {
         <div className="feature">
           <h3>Staked positions included</h3>
           <p>
-            Positions staked in Aerodrome gauges don&apos;t show up as tokens in the wallet. We read them straight from
-            the protocol, with pending AERO emissions.
+            Positions staked in Aerodrome or Velodrome gauges don&apos;t show up as tokens in the wallet. We read them
+            straight from the protocol, with their pending AERO or VELO emissions.
           </p>
         </div>
         <div className="feature">

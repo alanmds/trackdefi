@@ -52,8 +52,7 @@ comes from.
 Protocol-specific code lives behind one interface (`core/types.ts` →
 `ProtocolAdapter`). Adding a network or exchange means writing an adapter and
 registering it in `core/adapters/registry.ts` — the API, the price layer and the
-UI don't change. The step-by-step recipes for expanding live in
-[PLAYBOOK_EXPANSAO.md](PLAYBOOK_EXPANSAO.md) (pt-BR).
+UI don't change.
 
 Money is handled as `BigInt` throughout the core; floats appear only at the
 display edge.

@@ -1,6 +1,6 @@
 /**
  * Adapter Uniswap V3 (Base) — implementa ProtocolAdapter (Receita B do
- * PLAYBOOK_EXPANSAO.md).
+ * privado/PLAYBOOK_EXPANSAO.md).
  *
  * Estratégia:
  * - Enumeração BARATA pelos NFTs da conta (balanceOf → tokenOfOwnerByIndex →

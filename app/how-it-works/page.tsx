@@ -5,8 +5,11 @@ import { pageMetadata } from "../site";
 export const metadata: Metadata = pageMetadata({
   path: "/how-it-works",
   title: "How it works & why it's safe",
+  /* sem citar redes: a lista muda a cada expansão e a descrição envelhece
+     sozinha (foi o que aconteceu — dizia "the Base blockchain" quando já
+     eram quatro redes). */
   description:
-    "How trackdefi reads your LP positions straight from the Base blockchain — no login, no wallet connection, no keys — and why it can never touch your funds.",
+    "How trackdefi reads your LP positions straight from the blockchain — no login, no wallet connection, no keys — and why it can never touch your funds.",
 });
 
 export default function HowItWorks() {
@@ -47,8 +50,9 @@ export default function HowItWorks() {
           that don&apos;t appear as tokens in the wallet.
         </li>
         <li>
-          For each position we compute how much of each token it holds, the pending fees and AERO emissions, and — for
-          concentrated positions — whether the price is inside your chosen range.
+          For each position we compute how much of each token it holds, the pending fees, and the pending emissions
+          where the exchange pays them (AERO on Aerodrome, VELO on Velodrome) — and, for concentrated positions,
+          whether the price is inside your chosen range.
         </li>
         <li>
           US-dollar values come from public price data (DefiLlama). When a token has no reliable price, we show “—”

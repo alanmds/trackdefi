@@ -1,7 +1,7 @@
 /**
  * Adapter Aerodrome (Base) — implementa ProtocolAdapter.
  *
- * Estratégia de varredura (decidida na Fase 1/2, ver PLANO_DE_TRABALHO.md):
+ * Estratégia de varredura (decidida na Fase 1/2, ver privado/PLANO_DE_TRABALHO.md):
  * - `positions()` do Sugar pagina por POOLS (~34 mil na Aerodrome) e cobre
  *   clássicas + concentradas em stake → varremos em janelas PARALELAS.
  * - `positionsUnstakedConcentrated()` pagina pelos NFTs DA CONTA (barato) e

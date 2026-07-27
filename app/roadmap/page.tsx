@@ -6,7 +6,7 @@ export const metadata: Metadata = pageMetadata({
   path: "/roadmap",
   title: "Roadmap — networks & exchanges",
   description:
-    "Where trackdefi is today and where it's going: Aerodrome, Velodrome and Uniswap v3 live across 4 networks; more Superchain exchanges next; Uniswap v4 and P&L planned.",
+    "Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome and Uniswap v3 across 4 networks; Uniswap v4, pool age and P&L planned.",
 });
 
 function Status({ kind }: { kind: "live" | "next" | "planned" | "exploring" }) {
@@ -31,6 +31,14 @@ export default function Roadmap() {
 
       <h2>Live today</h2>
       <ul className="roadmap-list">
+        <li>
+          <Status kind="live" />
+          <span>
+            <strong>Per-position APR — &ldquo;Earning now&rdquo;</strong> — what <em>your</em> position earns right
+            now, not the pool average: swap fees and emissions counted separately, and an honest 0% when a
+            concentrated position is out of range and earning nothing.
+          </span>
+        </li>
         <li>
           <Status kind="live" />
           <span>
@@ -106,6 +114,13 @@ export default function Roadmap() {
           <Status kind="exploring" />
           <span>
             <strong>Out-of-range alerts</strong> — get notified when a concentrated position stops earning fees.
+          </span>
+        </li>
+        <li>
+          <Status kind="exploring" />
+          <span>
+            <strong>Pool age</strong> — how long a pool has existed, shown next to its APR. A brand-new pool with a
+            high APR is a different signal from an old one with the same number.
           </span>
         </li>
       </ul>

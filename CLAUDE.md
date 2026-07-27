@@ -30,7 +30,7 @@ Janeiro, não-programador). Windows.
   `gemini/` (que ficam fora do GitHub).
 - **Troca de computador:** `npm run retomar` ao chegar (git pull + npm
   install + pastas privadas do Drive); `npm run salvar` ao sair. O código
-  viaja pelo **GitHub** (não pelo Drive). Ver COMO_RETOMAR.md.
+  viaja pelo **GitHub** (não pelo Drive). Ver `privado/COMO_RETOMAR.md`.
 - ARMADILHA: **não rodar `npm` dentro do Google Drive** — o `npm install` do
   zero falha lá (erros `TAR_ENTRY_ERROR` na extração paralela) e o Drive não
   aceita junction/symlink. Por isso trabalha-se no disco local e o Drive é só
@@ -38,18 +38,22 @@ Janeiro, não-programador). Windows.
 - Caminho tem espaços ("Claude aplicacoes") → no Windows, alguns comandos
   precisam de aspas ou do caminho curto 8.3 (o `.claude/launch.json` já usa).
 - Trabalho remoto / outro PC: `git clone` para uma pasta LOCAL + `npm
-  install`. Ver COMO_RETOMAR.md.
+  install`. Ver `privado/COMO_RETOMAR.md`.
 
 ## Leia primeiro (a memória real do projeto)
-- `PLANO_DE_TRABALHO.md` — histórico de todas as fases/expansões e decisões.
-- `PLAYBOOK_EXPANSAO.md` — receitas para adicionar rede/protocolo (Receita A =
-  ecossistema Sugar; Receita B = Uniswap).
+- `privado/PLANO_DE_TRABALHO.md` — histórico de todas as fases/expansões e
+  decisões.
+- `privado/PLAYBOOK_EXPANSAO.md` — receitas para adicionar rede/protocolo
+  (Receita A = ecossistema Sugar; Receita B = Uniswap).
 - `privado/PENDENCIAS.md` — o que o Alan adiou, por tópico. Ler ao retomar e
   perguntar se algo dali entra na sessão.
 - `privado/SEO.md` — **Plano de SEO v2** (fases S0–S7) já no domínio
   definitivo `trackdefi.app`. CONFIDENCIAL — saiu do GitHub em 25/07/2026;
-  sincroniza via Drive. Passo a passo da fase em execução:
-  `privado/PASSO_A_PASSO_S0.md`.
+  sincroniza via Drive. Estado em 27/07/2026: **S0 concluída**
+  (`privado/PASSO_A_PASSO_S0.md`), **S1 e S2 congeladas** a pedido do Alan,
+  **S5 (backlinks) é a fase da vez** — passo a passo em
+  `privado/PASSO_A_PASSO_S5.md`, com material pronto em
+  `privado/SUBMISSAO_BASE.md` e `privado/RASCUNHO_REDDIT.md`.
 - `ebook/` (gitignored, local) — plano de monetização (material interno).
 
 ## Estado atual (jul/2026)
