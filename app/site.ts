@@ -17,9 +17,10 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://trackdefi.
 /** título da home (≤ 70 caracteres p/ não truncar no Google) */
 export const SITE_TITLE = `${SITE_NAME} — Liquidity Pool Tracker · Aerodrome, Velodrome & Uniswap v3`;
 
-/** descrição da home (~160 caracteres) */
+/** descrição da home (~160 caracteres) — "& more" absorve rede nova sem
+ *  estourar o limite do Google a cada expansão */
 export const SITE_DESCRIPTION =
-  "Free LP tracker: paste a wallet address to see every Aerodrome, Velodrome & Uniswap v3 position across Base, Ethereum, Arbitrum & Optimism — staked included.";
+  "Free LP tracker: paste a wallet address to see every Aerodrome, Velodrome & Uniswap v3 position across Base, Optimism, Robinhood Chain & more — staked included.";
 
 /** sufixo do título, igual ao template do layout (`%s — trackdefi`) */
 const titleFor = (title?: string) => (title ? `${title} — ${SITE_NAME}` : SITE_TITLE);

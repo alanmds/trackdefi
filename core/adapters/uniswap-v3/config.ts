@@ -41,12 +41,25 @@ export const UNISWAP_V3_OPTIMISM: UniV3ChainConfig = {
   nfpm: CANONICAL_NFPM,
 };
 
+/**
+ * Robinhood Chain (Arbitrum Orbit L2, chainId 4663) — endereços CONFIRMADOS
+ * na doc oficial em 27/07/2026 (developers.uniswap.org → v3 → Robinhood Chain
+ * Deployments) e conferidos on-chain no `poc/probe-robinhood.ts`
+ * (`NFPM.factory()` bate com a factory abaixo). NÃO usa os canônicos.
+ */
+export const UNISWAP_V3_ROBINHOOD: UniV3ChainConfig = {
+  chainId: 4663,
+  factory: "0x1f7d7550b1b028f7571e69a784071f0205fd2efa",
+  nfpm: "0x73991a25c818bf1f1128deaab1492d45638de0d3",
+};
+
 /** todas as redes Uniswap ativas (ordem = ordem no registry) */
 export const UNISWAP_V3_CHAINS: UniV3ChainConfig[] = [
   UNISWAP_V3_BASE,
   UNISWAP_V3_ETHEREUM,
   UNISWAP_V3_ARBITRUM,
   UNISWAP_V3_OPTIMISM,
+  UNISWAP_V3_ROBINHOOD,
 ];
 
 // compatibilidade com código/testes existentes (Base)

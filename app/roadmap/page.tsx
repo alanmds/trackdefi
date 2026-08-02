@@ -68,6 +68,14 @@ export default function Roadmap() {
             major networks.
           </span>
         </li>
+        <li>
+          <Status kind="live" />
+          <span>
+            <strong>Robinhood Chain · Uniswap v3</strong> — the tokenized-stock L2, live since July 2026 and already
+            one of the largest Uniswap v3 deployments by liquidity. Positions, amounts, pending fees and range status
+            all work; pool APR shows &ldquo;—&rdquo; until public yield data covers this network.
+          </span>
+        </li>
       </ul>
 
       <h2>Next</h2>

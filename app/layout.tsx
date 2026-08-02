@@ -26,6 +26,7 @@ export const metadata: Metadata = {
     "Base network",
     "Optimism",
     "Arbitrum",
+    "Robinhood Chain",
     "DeFi portfolio",
     "concentrated liquidity",
     "wallet address",
@@ -91,8 +92,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </span>
             <span>Not financial advice. Verify data on-chain before acting. Prices by DefiLlama.</span>
             <span>
-              Coverage: Aerodrome (Base) · Velodrome (Optimism) · Uniswap v3 (Base, Ethereum, Arbitrum &amp; Optimism)
-              — <Link href="/roadmap">see the roadmap</Link>.
+              Coverage: Aerodrome (Base) · Velodrome (Optimism) · Uniswap v3 (Base, Ethereum, Arbitrum, Optimism
+              &amp; Robinhood Chain) — <Link href="/roadmap">see the roadmap</Link>.
             </span>
           </div>
         </footer>

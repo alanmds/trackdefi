@@ -69,7 +69,8 @@ export default function HowItWorks() {
 
       <h2>Coverage</h2>
       <p>
-        Today: Aerodrome on Base, Velodrome on Optimism, and Uniswap v3 on Base, Ethereum, Arbitrum and Optimism. The
+        Today: Aerodrome on Base, Velodrome on Optimism, and Uniswap v3 on Base, Ethereum, Arbitrum, Optimism and
+        Robinhood Chain. The
         app is built so more networks and exchanges can be added without changing how it works for you — see{" "}
         <Link href="/roadmap">the roadmap</Link>.
       </p>

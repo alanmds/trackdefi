@@ -3,7 +3,7 @@
  * rótulo e RPCs. Adicionar rede = uma entrada aqui (Receita A do playbook).
  */
 
-import { arbitrum, base, mainnet, optimism } from "viem/chains";
+import { arbitrum, base, mainnet, optimism, robinhood } from "viem/chains";
 import type { Chain } from "viem";
 
 export interface ChainInfo {
@@ -60,6 +60,24 @@ export const CHAINS: Record<number, ChainInfo> = {
       "https://ethereum-rpc.publicnode.com",
       "https://eth.llamarpc.com",
       "https://cloudflare-eth.com",
+    ],
+  },
+  4663: {
+    chain: robinhood,
+    label: "Robinhood",
+    priceSlug: "robinhood",
+    // conferido no dataset yields.llama.fi em 27/07/2026
+    yieldsLabel: "Robinhood Chain",
+    explorerUrl: "https://robinhoodchain.blockscout.com",
+    explorerLabel: "Blockscout",
+    rpcEnv: "ROBINHOOD_RPC_URLS",
+    /* publicnode primeiro: é o provedor já usado nas outras redes e o único
+       confirmado alcançável no PoC de 27/07. O RPC oficial da Robinhood entra
+       como terceiro — ele é rate-limited e não resolve em alguns ambientes. */
+    defaultRpcs: [
+      "https://robinhood-rpc.publicnode.com",
+      "https://robinhood.drpc.org",
+      "https://rpc.mainnet.chain.robinhood.com",
     ],
   },
   42161: {
