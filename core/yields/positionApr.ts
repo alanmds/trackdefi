@@ -38,7 +38,15 @@ export interface EarningInputs {
   inRange: boolean;
   valueUsd: number | null;
 
-  // --- taxas (do casamento com a DefiLlama + liquidez on-chain) ---
+  /**
+   * Fee APR da posição JÁ CALCULADO on-chain (`yields/onchain.ts`).
+   * Quando presente, **vence** o caminho da DefiLlama abaixo: é medido no
+   * próprio pool, sem casamento por nome e sem denominador discutível.
+   * null = sem RPC com arquivo, ou leitura falhou → cai no caminho antigo.
+   */
+  onchainFeeAprPct?: number | null;
+
+  // --- taxas (do casamento com a DefiLlama + liquidez on-chain) — FALLBACK ---
   /** apyBase do pool (% a.a. de taxas), da DefiLlama */
   poolFeeAprPct: number | null;
   /** TVL do pool (US$), da DefiLlama */
@@ -89,6 +97,10 @@ export function computeEarning(i: EarningInputs): EarningNow | null {
 }
 
 function computeFee(i: EarningInputs): number | null {
+  // medido no contrato vence estimativa de terceiro (Receita G)
+  if (i.onchainFeeAprPct !== null && i.onchainFeeAprPct !== undefined) {
+    return within(i.onchainFeeAprPct) ? i.onchainFeeAprPct : null;
+  }
   if (
     i.poolFeeAprPct === null ||
     i.poolTvlUsd === null ||

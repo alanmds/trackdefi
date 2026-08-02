@@ -18,6 +18,12 @@ export interface ChainInfo {
   yieldsLabel: string;
   explorerUrl: string;
   explorerLabel: string;
+  /**
+   * segundos por bloco — converte janela de TEMPO em janela de BLOCOS para o
+   * fee APR on-chain (`core/yields/onchain.ts`). Valor nominal da rede; varia
+   * um pouco na prática, e o cálculo tolera (a janela é longa).
+   */
+  secPerBlock: number;
   /** env que injeta RPC(s) pagos, separados por vírgula */
   rpcEnv: string;
   defaultRpcs: string[];
@@ -31,6 +37,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     yieldsLabel: "Base",
     explorerUrl: "https://basescan.org",
     explorerLabel: "BaseScan",
+    secPerBlock: 2,
     rpcEnv: "BASE_RPC_URLS",
     defaultRpcs: ["https://mainnet.base.org", "https://base-rpc.publicnode.com", "https://base.llamarpc.com"],
   },
@@ -41,6 +48,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     yieldsLabel: "OP Mainnet",
     explorerUrl: "https://optimistic.etherscan.io",
     explorerLabel: "OP Etherscan",
+    secPerBlock: 2,
     rpcEnv: "OPTIMISM_RPC_URLS",
     defaultRpcs: [
       "https://mainnet.optimism.io",
@@ -55,6 +63,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     yieldsLabel: "Ethereum",
     explorerUrl: "https://etherscan.io",
     explorerLabel: "Etherscan",
+    secPerBlock: 12,
     rpcEnv: "ETHEREUM_RPC_URLS",
     defaultRpcs: [
       "https://ethereum-rpc.publicnode.com",
@@ -70,6 +79,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     yieldsLabel: "Robinhood Chain",
     explorerUrl: "https://robinhoodchain.blockscout.com",
     explorerLabel: "Blockscout",
+    secPerBlock: 0.1,
     rpcEnv: "ROBINHOOD_RPC_URLS",
     /* publicnode primeiro: é o provedor já usado nas outras redes e o único
        confirmado alcançável no PoC de 27/07. O RPC oficial da Robinhood entra
@@ -87,6 +97,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     yieldsLabel: "Arbitrum",
     explorerUrl: "https://arbiscan.io",
     explorerLabel: "Arbiscan",
+    secPerBlock: 0.25,
     rpcEnv: "ARBITRUM_RPC_URLS",
     defaultRpcs: [
       "https://arb1.arbitrum.io/rpc",

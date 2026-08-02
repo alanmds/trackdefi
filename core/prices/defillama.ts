@@ -6,6 +6,7 @@
 
 import type { Address } from "viem";
 import { chunks } from "../util";
+import type { PriceProvider } from "./types";
 
 const BASE_URL = "https://coins.llama.fi/prices/current";
 const CHUNK = 80; // tokens por requisição (limite prático de URL)
@@ -35,3 +36,9 @@ export async function fetchUsdPrices(
   }
   return out;
 }
+
+/** A DefiLlama como `PriceProvider` — é o provedor padrão do projeto. */
+export const defillamaPrices: PriceProvider = {
+  name: "DefiLlama",
+  fetchUsdPrices: (chainSlug, addresses, onWarn) => fetchUsdPrices(chainSlug, addresses, onWarn),
+};

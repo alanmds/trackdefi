@@ -12,9 +12,13 @@ import { formatUnits, type Address } from "viem";
 import type { LpPosition, PositionKind, ProtocolAdapter } from "./types";
 import { buildAdapters } from "./adapters/registry";
 import { chainInfo } from "./chains";
-import { fetchUsdPrices } from "./prices/defillama";
+import { defillamaPrices } from "./prices/defillama";
+import type { PriceProvider } from "./prices/types";
 import { getYieldsIndex, type YieldsIndex } from "./yields/defillama";
 import { computeEarning } from "./yields/positionApr";
+import { computeOnchainFeeApr, readFeeGrowthWindow, DEFAULT_WINDOW_HOURS, type FeeGrowthWindow } from "./yields/onchain";
+import { createReader } from "./chain";
+import { mapLimit } from "./util";
 import { orientRange } from "./math/ticks";
 
 export interface TokenAmountDTO {
@@ -138,6 +142,9 @@ export function buildResponse(params: {
   protocols?: string[];
   chains?: string[];
   yields?: YieldsIndex | null;
+  /** janelas de feeGrowth por `chainId:pool` — fee APR medido no contrato
+   *  (Receita G). Ausente = cai no apyBase da DefiLlama. */
+  feeWindows?: Map<string, FeeGrowthWindow>;
 }): PositionsResponseDTO {
   const {
     address,
@@ -149,6 +156,7 @@ export function buildResponse(params: {
     protocols = ["aerodrome"],
     chains = ["base"],
     yields = null,
+    feeWindows,
   } = params;
 
   const positions: PositionDTO[] = normalized.map((p) => {
@@ -211,8 +219,24 @@ export function buildResponse(params: {
     if (p.range) {
       const ei = p.earningInputs;
       const emToken = ei?.emissionToken ?? null;
+      // taxas medidas NO CONTRATO quando houver janela (Receita G)
+      const win = feeWindows?.get(`${p.chainId}:${p.poolAddress.toLowerCase()}`);
+      const onchainFeeAprPct = win
+        ? computeOnchainFeeApr({
+            delta0: win.delta0,
+            delta1: win.delta1,
+            posLiquidity: ei?.liquidity ?? null,
+            windowSec: win.windowSec,
+            decimals0: p.token0.decimals,
+            decimals1: p.token1.decimals,
+            price0Usd: p0,
+            price1Usd: p1,
+            positionValueUsd: valueUsd,
+          })
+        : null;
       earning = computeEarning({
         inRange: p.range.inRange,
+        onchainFeeAprPct,
         valueUsd,
         poolFeeAprPct: m?.base ?? null,
         poolTvlUsd: m?.tvlUsd ?? null,
@@ -294,6 +318,8 @@ export function buildResponse(params: {
 export async function getWalletPositions(
   address: Address,
   adaptersOverride?: ProtocolAdapter[],
+  /** fonte de preços; trocar de provedor não toca em mais nada (Receita H) */
+  priceProvider: PriceProvider = defillamaPrices,
 ): Promise<PositionsResponseDTO> {
   const warnings: string[] = [];
   const adapters = adaptersOverride ?? buildAdapters({ onWarn: (m) => warnings.push(m) });
@@ -332,7 +358,7 @@ export async function getWalletPositions(
   await Promise.all(
     [...byChain.entries()].map(async ([chainId, addrs]) => {
       const slug = chainInfo(chainId).priceSlug;
-      const chainPrices = await fetchUsdPrices(slug, [...addrs] as Address[], (m) => warnings.push(m));
+      const chainPrices = await priceProvider.fetchUsdPrices(slug, [...addrs] as Address[], (m) => warnings.push(m));
       for (const [addr, price] of chainPrices) prices.set(priceKey(chainId, addr), price);
     }),
   );
@@ -346,5 +372,53 @@ export async function getWalletPositions(
     protocols: [...new Set(adapters.map((a) => a.protocol))],
     chains: [...new Set(adapters.map((a) => chainInfo(a.chainId).priceSlug))],
     yields: await yieldsPromise,
+    feeWindows: await readFeeWindows(normalized, (m) => warnings.push(m)),
   });
+}
+
+/** teto de pools consultados por varredura — carteira-lixeira não pode
+ *  transformar isto em centenas de chamadas de arquivo */
+export const MAX_FEE_APR_POOLS = 40;
+
+/**
+ * Lê as janelas de feeGrowth dos pools concentrados (Receita G).
+ *
+ * NADA aqui pode derrubar a varredura: sem RPC com arquivo, o resultado é um
+ * mapa vazio e o APR volta a sair da DefiLlama. Por isso tudo está dentro de
+ * try/catch e o teto acima existe.
+ */
+async function readFeeWindows(
+  positions: LpPosition[],
+  onWarn: (msg: string) => void,
+): Promise<Map<string, FeeGrowthWindow>> {
+  const out = new Map<string, FeeGrowthWindow>();
+  const porRede = new Map<number, Set<string>>();
+  for (const p of positions) {
+    if (p.kind !== "concentrated" || !p.range?.inRange) continue; // fora do range rende 0, não precisa medir
+    const set = porRede.get(p.chainId) ?? new Set<string>();
+    set.add(p.poolAddress.toLowerCase());
+    porRede.set(p.chainId, set);
+  }
+  if (porRede.size === 0) return out;
+
+  let orcamento = MAX_FEE_APR_POOLS;
+  await Promise.all(
+    [...porRede.entries()].map(async ([chainId, pools]) => {
+      const info = chainInfo(chainId);
+      try {
+        const reader = createReader(chainId);
+        const bloco = await reader.getBlockNumber?.();
+        if (bloco === undefined) return;
+        const alvos = [...pools].slice(0, Math.max(0, orcamento));
+        orcamento -= alvos.length;
+        await mapLimit(alvos, 6, async (pool) => {
+          const win = await readFeeGrowthWindow(reader, pool as Address, bloco, info.secPerBlock, DEFAULT_WINDOW_HOURS, onWarn);
+          if (win) out.set(`${chainId}:${pool}`, win);
+        });
+      } catch (e) {
+        onWarn(`fee APR on-chain indisponível em ${info.label}: ${(e as Error).message.split("\n")[0].slice(0, 60)}`);
+      }
+    }),
+  );
+  return out;
 }

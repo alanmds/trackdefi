@@ -95,6 +95,9 @@ export type ChainReader = {
     abi: unknown;
     functionName: string;
     args?: readonly unknown[];
+    /** lê o estado num bloco PASSADO — exige RPC com arquivo. Sem chave, o
+     *  RPC público costuma recusar; quem usa trata a falha como "sem dado". */
+    blockNumber?: bigint;
   }): Promise<unknown>;
   multicall(args: {
     contracts: readonly {
@@ -105,6 +108,8 @@ export type ChainReader = {
     }[];
     allowFailure: true;
   }): Promise<{ status: "success" | "failure"; result?: unknown; error?: Error }[]>;
+  /** bloco mais recente — usado para montar a janela do fee APR on-chain */
+  getBlockNumber?(): Promise<bigint>;
   /**
    * eth_call simulando uma função de escrita SEM transação (continua 100%
    * leitura). Usado p/ ler taxas pendentes da Uniswap via collect().
