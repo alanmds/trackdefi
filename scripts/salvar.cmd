@@ -22,7 +22,10 @@ if not exist "%DRIVE%" (
 
 echo.
 echo [1/2] Espelhando o codigo no Drive...
-robocopy . "%DRIVE%" /MIR /XD node_modules .next .git worktrees privado ebook backups gemini /NJH /NJS /NDL /NFL /NP >nul
+rem /XF: SEGREDOS NUNCA VAO PARA O DRIVE. O Drive e nuvem e espelha para o
+rem outro computador - chave de RPC ali e vazamento. O .gitignore ja barra o
+rem GitHub; esta linha barra o Drive. Ao criar env novo, adicione aqui.
+robocopy . "%DRIVE%" /MIR /XD node_modules .next .git worktrees privado ebook backups gemini /XF .env .env.local .env.*.local /NJH /NJS /NDL /NFL /NP >nul
 if errorlevel 8 goto :rcfail
 
 echo [2/2] Copiando pastas privadas para o Drive: privado, ebook, gemini, backups...
