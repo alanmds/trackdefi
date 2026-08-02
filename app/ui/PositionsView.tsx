@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { PositionsResponseDTO } from "../../core/service";
+import { NETWORK_LABELS, networksSentence } from "../site";
 import { fmtUsd, shortAddress } from "./format";
 import PositionCard from "./PositionCard";
 
@@ -74,7 +75,7 @@ export default function PositionsView({ address }: { address: string }) {
         <div className="wallet-id">
           <h1 title={address}>{shortAddress(address)}</h1>
           <span className="wallet-sub">
-            Base · Optimism · Ethereum · Arbitrum ·{" "}
+            {NETWORK_LABELS.join(" · ")} ·{" "}
             <a href={`https://basescan.org/address/${address}`} target="_blank" rel="noopener noreferrer">
               BaseScan ↗
             </a>
@@ -96,8 +97,8 @@ export default function PositionsView({ address }: { address: string }) {
             <div className="spinner" aria-hidden />
             <h2>Scanning the blockchains…</h2>
             <p>
-              Reading Aerodrome, Velodrome and Uniswap v3 across Base, Optimism, Ethereum and Arbitrum — classic,
-              concentrated and gauge-staked positions.
+              Reading Aerodrome, Velodrome and Uniswap v3 across {networksSentence()} — classic, concentrated and
+              gauge-staked positions.
             </p>
             <Elapsed />
           </div>

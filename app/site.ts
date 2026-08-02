@@ -8,6 +8,25 @@
 export const SITE_NAME = "trackdefi";
 
 /**
+ * Nomes das redes para TEXTO de interface, na ordem em que aparecem.
+ *
+ * Vive aqui, e não em `core/chains.ts`, porque componentes client importam
+ * este arquivo e `core/chains.ts` carrega as definições do viem — não vale
+ * engordar o bundle do navegador por causa de uma frase.
+ *
+ * A duplicação é PROTEGIDA: `tests/chains.test.ts` compara esta lista com o
+ * `CHAINS` de verdade. Rede nova sem atualizar aqui **quebra o teste**, não o
+ * site — foi o que aconteceu em 02/08/2026, quando a Robinhood Chain entrou e
+ * a página de resultados continuou anunciando quatro redes.
+ */
+export const NETWORK_LABELS = ["Base", "Optimism", "Ethereum", "Arbitrum", "Robinhood"] as const;
+
+/** "Base, Optimism, Ethereum, Arbitrum and Robinhood" */
+export function networksSentence(): string {
+  return `${NETWORK_LABELS.slice(0, -1).join(", ")} and ${NETWORK_LABELS[NETWORK_LABELS.length - 1]}`;
+}
+
+/**
  * Domínio definitivo desde 24/07/2026. A Vercel deve ter
  * NEXT_PUBLIC_SITE_URL=https://trackdefi.app (Production) — este valor é só a
  * rede de segurança para quando a variável não estiver setada.
