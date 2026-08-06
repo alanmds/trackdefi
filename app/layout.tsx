@@ -48,6 +48,20 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
   },
   robots: { index: true, follow: true },
+  /**
+   * Prova de propriedade do domínio para o Base Dashboard
+   * (`dashboard.base.org/apps/6a74c0ad80688a9243409bfa`), pedida no cadastro
+   * do app em 06/08/2026 — Fase S5, Parte B. Sai como
+   * `<meta name="base:app_id" content="…">` em toda página.
+   *
+   * NÃO é segredo: o valor existe justamente para ser lido no HTML público, e
+   * fica no repo de propósito — assim ele viaja pelo git e não some numa
+   * troca de computador, ao contrário do que é só de painel.
+   *
+   * ⚠️ Não remover sem conferir antes: se a Base revalidar o domínio e não
+   * achar a tag, o app cai do cadastro.
+   */
+  other: { "base:app_id": "6a74c0ad80688a9243409bfa" },
 };
 
 /** Dados estruturados do site (Google) — nome/URL vêm de app/site.ts */
