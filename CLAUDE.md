@@ -41,24 +41,30 @@ Janeiro, não-programador). Windows.
   install`. Ver `privado/COMO_RETOMAR.md`.
 
 ## Leia primeiro (a memória real do projeto)
+- `NOTES-progresso.md` (raiz, gitignored) — **o primeiro a ler ao retomar**:
+  o que está em curso, o que já foi feito e o próximo passo. O laptop do
+  Computador 2 desliga sem aviso; este arquivo é o que salva a sessão.
+- `privado/PENDENCIAS.md` — o que o Alan adiou, por tópico. Ler ao retomar e
+  perguntar se algo dali entra na sessão.
 - `privado/PLANO_DE_TRABALHO.md` — histórico de todas as fases/expansões e
   decisões.
 - `privado/PLAYBOOK_EXPANSAO.md` — receitas para adicionar rede/protocolo
-  (Receita A = ecossistema Sugar; Receita B = Uniswap).
-- `privado/PENDENCIAS.md` — o que o Alan adiou, por tópico. Ler ao retomar e
-  perguntar se algo dali entra na sessão.
-- `privado/SEO.md` — **Plano de SEO v2** (fases S0–S7) já no domínio
-  definitivo `trackdefi.app`. CONFIDENCIAL — saiu do GitHub em 25/07/2026;
-  sincroniza via Drive. Estado em 27/07/2026: **S0 concluída**
-  (`privado/PASSO_A_PASSO_S0.md`), **S1 e S2 congeladas** a pedido do Alan,
-  **S5 (backlinks) é a fase da vez** — passo a passo em
-  `privado/PASSO_A_PASSO_S5.md`, com material pronto em
-  `privado/SUBMISSAO_BASE.md` e `privado/RASCUNHO_REDDIT.md`.
+  (Receita A = ecossistema Sugar; Receita B = Uniswap) e o estado de cada
+  melhoria mapeada.
+- `privado/INFRA_E_DOMINIO.md` — domínio, DNS, variáveis de ambiente e contas:
+  tudo que só existe em painel e não viaja por git. **Tem regras com prazo.**
+- `privado/SEO.md` — **Plano de SEO v2** (fases S0–S7). Estado em 06/08/2026:
+  **S0 encerrada** (site indexado), **S1 e S2 congeladas** a pedido do Alan,
+  **S5 (distribuição/backlinks) é a fase da vez** — operacional em
+  `privado/PASSO_A_PASSO_S5.md`, com material em `privado/SUBMISSAO_BASE.md`
+  e `privado/RASCUNHO_REDDIT.md`.
 - `ebook/` (gitignored, local) — plano de monetização (material interno).
 
-## Estado atual (jul/2026)
-4 redes (Base, Optimism, Ethereum, Arbitrum) · 3 protocolos (Aerodrome,
-Velodrome, Uniswap v3). Roadmap público em `/roadmap`.
+## Estado atual (ago/2026)
+5 redes (Base, Optimism, Ethereum, Arbitrum, Robinhood Chain) · 3 protocolos
+(Aerodrome, Velodrome, Uniswap v3). Roadmap público em `/roadmap`.
+**Nenhum texto do site escreve nome de rede à mão** — tudo sai de `NETWORKS`
+em `app/site.ts`, com teste que impede envelhecer.
 
 ## Stack e arquitetura
 - Next.js (App Router) + TypeScript + viem. Preços: DefiLlama. Deploy: Vercel.
