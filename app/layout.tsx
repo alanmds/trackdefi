@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Fraunces, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "./site";
+import { COVERAGE, humanList, NETWORK_NAMES, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "./site";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -17,16 +17,15 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
+  /* as redes saem de NETWORK_NAMES: rede nova entra sozinha, e nenhuma fica
+     de fora por esquecimento (a Robinhood Chain ficou, entre 02 e 06/08). */
   keywords: [
     "liquidity pool tracker",
     "LP position tracker",
     "Aerodrome",
     "Uniswap v3",
     "Velodrome",
-    "Base network",
-    "Optimism",
-    "Arbitrum",
-    "Robinhood Chain",
+    ...NETWORK_NAMES.map((n) => `${n} LP tracker`),
     "DeFi portfolio",
     "concentrated liquidity",
     "wallet address",
@@ -92,8 +91,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </span>
             <span>Not financial advice. Verify data on-chain before acting. Prices by DefiLlama.</span>
             <span>
-              Coverage: Aerodrome (Base) · Velodrome (Optimism) · Uniswap v3 (Base, Ethereum, Arbitrum, Optimism
-              &amp; Robinhood Chain) — <Link href="/roadmap">see the roadmap</Link>.
+              Coverage:{" "}
+              {COVERAGE.map((c) => `${c.protocol} (${humanList(c.networks, "&")})`).join(" · ")} —{" "}
+              <Link href="/roadmap">see the roadmap</Link>.
             </span>
           </div>
         </footer>

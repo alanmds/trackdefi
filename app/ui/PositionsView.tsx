@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { PositionsResponseDTO } from "../../core/service";
-import { NETWORK_LABELS, networksSentence } from "../site";
+import { networksDotted, networksSentence } from "../site";
 import { fmtUsd, shortAddress } from "./format";
 import PositionCard from "./PositionCard";
 
@@ -74,12 +74,11 @@ export default function PositionsView({ address }: { address: string }) {
       <div className="wallet-head">
         <div className="wallet-id">
           <h1 title={address}>{shortAddress(address)}</h1>
-          <span className="wallet-sub">
-            {NETWORK_LABELS.join(" · ")} ·{" "}
-            <a href={`https://basescan.org/address/${address}`} target="_blank" rel="noopener noreferrer">
-              BaseScan ↗
-            </a>
-          </span>
+          {/* sem link de explorer aqui: o cabeçalho vale para TODAS as redes e
+              mandava todo mundo para o BaseScan, que só conhece a Base. Cada
+              card já linka o seu pool no explorer da rede certa
+              (PositionCard usa CHAINS[chainId].explorerUrl). */}
+          <span className="wallet-sub">{networksDotted()}</span>
         </div>
         <div className="wallet-actions">
           <button type="button" className="btn btn-ghost btn-sm" onClick={copy}>
@@ -124,8 +123,8 @@ export default function PositionsView({ address }: { address: string }) {
         <div className="state-box">
           <h2>No liquidity positions found</h2>
           <p>
-            This wallet has no active positions on Aerodrome, Velodrome or Uniswap v3 across Base, Optimism, Ethereum
-            and Arbitrum right now.
+            This wallet has no active positions on Aerodrome, Velodrome or Uniswap v3 across {networksSentence()}{" "}
+            right now.
           </p>
           <Link href="/" className="btn">
             Track another wallet

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { pageMetadata } from "../site";
+import { coverageSentence, pageMetadata } from "../site";
 
 export const metadata: Metadata = pageMetadata({
   path: "/how-it-works",
@@ -69,10 +69,8 @@ export default function HowItWorks() {
 
       <h2>Coverage</h2>
       <p>
-        Today: Aerodrome on Base, Velodrome on Optimism, and Uniswap v3 on Base, Ethereum, Arbitrum, Optimism and
-        Robinhood Chain. The
-        app is built so more networks and exchanges can be added without changing how it works for you — see{" "}
-        <Link href="/roadmap">the roadmap</Link>.
+        Today: {coverageSentence()}. The app is built so more networks and exchanges can be added without changing how
+        it works for you — see <Link href="/roadmap">the roadmap</Link>.
       </p>
 
       <p className="prose-back">

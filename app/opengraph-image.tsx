@@ -15,7 +15,7 @@
  */
 
 import { ImageResponse } from "next/og";
-import { SITE_NAME } from "./site";
+import { NETWORK_COUNT, SITE_NAME } from "./site";
 
 export const alt = `${SITE_NAME} — liquidity pool tracker`;
 export const size = { width: 1200, height: 630 };
@@ -71,7 +71,10 @@ export default function OpengraphImage() {
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 27, color: INK_SOFT }}>
             <div style={{ width: 16, height: 16, borderRadius: 8, background: GOOD }} />
-            <div style={{ display: "flex" }}>Base · Optimism · Ethereum · Arbitrum — read-only, no keys, no login</div>
+            {/* o número, não a lista: os nomes das cinco redes não cabem numa
+                linha aqui (o Satori não quebra linha dentro de um flex), e a
+                lista escrita à mão ficou sem a Robinhood Chain por dias. */}
+            <div style={{ display: "flex" }}>{NETWORK_COUNT} networks — read-only, no keys, no login</div>
           </div>
         </div>
       </div>

@@ -8,22 +8,74 @@
 export const SITE_NAME = "trackdefi";
 
 /**
- * Nomes das redes para TEXTO de interface, na ordem em que aparecem.
+ * Redes suportadas, na ordem em que aparecem nos textos.
  *
  * Vive aqui, e não em `core/chains.ts`, porque componentes client importam
  * este arquivo e `core/chains.ts` carrega as definições do viem — não vale
  * engordar o bundle do navegador por causa de uma frase.
  *
- * A duplicação é PROTEGIDA: `tests/chains.test.ts` compara esta lista com o
+ * `label` é o nome curto (badge do card de posição, onde o espaço é apertado);
+ * `name` é o nome por extenso do texto corrido. Só a Robinhood Chain difere.
+ *
+ * A duplicação é PROTEGIDA: `tests/chains.test.ts` compara os `label` com o
  * `CHAINS` de verdade. Rede nova sem atualizar aqui **quebra o teste**, não o
  * site — foi o que aconteceu em 02/08/2026, quando a Robinhood Chain entrou e
  * a página de resultados continuou anunciando quatro redes.
+ *
+ * ⚠️ REGRA: **nenhum texto do site escreve nome ou número de rede à mão.**
+ * Toda frase de cobertura sai das funções deste arquivo. Foi escrevendo à mão
+ * que "the Base blockchain" (quando já eram quatro redes) e "across 4
+ * networks" (quando já eram cinco) foram parar no ar sem ninguém ver.
+ * Exceção consciente: o /roadmap, onde cada item é um marco histórico e
+ * *deve* citar a rede daquela expansão pelo nome.
  */
-export const NETWORK_LABELS = ["Base", "Optimism", "Ethereum", "Arbitrum", "Robinhood"] as const;
+export const NETWORKS = [
+  { label: "Base", name: "Base" },
+  { label: "Optimism", name: "Optimism" },
+  { label: "Ethereum", name: "Ethereum" },
+  { label: "Arbitrum", name: "Arbitrum" },
+  { label: "Robinhood", name: "Robinhood Chain" },
+] as const;
 
-/** "Base, Optimism, Ethereum, Arbitrum and Robinhood" */
-export function networksSentence(): string {
-  return `${NETWORK_LABELS.slice(0, -1).join(", ")} and ${NETWORK_LABELS[NETWORK_LABELS.length - 1]}`;
+/** nomes por extenso, na ordem de exibição */
+export const NETWORK_NAMES: readonly string[] = NETWORKS.map((n) => n.name);
+
+/** quantas redes o site cobre — usar isto em vez de digitar o número */
+export const NETWORK_COUNT = NETWORKS.length;
+
+/** "A, B and C" (ou "A, B & C") — sem vírgula de Oxford, como o resto do site */
+export function humanList(items: readonly string[], last: "and" | "&" = "and"): string {
+  if (items.length === 0) return "";
+  if (items.length === 1) return items[0];
+  return `${items.slice(0, -1).join(", ")} ${last} ${items[items.length - 1]}`;
+}
+
+/** "Base, Optimism, Ethereum, Arbitrum and Robinhood Chain" */
+export function networksSentence(last: "and" | "&" = "and"): string {
+  return humanList(NETWORK_NAMES, last);
+}
+
+/** "Base · Optimism · Ethereum · Arbitrum · Robinhood Chain" */
+export function networksDotted(): string {
+  return NETWORK_NAMES.join(" · ");
+}
+
+/**
+ * Quem lê o quê, por protocolo. Aerodrome e Velodrome são de uma rede só por
+ * natureza; o Uniswap v3 roda em TODAS as redes registradas — conferido em
+ * `core/adapters/uniswap-v3/config.ts`, e `tests/chains.test.ts` garante que
+ * a união desta tabela continue cobrindo todas as redes.
+ */
+export const COVERAGE = [
+  { protocol: "Aerodrome", networks: ["Base"] as readonly string[] },
+  { protocol: "Velodrome", networks: ["Optimism"] as readonly string[] },
+  { protocol: "Uniswap v3", networks: NETWORK_NAMES },
+] as const;
+
+/** "Aerodrome on Base, Velodrome on Optimism, and Uniswap v3 on Base, …" */
+export function coverageSentence(): string {
+  const parts = COVERAGE.map((c) => `${c.protocol} on ${humanList(c.networks)}`);
+  return `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}`;
 }
 
 /**
@@ -36,10 +88,17 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://trackdefi.
 /** título da home (≤ 70 caracteres p/ não truncar no Google) */
 export const SITE_TITLE = `${SITE_NAME} — Liquidity Pool Tracker · Aerodrome, Velodrome & Uniswap v3`;
 
-/** descrição da home (~160 caracteres) — "& more" absorve rede nova sem
- *  estourar o limite do Google a cada expansão */
-export const SITE_DESCRIPTION =
-  "Free LP tracker: paste a wallet address to see every Aerodrome, Velodrome & Uniswap v3 position across Base, Optimism, Robinhood Chain & more — staked included.";
+/**
+ * Descrição da home (limite ~160 caracteres, guardado por teste).
+ *
+ * Conta as redes em vez de listá-las de propósito. Listar obrigava a escolher
+ * quais três cabiam — e a primeira da lista era sempre a Base, por acaso
+ * histórico de ter sido a rede inicial. O número nunca envelhece, não
+ * privilegia rede nenhuma e libera espaço para o diferencial (posição em
+ * stake). Os NOMES continuam no corpo das páginas, que é onde o Google os lê
+ * para ranquear — a meta description só decide a aparência do resultado.
+ */
+export const SITE_DESCRIPTION = `Free LP tracker: paste a wallet address to see every Aerodrome, Velodrome & Uniswap v3 position across ${NETWORK_COUNT} networks — gauge-staked ones included.`;
 
 /** sufixo do título, igual ao template do layout (`%s — trackdefi`) */
 const titleFor = (title?: string) => (title ? `${title} — ${SITE_NAME}` : SITE_TITLE);

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { pageMetadata } from "../site";
+import { NETWORK_COUNT, pageMetadata } from "../site";
 
 export const metadata: Metadata = pageMetadata({
   path: "/roadmap",
   title: "Roadmap — networks & exchanges",
-  description:
-    "Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome and Uniswap v3 across 4 networks; Uniswap v4, pool age and P&L planned.",
+  /* o número de redes vem de NETWORK_COUNT: escrito à mão, ficou preso em
+     "4 networks" e foi assim para o ar depois da Robinhood Chain. */
+  description: `Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome and Uniswap v3 across ${NETWORK_COUNT} networks; Uniswap v4, pool age and P&L planned.`,
 });
 
 function Status({ kind }: { kind: "live" | "next" | "planned" | "exploring" }) {
