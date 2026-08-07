@@ -53,11 +53,13 @@ Janeiro, não-programador). Windows.
   melhoria mapeada.
 - `privado/INFRA_E_DOMINIO.md` — domínio, DNS, variáveis de ambiente e contas:
   tudo que só existe em painel e não viaja por git. **Tem regras com prazo.**
-- `privado/SEO.md` — **Plano de SEO v2** (fases S0–S7). Estado em 06/08/2026:
-  **S0 encerrada** (site indexado), **S1 e S2 congeladas** a pedido do Alan,
-  **S5 (distribuição/backlinks) é a fase da vez** — operacional em
-  `privado/PASSO_A_PASSO_S5.md`, com material em `privado/SUBMISSAO_BASE.md`
-  e `privado/RASCUNHO_REDDIT.md`.
+- `privado/TRAFEGO_ORGANICO.md` — **como o site ganha visitantes**: o estado
+  de cada canal de divulgação (GitHub, Base, Reddit, listas, redes sociais),
+  o material pronto e as regras verificadas. É o arquivo único desse assunto.
+- `privado/SEO.md` — **estratégia** de SEO (objetivo, personas, mapa de
+  termos, on-page, ferramentas, medição). Estado em 06/08/2026: **S0
+  encerrada** (site indexado), **S1 e S2 congeladas** a pedido do Alan,
+  **distribuição é a frente da vez**.
 - `ebook/` (gitignored, local) — plano de monetização (material interno).
 
 ## Estado atual (ago/2026)
