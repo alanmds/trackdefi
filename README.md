@@ -3,7 +3,7 @@
 **Live at [trackdefi.app](https://trackdefi.app) — free, no login, no wallet connection.**
 
 Paste any wallet address and see all of its liquidity-pool positions across
-five networks, including the gauge-staked ones that most trackers miss.
+ten networks, including the gauge-staked ones that most trackers miss.
 Read-only: trackdefi never asks for private keys or seed phrases, and cannot
 move funds.
 
@@ -32,7 +32,7 @@ When a token has no reliable price, trackdefi shows `—` instead of guessing.
 | Exchange | Networks |
 |---|---|
 | Aerodrome | Base |
-| Velodrome | Optimism |
+| Velodrome | Optimism, Unichain, Ink, Mode, Soneium, Fraxtal |
 | Uniswap v3 | Base, Ethereum, Arbitrum, Optimism, Robinhood Chain |
 
 Classic (v2-style) and concentrated positions, staked or not, with pending fees

@@ -3,7 +3,7 @@
  * rótulo e RPCs. Adicionar rede = uma entrada aqui (Receita A do playbook).
  */
 
-import { arbitrum, base, mainnet, optimism, robinhood } from "viem/chains";
+import { arbitrum, base, fraxtal, ink, mainnet, mode, optimism, robinhood, soneium, unichain } from "viem/chains";
 import type { Chain } from "viem";
 
 export interface ChainInfo {
@@ -104,6 +104,78 @@ export const CHAINS: Record<number, ChainInfo> = {
       "https://arbitrum-one-rpc.publicnode.com",
       "https://arbitrum.llamarpc.com",
     ],
+  },
+
+  /* ── Leaf chains da Superchain (Velodrome) — Receita A, 10/08/2026 ──
+     Todas provadas em `poc/probe-superchain.ts` (RPC, multicall3, LP_SUGAR,
+     struct do Sugar e token de emissões). `secPerBlock` foi MEDIDO no PoC
+     sobre 10 mil blocos, não copiado da documentação. `priceSlug` foi
+     conferido pedindo um preço real à coins.llama.fi.
+
+     ⚠️ `yieldsLabel`: conferido no dataset em 10/08 — **Mode e Soneium não
+     aparecem nele** e Unichain/Fraxtal aparecem sem nenhuma pool da
+     Velodrome; só a Ink tem (17, projeto "velodrome-v3"). Os nomes abaixo
+     são os da DefiLlama (`api.llama.fi/v2/chains`, todas as 5 conhecidas),
+     então o dia em que o dataset ganhar essas pools o casamento já funciona.
+     Até lá o APR sai "—" honesto, como na Robinhood Chain. */
+  34443: {
+    chain: mode,
+    label: "Mode",
+    priceSlug: "mode",
+    yieldsLabel: "Mode",
+    explorerUrl: "https://modescan.io",
+    explorerLabel: "Modescan",
+    secPerBlock: 2,
+    rpcEnv: "MODE_RPC_URLS",
+    defaultRpcs: ["https://mainnet.mode.network", "https://mode.drpc.org"],
+  },
+  57073: {
+    chain: ink,
+    label: "Ink",
+    priceSlug: "ink",
+    yieldsLabel: "Ink",
+    explorerUrl: "https://explorer.inkonchain.com",
+    explorerLabel: "Blockscout",
+    secPerBlock: 1,
+    rpcEnv: "INK_RPC_URLS",
+    defaultRpcs: ["https://rpc-gel.inkonchain.com", "https://rpc-qnd.inkonchain.com", "https://ink.drpc.org"],
+  },
+  130: {
+    chain: unichain,
+    label: "Unichain",
+    priceSlug: "unichain",
+    yieldsLabel: "Unichain",
+    explorerUrl: "https://uniscan.xyz",
+    explorerLabel: "Uniscan",
+    secPerBlock: 1,
+    rpcEnv: "UNICHAIN_RPC_URLS",
+    defaultRpcs: [
+      "https://mainnet.unichain.org",
+      "https://unichain-rpc.publicnode.com",
+      "https://unichain.drpc.org",
+    ],
+  },
+  1868: {
+    chain: soneium,
+    label: "Soneium",
+    priceSlug: "soneium",
+    yieldsLabel: "Soneium",
+    explorerUrl: "https://soneium.blockscout.com",
+    explorerLabel: "Blockscout",
+    secPerBlock: 2,
+    rpcEnv: "SONEIUM_RPC_URLS",
+    defaultRpcs: ["https://rpc.soneium.org", "https://soneium.drpc.org"],
+  },
+  252: {
+    chain: fraxtal,
+    label: "Fraxtal",
+    priceSlug: "fraxtal",
+    yieldsLabel: "Fraxtal",
+    explorerUrl: "https://fraxscan.com",
+    explorerLabel: "Fraxscan",
+    secPerBlock: 2,
+    rpcEnv: "FRAXTAL_RPC_URLS",
+    defaultRpcs: ["https://rpc.frax.com", "https://fraxtal-rpc.publicnode.com", "https://fraxtal.drpc.org"],
   },
 };
 

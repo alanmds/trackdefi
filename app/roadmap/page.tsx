@@ -72,9 +72,20 @@ export default function Roadmap() {
         <li>
           <Status kind="live" />
           <span>
-            <strong>Robinhood Chain · Uniswap v3</strong> — the tokenized-stock L2, live since July 2026 and already
-            one of the largest Uniswap v3 deployments by liquidity. Positions, amounts, pending fees and range status
-            all work; pool APR shows &ldquo;—&rdquo; until public yield data covers this network.
+            {/* o texto vai entre chaves de propósito: solto, o JSX come o espaço
+                antes do travessão quando o trecho contém entidade HTML — foi
+                assim que "Uniswap v3— the tokenized-stock" foi parar no ar. */}
+            <strong>Robinhood Chain · Uniswap v3</strong>
+            {" — the tokenized-stock L2, live since July 2026 and already one of the largest Uniswap v3 deployments by liquidity. Positions, amounts, pending fees and range status all work; pool APR shows “—” until public yield data covers this network."}
+          </span>
+        </li>
+        <li>
+          <Status kind="live" />
+          <span>
+            <strong>Unichain, Ink, Mode, Soneium &amp; Fraxtal · Velodrome</strong>
+            {" — Velodrome's Superchain deployment. Five networks in one step, because they share the same architecture we already read: staked positions and pending XVELO emissions included. Emission "}
+            <em>values</em>
+            {" show “—” while public price data doesn't cover XVELO — the amounts are exact either way."}
           </span>
         </li>
       </ul>
@@ -84,8 +95,8 @@ export default function Roadmap() {
         <li>
           <Status kind="next" />
           <span>
-            <strong>More Superchain exchanges</strong>
-            {" (Mode, Lisk, Ink and friends) — they share Aerodrome's architecture, so coverage grows fast."}
+            <strong>Uniswap v4</strong>
+            {" — now the biggest gap in coverage: wallets already hold v4 positions on networks we support, and today they simply don't appear."}
           </span>
         </li>
       </ul>
@@ -95,16 +106,14 @@ export default function Roadmap() {
         <li>
           <Status kind="planned" />
           <span>
-            <strong>Uniswap v4</strong>
-            {
-              " — the new singleton-and-hooks architecture. Positions and value reuse the engine we already have; reading fees reliably across custom hooks is the harder part, so it follows the v3 rollout."
-            }
+            <strong>More Superchain networks</strong>
+            {" (Lisk, Swell, Metal L2, Superseed, Celo) — the tail of the same deployment, added the same way."}
           </span>
         </li>
         <li>
           <Status kind="planned" />
           <span>
-            <strong>The 10 biggest DeFi networks</strong> — the long-term goal: one address, every network, every
+            <strong>Every major DeFi network</strong> — the long-term goal: one address, every network, every
             position.
           </span>
         </li>
@@ -141,7 +150,7 @@ export default function Roadmap() {
         <li>Read straight from the blockchain, so what you see is the on-chain truth.</li>
       </ul>
 
-      <p className="roadmap-updated">Last updated: July 2026.</p>
+      <p className="roadmap-updated">Last updated: August 2026.</p>
 
       <p className="prose-back">
         <Link href="/" className="btn">

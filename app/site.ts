@@ -35,6 +35,11 @@ export const NETWORKS = [
   { label: "Ethereum", name: "Ethereum" },
   { label: "Arbitrum", name: "Arbitrum" },
   { label: "Robinhood", name: "Robinhood Chain" },
+  { label: "Unichain", name: "Unichain" },
+  { label: "Ink", name: "Ink" },
+  { label: "Mode", name: "Mode" },
+  { label: "Soneium", name: "Soneium" },
+  { label: "Fraxtal", name: "Fraxtal" },
 ] as const;
 
 /** nomes por extenso, na ordem de exibição */
@@ -61,16 +66,38 @@ export function networksDotted(): string {
 }
 
 /**
- * Quem lê o quê, por protocolo. Aerodrome e Velodrome são de uma rede só por
- * natureza; o Uniswap v3 roda em TODAS as redes registradas — conferido em
- * `core/adapters/uniswap-v3/config.ts`, e `tests/chains.test.ts` garante que
- * a união desta tabela continue cobrindo todas as redes.
+ * Quem lê o quê, por protocolo.
+ *
+ * ⚠️ Até 10/08/2026 o Uniswap v3 rodava em TODAS as redes registradas e esta
+ * tabela dizia `networks: NETWORK_NAMES`. **Deixou de ser verdade** quando as
+ * leaf chains da Superchain entraram (Receita A): a Velodrome roda nelas, o
+ * Uniswap v3 não. Cada protocolo agora lista as suas redes explicitamente, e
+ * `tests/chains.test.ts` compara ESTAS listas com os registries de verdade
+ * (os `config.ts` de cada adapter em `core/adapters/`) — protocolo que ganhe
+ * ou perca rede sem atualizar aqui quebra o teste, não o site.
  */
 export const COVERAGE = [
   { protocol: "Aerodrome", networks: ["Base"] as readonly string[] },
-  { protocol: "Velodrome", networks: ["Optimism"] as readonly string[] },
-  { protocol: "Uniswap v3", networks: NETWORK_NAMES },
+  {
+    protocol: "Velodrome",
+    networks: ["Optimism", "Unichain", "Ink", "Mode", "Soneium", "Fraxtal"] as readonly string[],
+  },
+  {
+    protocol: "Uniswap v3",
+    networks: ["Base", "Optimism", "Ethereum", "Arbitrum", "Robinhood Chain"] as readonly string[],
+  },
 ] as const;
+
+/**
+ * Redes de UM protocolo. Existe para que uma frase que fale de um protocolo
+ * específico ("gauges da Velodrome em…") continue saindo da tabela, e não da
+ * memória de quem escreveu — é a mesma regra do `NETWORKS`, um nível abaixo.
+ */
+export function networksOf(protocol: string): readonly string[] {
+  const c = COVERAGE.find((c) => c.protocol === protocol);
+  if (!c) throw new Error(`protocolo fora de COVERAGE: ${protocol}`);
+  return c.networks;
+}
 
 /** "Aerodrome on Base, Velodrome on Optimism, and Uniswap v3 on Base, …" */
 export function coverageSentence(): string {

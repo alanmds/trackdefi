@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SearchForm from "./ui/SearchForm";
-import { COVERAGE, coverageSentence, humanList, networksSentence, pageMetadata, SITE_NAME } from "./site";
+import { COVERAGE, coverageSentence, humanList, networksOf, networksSentence, pageMetadata, SITE_NAME } from "./site";
 
 const DEMO_WALLET = "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac";
 
@@ -16,7 +16,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Why don't my staked Aerodrome LP positions show up in my wallet?",
-    a: `When you stake a position in an Aerodrome gauge to earn AERO, the LP token (or NFT) moves into the gauge contract, so wallets and most portfolio trackers stop showing it. ${SITE_NAME} reads the gauges directly, so staked positions appear with their pending AERO emissions. The same applies to Velodrome gauges on Optimism, with VELO.`,
+    a: `When you stake a position in an Aerodrome gauge to earn AERO, the LP token (or NFT) moves into the gauge contract, so wallets and most portfolio trackers stop showing it. ${SITE_NAME} reads the gauges directly, so staked positions appear with their pending emissions. The same applies to Velodrome gauges on ${humanList(networksOf("Velodrome"))}.`,
   },
   {
     q: "Do I need to connect my wallet or create an account?",
@@ -87,7 +87,7 @@ export default function Home() {
           <h3>Staked positions included</h3>
           <p>
             Positions staked in Aerodrome or Velodrome gauges don&apos;t show up as tokens in the wallet. We read them
-            straight from the protocol, with their pending AERO or VELO emissions.
+            straight from the protocol, with their pending emissions.
           </p>
         </div>
         <div className="feature">

@@ -51,8 +51,8 @@ export default function HowItWorks() {
         </li>
         <li>
           For each position we compute how much of each token it holds, the pending fees, and the pending emissions
-          where the exchange pays them (AERO on Aerodrome, VELO on Velodrome) — and, for concentrated positions,
-          whether the price is inside your chosen range.
+          where the exchange pays them — and, for concentrated positions, whether the price is inside your chosen
+          range.
         </li>
         <li>
           US-dollar values come from public price data (DefiLlama). When a token has no reliable price, we show “—”

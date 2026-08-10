@@ -63,8 +63,10 @@ Janeiro, não-programador). Windows.
 - `ebook/` (gitignored, local) — plano de monetização (material interno).
 
 ## Estado atual (ago/2026)
-5 redes (Base, Optimism, Ethereum, Arbitrum, Robinhood Chain) · 3 protocolos
-(Aerodrome, Velodrome, Uniswap v3). Roadmap público em `/roadmap`.
+**10 redes** (Base, Optimism, Ethereum, Arbitrum, Robinhood Chain +
+Unichain, Ink, Mode, Soneium e Fraxtal, as leaf chains da Superchain que
+entraram em 10/08) · 3 protocolos (Aerodrome, Velodrome, Uniswap v3).
+Roadmap público em `/roadmap`.
 **Nenhum texto do site escreve nome de rede à mão** — tudo sai de `NETWORKS`
 em `app/site.ts`, com teste que impede envelhecer.
 

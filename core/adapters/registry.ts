@@ -7,7 +7,7 @@
 import type { ChainReader, ProtocolAdapter } from "../types";
 import { createReader } from "../chain";
 import { AerodromeAdapter } from "./aerodrome/index";
-import { VELODROME_OPTIMISM } from "./aerodrome/config";
+import { VELODROME_LEAF_CHAINS, VELODROME_OPTIMISM } from "./aerodrome/config";
 import { UniswapV3Adapter } from "./uniswap-v3/index";
 import { UNISWAP_V3_CHAINS } from "./uniswap-v3/config";
 
@@ -22,6 +22,7 @@ export function buildAdapters(opts: { onWarn?: (msg: string) => void } = {}): Pr
   return [
     new AerodromeAdapter(readerFor(8453), opts),
     new AerodromeAdapter(readerFor(10), { ...opts, config: VELODROME_OPTIMISM }),
+    ...VELODROME_LEAF_CHAINS.map((config) => new AerodromeAdapter(readerFor(config.chainId), { ...opts, config })),
     ...UNISWAP_V3_CHAINS.map((config) => new UniswapV3Adapter(readerFor(config.chainId), { ...opts, config })),
   ];
 }

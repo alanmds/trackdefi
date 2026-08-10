@@ -13,6 +13,8 @@
 
 import { describe, expect, it } from "vitest";
 import { CHAINS } from "../core/chains";
+import { AERODROME_BASE, VELODROME_LEAF_CHAINS, VELODROME_OPTIMISM } from "../core/adapters/aerodrome/config";
+import { UNISWAP_V3_CHAINS } from "../core/adapters/uniswap-v3/config";
 import {
   COVERAGE,
   humanList,
@@ -62,6 +64,41 @@ describe("frase de cobertura", () => {
     // seria uma rede varrida pelo motor e invisível nos textos do site.
     const cobertas = new Set(COVERAGE.flatMap((c) => [...c.networks]));
     expect([...cobertas].sort()).toEqual([...NETWORK_NAMES].sort());
+  });
+
+  /**
+   * O teste acima só garante que a UNIÃO fecha — ele passaria com os
+   * protocolos trocados entre si. Estes comparam protocolo a protocolo com o
+   * registry de verdade, que é o que o motor realmente varre.
+   *
+   * Até 10/08/2026 não fazia falta: o Uniswap v3 rodava em todas as redes e a
+   * tabela dizia `NETWORK_NAMES`. Com as leaf chains da Superchain isso
+   * quebrou (a Velodrome roda nelas, o Uniswap não) e a tabela virou lista à
+   * mão — que é exatamente o tipo de coisa que envelhece calada.
+   */
+  const nomeDaRede = (chainId: number): string => {
+    const label = CHAINS[chainId].label;
+    const rede = NETWORKS.find((n) => n.label === label);
+    if (!rede) throw new Error(`rede ${chainId} (${label}) não está em NETWORKS`);
+    return rede.name;
+  };
+  const redesDe = (protocolo: string) => {
+    const c = COVERAGE.find((c) => c.protocol === protocolo);
+    if (!c) throw new Error(`protocolo ${protocolo} sumiu de COVERAGE`);
+    return [...c.networks].sort();
+  };
+
+  it("Aerodrome cobre exatamente as redes do seu config", () => {
+    expect(redesDe("Aerodrome")).toEqual([nomeDaRede(AERODROME_BASE.chainId)].sort());
+  });
+
+  it("Velodrome cobre a Optimism mais todas as leaf chains da Superchain", () => {
+    const doRegistro = [VELODROME_OPTIMISM, ...VELODROME_LEAF_CHAINS].map((c) => nomeDaRede(c.chainId)).sort();
+    expect(redesDe("Velodrome")).toEqual(doRegistro);
+  });
+
+  it("Uniswap v3 cobre exatamente as redes do seu config", () => {
+    expect(redesDe("Uniswap v3")).toEqual(UNISWAP_V3_CHAINS.map((c) => nomeDaRede(c.chainId)).sort());
   });
 });
 
