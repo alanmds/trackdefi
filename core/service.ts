@@ -387,6 +387,13 @@ export const MAX_FEE_APR_POOLS = 40;
  * mapa vazio e o APR volta a sair da DefiLlama. Por isso tudo está dentro de
  * try/catch e o teto acima existe.
  */
+/**
+ * Protocolos cujo `poolAddress` NÃO é um pool no estilo v3 e portanto não
+ * respondem às leituras do fee APR on-chain. Medir ali não é "dado faltando",
+ * é pergunta sem sentido — some do cálculo sem virar aviso.
+ */
+const SEM_FEE_APR_ONCHAIN = new Set(["uniswap-v4"]);
+
 async function readFeeWindows(
   positions: LpPosition[],
   onWarn: (msg: string) => void,
@@ -395,6 +402,11 @@ async function readFeeWindows(
   const porRede = new Map<number, Set<string>>();
   for (const p of positions) {
     if (p.kind !== "concentrated" || !p.range?.inRange) continue; // fora do range rende 0, não precisa medir
+    /* O Uniswap v4 não tem contrato de pool: o `poolAddress` dele é o
+       singleton PoolManager, que não expõe `feeGrowthGlobal0X128`. Tentar
+       medir ali sempre reverte e gerava um aviso alarmante na tela ("some
+       data may be incomplete") por um caso perfeitamente normal. */
+    if (SEM_FEE_APR_ONCHAIN.has(p.protocol)) continue;
     const set = porRede.get(p.chainId) ?? new Set<string>();
     set.add(p.poolAddress.toLowerCase());
     porRede.set(p.chainId, set);

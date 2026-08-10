@@ -86,6 +86,7 @@ export const COVERAGE = [
     protocol: "Uniswap v3",
     networks: ["Base", "Optimism", "Ethereum", "Arbitrum", "Robinhood Chain"] as readonly string[],
   },
+  { protocol: "Uniswap v4", networks: ["Robinhood Chain"] as readonly string[] },
 ] as const;
 
 /**
@@ -98,6 +99,19 @@ export function networksOf(protocol: string): readonly string[] {
   if (!c) throw new Error(`protocolo fora de COVERAGE: ${protocol}`);
   return c.networks;
 }
+
+/**
+ * "Aerodrome, Velodrome & Uniswap" — as FAMÍLIAS, sem número de versão.
+ *
+ * Título e meta description precisam citar os protocolos e são curtos demais
+ * para caber "Uniswap v3 & v4" (o título já batia no teto de 70 caracteres
+ * com uma versão só). Citar a família resolve os dois problemas: cabe, e não
+ * envelhece a cada versão nova — que foi exatamente o que aconteceu com os
+ * nomes de rede antes do `NETWORKS`.
+ */
+export const PROTOCOL_FAMILIES: readonly string[] = [
+  ...new Set(COVERAGE.map((c) => c.protocol.replace(/ v\d+$/, ""))),
+];
 
 /** "Aerodrome on Base, Velodrome on Optimism, and Uniswap v3 on Base, …" */
 export function coverageSentence(): string {
@@ -113,7 +127,7 @@ export function coverageSentence(): string {
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://trackdefi.app").replace(/\/$/, "");
 
 /** título da home (≤ 70 caracteres p/ não truncar no Google) */
-export const SITE_TITLE = `${SITE_NAME} — Liquidity Pool Tracker · Aerodrome, Velodrome & Uniswap v3`;
+export const SITE_TITLE = `${SITE_NAME} — Liquidity Pool Tracker · ${humanList(PROTOCOL_FAMILIES, "&")}`;
 
 /**
  * Descrição da home (limite ~160 caracteres, guardado por teste).
@@ -125,7 +139,7 @@ export const SITE_TITLE = `${SITE_NAME} — Liquidity Pool Tracker · Aerodrome,
  * stake). Os NOMES continuam no corpo das páginas, que é onde o Google os lê
  * para ranquear — a meta description só decide a aparência do resultado.
  */
-export const SITE_DESCRIPTION = `Free LP tracker: paste a wallet address to see every Aerodrome, Velodrome & Uniswap v3 position across ${NETWORK_COUNT} networks — gauge-staked ones included.`;
+export const SITE_DESCRIPTION = `Free LP tracker: paste a wallet address to see every ${humanList(PROTOCOL_FAMILIES, "&")} position across ${NETWORK_COUNT} networks — gauge-staked ones included.`;
 
 /** sufixo do título, igual ao template do layout (`%s — trackdefi`) */
 const titleFor = (title?: string) => (title ? `${title} — ${SITE_NAME}` : SITE_TITLE);

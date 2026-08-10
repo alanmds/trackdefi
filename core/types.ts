@@ -122,4 +122,18 @@ export type ChainReader = {
     args?: readonly unknown[];
     account: Address;
   }): Promise<{ result: unknown }>;
+  /**
+   * Logs de um evento numa faixa de blocos. Existe por causa do Uniswap v4:
+   * o PositionManager dele NÃO é ERC721Enumerable, então a única forma de
+   * saber quais NFTs a carteira tem é o histórico de `Transfer`.
+   * Opcional (e nem todo RPC aceita faixa larga): adapter que dependa disso
+   * deve degradar com aviso, nunca devolver lista incompleta em silêncio.
+   */
+  getLogs?(args: {
+    address: Address;
+    event: unknown;
+    args?: Record<string, unknown>;
+    fromBlock: bigint;
+    toBlock: bigint;
+  }): Promise<{ args: Record<string, unknown> }[]>;
 };

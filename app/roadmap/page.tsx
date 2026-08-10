@@ -7,7 +7,7 @@ export const metadata: Metadata = pageMetadata({
   title: "Roadmap — networks & exchanges",
   /* o número de redes vem de NETWORK_COUNT: escrito à mão, ficou preso em
      "4 networks" e foi assim para o ar depois da Robinhood Chain. */
-  description: `Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome and Uniswap v3 across ${NETWORK_COUNT} networks; Uniswap v4, pool age and P&L planned.`,
+  description: `Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome and Uniswap across ${NETWORK_COUNT} networks; wider Uniswap v4 coverage, pool age and P&L next.`,
 });
 
 function Status({ kind }: { kind: "live" | "next" | "planned" | "exploring" }) {
@@ -88,6 +88,13 @@ export default function Roadmap() {
             {" show “—” while public price data doesn't cover XVELO — the amounts are exact either way."}
           </span>
         </li>
+        <li>
+          <Status kind="live" />
+          <span>
+            <strong>Robinhood Chain · Uniswap v4</strong>
+            {" — the singleton-and-hooks architecture. Positions, amounts, price ranges and pending swap fees, checked against Uniswap's own interface to the cent. Closed positions are hidden, same as Uniswap does."}
+          </span>
+        </li>
       </ul>
 
       <h2>Next</h2>
@@ -95,8 +102,8 @@ export default function Roadmap() {
         <li>
           <Status kind="next" />
           <span>
-            <strong>Uniswap v4</strong>
-            {" — now the biggest gap in coverage: wallets already hold v4 positions on networks we support, and today they simply don't appear."}
+            <strong>Uniswap v4 on more networks</strong>
+            {" — v4 has no cheap way to ask which positions a wallet owns, so it needs a node that will scan history. Solved on Robinhood Chain; Base and the rest follow."}
           </span>
         </li>
       </ul>

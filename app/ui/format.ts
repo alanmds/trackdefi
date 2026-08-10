@@ -47,6 +47,7 @@ const PROTOCOL_LABELS: Record<string, string> = {
   aerodrome: "Aerodrome",
   velodrome: "Velodrome",
   "uniswap-v3": "Uniswap v3",
+  "uniswap-v4": "Uniswap v4",
 };
 
 export function protocolLabel(id: string): string {

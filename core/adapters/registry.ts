@@ -10,6 +10,8 @@ import { AerodromeAdapter } from "./aerodrome/index";
 import { VELODROME_LEAF_CHAINS, VELODROME_OPTIMISM } from "./aerodrome/config";
 import { UniswapV3Adapter } from "./uniswap-v3/index";
 import { UNISWAP_V3_CHAINS } from "./uniswap-v3/config";
+import { UniswapV4Adapter } from "./uniswap-v4/index";
+import { UNISWAP_V4_CHAINS } from "./uniswap-v4/config";
 
 export function buildAdapters(opts: { onWarn?: (msg: string) => void } = {}): ProtocolAdapter[] {
   // um reader por rede, compartilhado entre os adapters daquela rede
@@ -24,5 +26,6 @@ export function buildAdapters(opts: { onWarn?: (msg: string) => void } = {}): Pr
     new AerodromeAdapter(readerFor(10), { ...opts, config: VELODROME_OPTIMISM }),
     ...VELODROME_LEAF_CHAINS.map((config) => new AerodromeAdapter(readerFor(config.chainId), { ...opts, config })),
     ...UNISWAP_V3_CHAINS.map((config) => new UniswapV3Adapter(readerFor(config.chainId), { ...opts, config })),
+    ...UNISWAP_V4_CHAINS.map((config) => new UniswapV4Adapter(readerFor(config.chainId), { ...opts, config })),
   ];
 }

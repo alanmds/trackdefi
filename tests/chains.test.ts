@@ -15,6 +15,7 @@ import { describe, expect, it } from "vitest";
 import { CHAINS } from "../core/chains";
 import { AERODROME_BASE, VELODROME_LEAF_CHAINS, VELODROME_OPTIMISM } from "../core/adapters/aerodrome/config";
 import { UNISWAP_V3_CHAINS } from "../core/adapters/uniswap-v3/config";
+import { UNISWAP_V4_CHAINS } from "../core/adapters/uniswap-v4/config";
 import {
   COVERAGE,
   humanList,
@@ -99,6 +100,13 @@ describe("frase de cobertura", () => {
 
   it("Uniswap v3 cobre exatamente as redes do seu config", () => {
     expect(redesDe("Uniswap v3")).toEqual(UNISWAP_V3_CHAINS.map((c) => nomeDaRede(c.chainId)).sort());
+  });
+
+  it("Uniswap v4 cobre exatamente as redes do seu config", () => {
+    // hoje só a Robinhood Chain: o v4 depende de RPC que aceite varredura de
+    // histórico, e o público da Base não aceita. Rede nova entra na config e
+    // ESTE teste cobra o texto do site.
+    expect(redesDe("Uniswap v4")).toEqual(UNISWAP_V4_CHAINS.map((c) => nomeDaRede(c.chainId)).sort());
   });
 });
 

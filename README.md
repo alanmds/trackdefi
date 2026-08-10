@@ -34,6 +34,7 @@ When a token has no reliable price, trackdefi shows `—` instead of guessing.
 | Aerodrome | Base |
 | Velodrome | Optimism, Unichain, Ink, Mode, Soneium, Fraxtal |
 | Uniswap v3 | Base, Ethereum, Arbitrum, Optimism, Robinhood Chain |
+| Uniswap v4 | Robinhood Chain |
 
 Classic (v2-style) and concentrated positions, staked or not, with pending fees
 and emissions. The [roadmap](https://trackdefi.app/roadmap) tracks what's next;
@@ -44,7 +45,8 @@ comes from.
 
 - **Next.js (App Router) + TypeScript** — site + API
 - **viem** — read-only on-chain access (Sugar contracts for the Aerodrome/
-  Velodrome family; the NonfungiblePositionManager for Uniswap v3)
+  Velodrome family; the NonfungiblePositionManager for Uniswap v3; the
+  PositionManager and StateView for Uniswap v4)
 - **DefiLlama** — USD prices and pool yield data (free, no key)
 - **Vercel** — hosting; **Vercel Analytics** — cookieless usage stats
 
