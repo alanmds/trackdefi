@@ -118,10 +118,11 @@ async function main() {
     console.log(`  não achei o toque em ${leituras} leituras (posição muito antiga ou RPC sem arquivo profundo)`);
   } else {
     // 2) binária entre baixo (antes) e alto (depois)
-    while (alto - baixo > 1n) {
-      const meio = (alto + baixo) / 2n;
+    let lo: bigint = baixo; // cópia não-nula: o TS perde o estreitamento no laço
+    while (alto - lo > 1n) {
+      const meio: bigint = (alto + lo) / 2n;
       const v = await valorEm(meio);
-      if (v === null || v !== alvo) baixo = meio;
+      if (v === null || v !== alvo) lo = meio;
       else alto = meio;
     }
     const b = await r.getBlock({ blockNumber: alto });
