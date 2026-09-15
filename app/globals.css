@@ -669,6 +669,69 @@ button {
   margin-top: 36px;
 }
 
+.prose-note {
+  color: var(--ink-2);
+  margin-top: 28px;
+}
+
+/* ------------------------------------------------------- changelog (/changelog)
+   Lista cronológica: a DATA é o que o olho procura, então ela vem antes do
+   título e fica na mesma linha do selo de tipo. */
+.changelog {
+  list-style: none;
+  padding-left: 0 !important;
+  gap: 0 !important;
+  margin-top: 26px;
+}
+
+.changelog-entry {
+  padding: 18px 0;
+  border-top: 1px solid var(--border);
+}
+
+.changelog-entry:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.changelog-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.changelog-date {
+  color: var(--ink-3);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.changelog-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  margin: 8px 0 6px;
+}
+
+.changelog-body {
+  color: var(--ink-2);
+  margin: 0;
+}
+
+/* linha "Updated …" da home: sinal de vida, não chamada de atenção — fica
+   abaixo da busca, do tamanho do texto de apoio que já existe ali */
+.whats-new {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--ink-3);
+}
+
+.whats-new .whats-new-date {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .roadmap-list {
   list-style: none;
   padding-left: 0 !important;
@@ -684,16 +747,6 @@ button {
   flex: none;
   margin-top: 2px;
   white-space: nowrap;
-}
-
-/* data de "no ar" sob cada item do roadmap: informação de apoio, não pode
-   competir com o texto do item */
-.roadmap-date {
-  display: block;
-  margin-top: 4px;
-  color: var(--ink-3);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
 }
 
 .roadmap-updated {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SearchForm from "./ui/SearchForm";
+import { fmtDate, LATEST } from "./changelog";
 import { COVERAGE, coverageSentence, humanList, networksOf, networksSentence, pageMetadata, SITE_NAME } from "./site";
 
 const DEMO_WALLET = "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac";
@@ -62,6 +63,12 @@ export default function Home() {
         <SearchForm autoFocus />
         <p className="try-demo">
           No wallet handy? <Link href={`/w/${DEMO_WALLET}`}>Try a demo wallet →</Link>
+        </p>
+        {/* sinal de que o site está vivo: a última mudança, datada, na página
+            que todo mundo vê. Sai de app/changelog.ts — nada escrito à mão. */}
+        <p className="whats-new">
+          <span className="whats-new-date">Updated {fmtDate(LATEST.date)}</span> — {LATEST.title}.{" "}
+          <Link href="/changelog">What&apos;s new →</Link>
         </p>
         <div className="coverage">
           {COVERAGE.map((c) => (

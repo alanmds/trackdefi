@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { NETWORK_COUNT, pageMetadata } from "../site";
-import { fmtDate, LAST_UPDATED, SHIPPED } from "./shipped";
+import { CHANGELOG, fmtDate } from "../changelog";
 
 export const metadata: Metadata = pageMetadata({
   path: "/roadmap",
@@ -10,15 +10,6 @@ export const metadata: Metadata = pageMetadata({
      "4 networks" e foi assim para o ar depois da Robinhood Chain. */
   description: `Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome and Uniswap across ${NETWORK_COUNT} networks; wider Uniswap v4 coverage, pool age and P&L next.`,
 });
-
-function Shipped({ at }: { at: { since: string; updated?: string } }) {
-  return (
-    <span className="roadmap-date">
-      Live since {fmtDate(at.since)}
-      {"updated" in at && at.updated ? ` · improved ${fmtDate(at.updated)}` : ""}
-    </span>
-  );
-}
 
 function Status({ kind }: { kind: "live" | "next" | "planned" | "exploring" }) {
   const map = {
@@ -48,7 +39,6 @@ export default function Roadmap() {
             <strong>Per-position APR — &ldquo;Earning now&rdquo;</strong> — what <em>your</em> position earns right
             now, not the pool average: swap fees and emissions counted separately, and an honest 0% when a
             concentrated position is out of range and earning nothing.
-            <Shipped at={SHIPPED.earningNow} />
           </span>
         </li>
         <li>
@@ -56,7 +46,6 @@ export default function Roadmap() {
           <span>
             <strong>Base · Aerodrome</strong> — classic and concentrated (Slipstream) positions, including
             gauge-staked ones, with pending fees and AERO emissions.
-            <Shipped at={SHIPPED.baseAerodrome} />
           </span>
         </li>
         <li>
@@ -64,7 +53,6 @@ export default function Roadmap() {
           <span>
             <strong>Base · Uniswap v3</strong> — concentrated positions with pending fees, read straight from the
             blockchain.
-            <Shipped at={SHIPPED.baseUniswapV3} />
           </span>
         </li>
         <li>
@@ -73,7 +61,6 @@ export default function Roadmap() {
             <strong>Optimism · Velodrome</strong>
             {" — "}Aerodrome&apos;s sister exchange: staked positions and VELO emissions included. Our first extra
             network.
-            <Shipped at={SHIPPED.optimismVelodrome} />
           </span>
         </li>
         <li>
@@ -81,7 +68,6 @@ export default function Roadmap() {
           <span>
             <strong>Ethereum, Arbitrum &amp; Optimism · Uniswap v3</strong> — the Base integration, now across the
             major networks.
-            <Shipped at={SHIPPED.uniswapV3Majors} />
           </span>
         </li>
         <li>
@@ -92,7 +78,6 @@ export default function Roadmap() {
                 assim que "Uniswap v3— the tokenized-stock" foi parar no ar. */}
             <strong>Robinhood Chain · Uniswap v3</strong>
             {" — the tokenized-stock L2, which launched in July 2026 and is already one of the largest Uniswap v3 deployments by liquidity. Positions, amounts, pending fees and range status all work; pool APR shows “—” until public yield data covers this network."}
-            <Shipped at={SHIPPED.robinhoodUniswapV3} />
           </span>
         </li>
         <li>
@@ -102,7 +87,6 @@ export default function Roadmap() {
             {" — Velodrome's Superchain deployment. Five networks in one step, because they share the same architecture we already read: staked positions and pending XVELO emissions included. Emission "}
             <em>values</em>
             {" show “—” while public price data doesn't cover XVELO — the amounts are exact either way."}
-            <Shipped at={SHIPPED.superchainVelodrome} />
           </span>
         </li>
         <li>
@@ -110,7 +94,6 @@ export default function Roadmap() {
           <span>
             <strong>Robinhood Chain · Uniswap v4</strong>
             {" — the singleton-and-hooks architecture. Positions, amounts, price ranges and pending swap fees, checked against Uniswap's own interface to the cent. Closed positions are hidden, same as Uniswap does."}
-            <Shipped at={SHIPPED.robinhoodUniswapV4} />
           </span>
         </li>
       </ul>
@@ -175,7 +158,9 @@ export default function Roadmap() {
         <li>Read straight from the blockchain, so what you see is the on-chain truth.</li>
       </ul>
 
-      <p className="roadmap-updated">Last updated: {fmtDate(LAST_UPDATED)}.</p>
+      <p className="roadmap-updated">
+        Last updated: {fmtDate(CHANGELOG[0].date)} — see <Link href="/changelog">what shipped and when</Link>.
+      </p>
 
       <p className="prose-back">
         <Link href="/" className="btn">

@@ -107,7 +107,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <span>
               Coverage:{" "}
               {COVERAGE.map((c) => `${c.protocol} (${humanList(c.networks, "&")})`).join(" · ")} —{" "}
-              <Link href="/roadmap">see the roadmap</Link>.
+              <Link href="/roadmap">see the roadmap</Link> · <Link href="/changelog">what&apos;s new</Link>.
             </span>
           </div>
         </footer>
