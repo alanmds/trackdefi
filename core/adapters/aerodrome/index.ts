@@ -406,6 +406,8 @@ export function toLpPosition(
         poolStakedLiquidity: pool.poolStakedLiquidity ?? null,
         emissionRatePerSec: pool.emissionRatePerSec ?? null,
         emissionToken: pool.gauge ? aero : null,
+        // o Sugar não devolve feeGrowthInside da posição → janela não validada
+        feeGrowthInside0LastX128: null,
       }
     : undefined;
 

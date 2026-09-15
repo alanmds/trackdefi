@@ -77,6 +77,14 @@ export interface EarningInputsOnchain {
   emissionRatePerSec: bigint | null;
   /** token de emissão do gauge (para o service buscar o preço) */
   emissionToken: TokenInfo | null;
+  /**
+   * `feeGrowthInside0LastX128` gravado NA POSIÇÃO no último mint/collect/
+   * modify. Serve para saber se ela já existia — e com o mesmo L — no início
+   * da janela do fee APR on-chain (ver `core/yields/onchain.ts`). Sem isso,
+   * uma posição aberta há 40 min recebe as taxas de 24 h do pool.
+   * null = o protocolo não expõe (o Sugar da Aerodrome não traz).
+   */
+  feeGrowthInside0LastX128: bigint | null;
 }
 
 export interface ProtocolAdapter {
@@ -107,6 +115,8 @@ export type ChainReader = {
       args?: readonly unknown[];
     }[];
     allowFailure: true;
+    /** lê tudo num bloco PASSADO — mesma exigência de arquivo do readContract */
+    blockNumber?: bigint;
   }): Promise<{ status: "success" | "failure"; result?: unknown; error?: Error }[]>;
   /** bloco mais recente — usado para montar a janela do fee APR on-chain */
   getBlockNumber?(): Promise<bigint>;

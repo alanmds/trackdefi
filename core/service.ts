@@ -16,7 +16,13 @@ import { defillamaPrices } from "./prices/defillama";
 import type { PriceProvider } from "./prices/types";
 import { getYieldsIndex, type YieldsIndex } from "./yields/defillama";
 import { computeEarning } from "./yields/positionApr";
-import { computeOnchainFeeApr, readFeeGrowthWindow, DEFAULT_WINDOW_HOURS, type FeeGrowthWindow } from "./yields/onchain";
+import {
+  computeOnchainFeeApr,
+  poolLayout,
+  readPositionFeeWindows,
+  type FeeGrowthWindow,
+  type FeeWindowTarget,
+} from "./yields/onchain";
 import { createReader } from "./chain";
 import { mapLimit } from "./util";
 import { orientRange } from "./math/ticks";
@@ -220,7 +226,7 @@ export function buildResponse(params: {
       const ei = p.earningInputs;
       const emToken = ei?.emissionToken ?? null;
       // taxas medidas NO CONTRATO quando houver janela (Receita G)
-      const win = feeWindows?.get(`${p.chainId}:${p.poolAddress.toLowerCase()}`);
+      const win = feeWindows?.get(feeWindowKey(p));
       const onchainFeeAprPct = win
         ? computeOnchainFeeApr({
             delta0: win.delta0,
@@ -388,45 +394,57 @@ export const MAX_FEE_APR_POOLS = 40;
  * try/catch e o teto acima existe.
  */
 /**
- * Protocolos cujo `poolAddress` NÃO é um pool no estilo v3 e portanto não
- * respondem às leituras do fee APR on-chain. Medir ali não é "dado faltando",
- * é pergunta sem sentido — some do cálculo sem virar aviso.
+ * Chave da janela de fee APR. É POR FAIXA, não por pool: a medição depende dos
+ * ticks da posição (Receita G v2), e duas posições na mesma faixa do mesmo
+ * pool compartilham o mesmo resultado.
  */
-const SEM_FEE_APR_ONCHAIN = new Set(["uniswap-v4"]);
+function feeWindowKey(p: LpPosition): string {
+  return `${p.chainId}:${p.poolAddress.toLowerCase()}:${p.range?.tickLower ?? ""}:${p.range?.tickUpper ?? ""}`;
+}
 
 async function readFeeWindows(
   positions: LpPosition[],
   onWarn: (msg: string) => void,
 ): Promise<Map<string, FeeGrowthWindow>> {
   const out = new Map<string, FeeGrowthWindow>();
-  const porRede = new Map<number, Set<string>>();
+  const porRede = new Map<number, FeeWindowTarget[]>();
+
   for (const p of positions) {
     if (p.kind !== "concentrated" || !p.range?.inRange) continue; // fora do range rende 0, não precisa medir
-    /* O Uniswap v4 não tem contrato de pool: o `poolAddress` dele é o
-       singleton PoolManager, que não expõe `feeGrowthGlobal0X128`. Tentar
-       medir ali sempre reverte e gerava um aviso alarmante na tela ("some
-       data may be incomplete") por um caso perfeitamente normal. */
-    if (SEM_FEE_APR_ONCHAIN.has(p.protocol)) continue;
-    const set = porRede.get(p.chainId) ?? new Set<string>();
-    set.add(p.poolAddress.toLowerCase());
-    porRede.set(p.chainId, set);
+    /* Protocolo sem layout de pool conhecido não é "dado faltando", é pergunta
+       sem sentido — o Uniswap v4 não tem contrato de pool (o `poolAddress` é o
+       singleton PoolManager), então medir ali sempre revertia e gerava um
+       aviso alarmante na tela por um caso perfeitamente normal. */
+    if (!poolLayout(p.protocol)) continue;
+
+    const alvos = porRede.get(p.chainId) ?? [];
+    const key = feeWindowKey(p);
+    if (!alvos.some((a) => a.key === key)) {
+      alvos.push({
+        key,
+        protocol: p.protocol,
+        pool: p.poolAddress,
+        tickLower: p.range.tickLower,
+        tickUpper: p.range.tickUpper,
+        inside0Last: p.earningInputs?.feeGrowthInside0LastX128 ?? null,
+      });
+    }
+    porRede.set(p.chainId, alvos);
   }
   if (porRede.size === 0) return out;
 
   let orcamento = MAX_FEE_APR_POOLS;
   await Promise.all(
-    [...porRede.entries()].map(async ([chainId, pools]) => {
+    [...porRede.entries()].map(async ([chainId, alvos]) => {
       const info = chainInfo(chainId);
       try {
         const reader = createReader(chainId);
         const bloco = await reader.getBlockNumber?.();
         if (bloco === undefined) return;
-        const alvos = [...pools].slice(0, Math.max(0, orcamento));
-        orcamento -= alvos.length;
-        await mapLimit(alvos, 6, async (pool) => {
-          const win = await readFeeGrowthWindow(reader, pool as Address, bloco, info.secPerBlock, DEFAULT_WINDOW_HOURS, onWarn);
-          if (win) out.set(`${chainId}:${pool}`, win);
-        });
+        const fatia = alvos.slice(0, Math.max(0, orcamento));
+        orcamento -= fatia.length;
+        const janelas = await readPositionFeeWindows(reader, fatia, bloco, info.secPerBlock, onWarn);
+        for (const [k, v] of janelas) out.set(k, v);
       } catch (e) {
         onWarn(`fee APR on-chain indisponível em ${info.label}: ${(e as Error).message.split("\n")[0].slice(0, 60)}`);
       }

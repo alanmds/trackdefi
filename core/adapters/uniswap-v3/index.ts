@@ -112,6 +112,7 @@ export class UniswapV3Adapter implements ProtocolAdapter {
           poolStakedLiquidity: null,
           emissionRatePerSec: null,
           emissionToken: null,
+          feeGrowthInside0LastX128: p.feeGrowthInside0LastX128,
         },
       });
     }
@@ -165,6 +166,7 @@ export class UniswapV3Adapter implements ProtocolAdapter {
         tickLower: Number(v[5]),
         tickUpper: Number(v[6]),
         liquidity: v[7] as bigint,
+        feeGrowthInside0LastX128: v[8] as bigint,
         tokensOwed0: v[10] as bigint,
         tokensOwed1: v[11] as bigint,
       });

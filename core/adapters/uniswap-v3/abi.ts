@@ -32,6 +32,8 @@ export type UniRawPosition = {
   tickLower: number;
   tickUpper: number;
   liquidity: bigint;
+  /** feeGrowthInside0LastX128 — valida a janela do fee APR on-chain */
+  feeGrowthInside0LastX128: bigint;
   tokensOwed0: bigint;
   tokensOwed1: bigint;
 };

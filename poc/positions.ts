@@ -73,6 +73,20 @@ async function main() {
         `   Faixa: ${price(p.range.lower)} – ${price(p.range.upper)} ${p.range.quoteLabel} → ${p.range.inRange ? "✅ NA FAIXA" : "⚠️ FORA DA FAIXA"}`,
       );
     }
+    /* "Rendendo agora" é o número que o SITE mostra em destaque (Receita C2).
+       Ficou anos fora daqui, e foi por isso que a investigação de 15/09/2026
+       começou achando que a posição RWA não tinha APR nenhum: o CLI só
+       imprimia o APR do pool (DefiLlama), que naquele caso é mesmo null. */
+    if (p.earning) {
+      const e = p.earning;
+      const partes = [
+        `taxas ${e.feePct === null ? "—" : e.feePct.toFixed(2) + "%"}`,
+        `emissões ${e.emissionPct === null ? "—" : e.emissionPct.toFixed(2) + "%"}`,
+      ];
+      console.log(`   Rendendo agora: ${e.nowPct.toFixed(2)}% a.a. (${partes.join(" + ")}) · medido no contrato`);
+    } else if (p.range) {
+      console.log(`   Rendendo agora: — (sem dado confiável)`);
+    }
     if (p.apr) {
       console.log(
         `   APR do pool: ${p.apr.current.toFixed(2)}% a.a. (taxas ${p.apr.base?.toFixed(2) ?? "—"}% + emissões ${p.apr.reward?.toFixed(2) ?? "—"}%) · média 30d ${p.apr.mean30d?.toFixed(2) ?? "—"}% · ${p.apr.source}`,

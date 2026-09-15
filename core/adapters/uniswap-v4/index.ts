@@ -140,6 +140,8 @@ export class UniswapV4Adapter implements ProtocolAdapter {
           poolStakedLiquidity: null,
           emissionRatePerSec: null,
           emissionToken: null,
+          // v4 não tem contrato de pool próprio → sem fee APR on-chain
+          feeGrowthInside0LastX128: null,
         },
       });
     }
