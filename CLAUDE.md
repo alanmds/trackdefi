@@ -82,6 +82,11 @@ em `app/site.ts`, com teste que impede envelhecer.
 1. **Publicar (git push) só com aprovação do Alan** — push vai direto para
    produção. Antes de publicar: `npm run typecheck && npm test && npm run build`.
 2. Depois de cada deploy: `npx tsx poc/validate-live.ts https://trackdefi.app`.
+2b. **Mudança que o usuário percebe = entrada nova em `app/changelog.ts`**, no
+   MESMO commit. É de lá que saem a página `/changelog`, a linha "Updated …"
+   da home e o rodapé do `/roadmap` — um log que para de crescer diz ao
+   visitante que o site parou. Data = o dia em que foi AO AR; texto para o
+   usuário, não para quem programa (tem teste barrando texto de commit).
 3. Nova rede/protocolo: **PoC primeiro** (script em `poc/`) antes de tocar no
    site; confirmar endereços na doc OFICIAL, nunca de memória.
 4. **TypeScript fixado em 5.x** — TS 7 quebra a integração do Next 16.
