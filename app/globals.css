@@ -686,6 +686,16 @@ button {
   white-space: nowrap;
 }
 
+/* data de "no ar" sob cada item do roadmap: informação de apoio, não pode
+   competir com o texto do item */
+.roadmap-date {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
 .roadmap-updated {
   color: var(--ink-3);
   font-size: 13px;
