@@ -491,6 +491,75 @@ button {
   color: var(--warn);
 }
 
+/* ------------------------------------------------- "Earning now" multi-janela
+   Uma linha por janela de medição. A grade é fixa em 3 colunas para os números
+   alinharem entre as linhas — comparar 15 min com 24 h é o ponto do bloco. */
+.earning {
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font-size: 13px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  cursor: help;
+  display: grid;
+  gap: 3px;
+}
+
+.earning-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.earning-poolref {
+  font-weight: 400;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.earning-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.earning-when {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.earning-pct {
+  color: var(--good);
+  font-size: 14px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.earning-usd {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  /* no celular a coluna do dólar cai para baixo em vez de espremer o número */
+  .earning-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .earning-usd {
+    grid-column: 2;
+    text-align: right;
+  }
+}
+
 /* linha de APR do pool (fonte externa, discreta) */
 
 .apr-line {

@@ -43,6 +43,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 export const CHANGELOG: ChangeEntry[] = [
   {
     date: "2026-09-15",
+    kind: "feature",
+    title: "Two measurement windows, side by side",
+    body:
+      "Swap fees are now measured over 24 hours and over 15 minutes at once, each with the dollar amount earned inside that window. Reading them together tells you something neither says alone: a short window far above the long one means the pool is busy right now, and far below means the move already passed. The plausibility cap came off measured fees too — a pool genuinely paying 2,000% now says 2,000%, and judging whether that is worth your money is yours to do, not ours.",
+  },
+  {
+    date: "2026-09-15",
     kind: "improvement",
     title: "Sharper APR for concentrated positions",
     body:

@@ -97,9 +97,15 @@ export function computeEarning(i: EarningInputs): EarningNow | null {
 }
 
 function computeFee(i: EarningInputs): number | null {
-  // medido no contrato vence estimativa de terceiro (Receita G)
+  /* Medido no contrato vence estimativa de terceiro (Receita G) — e NÃO passa
+     pelo teto de plausibilidade daqui. Ele já atravessou a barreira de absurdo
+     aritmético do `onchain.ts`, e aplicar 1.000% de novo esconderia rendimento
+     real (decisão do Alan em 15/09/2026). O teto continua valendo para o que
+     vem abaixo, que é ESTIMATIVA a partir de dado de terceiro, e para as
+     emissões, que são foto única. */
   if (i.onchainFeeAprPct !== null && i.onchainFeeAprPct !== undefined) {
-    return within(i.onchainFeeAprPct) ? i.onchainFeeAprPct : null;
+    const pct = i.onchainFeeAprPct;
+    return Number.isFinite(pct) && pct >= 0 ? pct : null;
   }
   if (
     i.poolFeeAprPct === null ||

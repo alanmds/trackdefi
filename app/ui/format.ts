@@ -33,6 +33,30 @@ export function fmtRangePrice(n: number): string {
   return new Intl.NumberFormat("en-US", { maximumSignificantDigits: 6 }).format(n);
 }
 
+/**
+ * Dólar de taxa ganha numa janela de medição.
+ *
+ * Numa janela de 15 min o valor costuma ser fração de centavo. `fmtUsd`
+ * arredondaria para "$0.00" (parece defeito) e a precisão crua imprime
+ * "$0.0000000006" (ruído que não ajuda ninguém a decidir nada). O meio-termo
+ * honesto é dizer que é menos de um centavo — a taxa em % ao lado é que
+ * carrega a informação nesse tamanho.
+ */
+export function fmtUsdFine(n: number | null | undefined): string {
+  if (n === null || n === undefined || !Number.isFinite(n)) return "—";
+  if (n === 0) return "$0.00";
+  if (Math.abs(n) >= 0.01) return fmtUsd(n);
+  return n > 0 ? "< $0.01" : "> -$0.01";
+}
+
+/** duração da janela de medição: 900 → "15 min", 86400 → "24 h" */
+export function fmtWindow(sec: number): string {
+  if (!Number.isFinite(sec) || sec <= 0) return "—";
+  if (sec < 3600) return `${Math.round(sec / 60)} min`;
+  const h = sec / 3600;
+  return `${h % 1 === 0 ? h : h.toFixed(1)} h`;
+}
+
 export function shortAddress(addr: string): string {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }

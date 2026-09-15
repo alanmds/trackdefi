@@ -20,7 +20,7 @@ import {
   computeOnchainFeeApr,
   poolLayout,
   readPositionFeeWindows,
-  type FeeGrowthWindow,
+  type FeeWindowsResult,
   type FeeWindowTarget,
 } from "./yields/onchain";
 import { createReader } from "./chain";
@@ -68,6 +68,16 @@ export interface AprDTO {
 }
 
 /** APR "rendendo agora" da POSIÇÃO (Receita C2) — 0 fora do range; null = "—" */
+/** uma janela de medição de taxas, já em números de exibição */
+export interface EarningWindowDTO {
+  /** duração real medida, em segundos (a UI escreve "15 min" / "24 h") */
+  windowSec: number;
+  /** % ao ano das taxas nesta janela */
+  feePct: number;
+  /** quanto a posição ganhou em taxas DENTRO da janela, em US$ */
+  feeUsd: number;
+}
+
 export interface EarningDTO {
   /** taxas + emissões que ESTA posição rende agora; 0 fora do range */
   nowPct: number;
@@ -75,6 +85,17 @@ export interface EarningDTO {
   feePct: number | null;
   /** componente de emissões do gauge (staked); null = não se aplica */
   emissionPct: number | null;
+  /**
+   * Cada janela medida (24 h e 15 min), da mais longa para a mais curta.
+   * Vazio = nenhuma medição no contrato — `feePct` então veio da estimativa
+   * antiga, ou não há número. O percentual sozinho engana quem opera no dia:
+   * anualizar 15 minutos multiplica por 35.040, então a tela mostra SEMPRE o
+   * valor em dólar ao lado.
+   */
+  windows: EarningWindowDTO[];
+  /** em range, porém mais nova que a menor janela — a tela avisa em vez de
+   *  deixar um vazio mudo */
+  tooNew: boolean;
 }
 
 export interface PositionDTO {
@@ -148,9 +169,9 @@ export function buildResponse(params: {
   protocols?: string[];
   chains?: string[];
   yields?: YieldsIndex | null;
-  /** janelas de feeGrowth por `chainId:pool` — fee APR medido no contrato
+  /** janelas de feeGrowth por posição — fee APR medido no contrato
    *  (Receita G). Ausente = cai no apyBase da DefiLlama. */
-  feeWindows?: Map<string, FeeGrowthWindow>;
+  feeWindows?: FeeWindowsResult;
 }): PositionsResponseDTO {
   const {
     address,
@@ -226,21 +247,32 @@ export function buildResponse(params: {
       const ei = p.earningInputs;
       const emToken = ei?.emissionToken ?? null;
       // taxas medidas NO CONTRATO quando houver janela (Receita G)
-      const win = feeWindows?.get(feeWindowKey(p));
-      const onchainFeeAprPct = win
-        ? computeOnchainFeeApr({
-            delta0: win.delta0,
-            delta1: win.delta1,
-            posLiquidity: ei?.liquidity ?? null,
-            windowSec: win.windowSec,
-            decimals0: p.token0.decimals,
-            decimals1: p.token1.decimals,
-            price0Usd: p0,
-            price1Usd: p1,
-            positionValueUsd: valueUsd,
-          })
-        : null;
-      earning = computeEarning({
+      const chave = feeWindowKey(p);
+      /* TODAS as janelas medidas viram linha na tela (24 h e 15 min). A mais
+         LONGA alimenta os campos antigos do DTO: é a menos ruidosa, e é ela
+         que responde "quanto isto rende", enquanto a curta responde "está
+         quente agora?". */
+      const janelas: EarningWindowDTO[] = [];
+      for (const win of feeWindows?.byTarget.get(chave) ?? []) {
+        const r = computeOnchainFeeApr({
+          delta0: win.delta0,
+          delta1: win.delta1,
+          posLiquidity: ei?.liquidity ?? null,
+          windowSec: win.windowSec,
+          decimals0: p.token0.decimals,
+          decimals1: p.token1.decimals,
+          price0Usd: p0,
+          price1Usd: p1,
+          positionValueUsd: valueUsd,
+        });
+        if (r) janelas.push({ windowSec: r.windowSec, feePct: r.pct, feeUsd: r.feesUsd });
+      }
+      /* mais CURTA primeiro: é a ordem da tela, e é a que responde "está quente
+         agora?". Os campos antigos do DTO seguem com a janela mais LONGA, que
+         é a menos ruidosa — trocar isso deixaria `nowPct` pulando. */
+      janelas.sort((a, b) => a.windowSec - b.windowSec);
+      const onchainFeeAprPct = janelas.length > 0 ? janelas[janelas.length - 1].feePct : null;
+      const base = computeEarning({
         inRange: p.range.inRange,
         onchainFeeAprPct,
         valueUsd,
@@ -255,6 +287,14 @@ export function buildResponse(params: {
         emissionPriceUsd: emToken ? priceOf(prices, p.chainId, emToken.address) : null,
         emissionDecimals: emToken?.decimals ?? 18,
       });
+      const tooNew = feeWindows?.tooNew.has(chave) ?? false;
+      if (base) {
+        earning = { ...base, windows: janelas, tooNew };
+      } else if (tooNew) {
+        /* Em range e sem número por ser nova demais: a tela precisa DIZER isso.
+           Um vazio mudo foi exatamente a queixa que abriu esta frente. */
+        earning = { nowPct: 0, feePct: null, emissionPct: null, windows: [], tooNew: true };
+      }
     }
 
     return {
@@ -405,8 +445,8 @@ function feeWindowKey(p: LpPosition): string {
 async function readFeeWindows(
   positions: LpPosition[],
   onWarn: (msg: string) => void,
-): Promise<Map<string, FeeGrowthWindow>> {
-  const out = new Map<string, FeeGrowthWindow>();
+): Promise<FeeWindowsResult> {
+  const out: FeeWindowsResult = { byTarget: new Map(), tooNew: new Set() };
   const porRede = new Map<number, FeeWindowTarget[]>();
 
   for (const p of positions) {
@@ -443,8 +483,9 @@ async function readFeeWindows(
         if (bloco === undefined) return;
         const fatia = alvos.slice(0, Math.max(0, orcamento));
         orcamento -= fatia.length;
-        const janelas = await readPositionFeeWindows(reader, fatia, bloco, info.secPerBlock, onWarn);
-        for (const [k, v] of janelas) out.set(k, v);
+        const r = await readPositionFeeWindows(reader, fatia, bloco, info.secPerBlock, onWarn);
+        for (const [k, v] of r.byTarget) out.byTarget.set(k, v);
+        for (const k of r.tooNew) out.tooNew.add(k);
       } catch (e) {
         onWarn(`fee APR on-chain indisponível em ${info.label}: ${(e as Error).message.split("\n")[0].slice(0, 60)}`);
       }

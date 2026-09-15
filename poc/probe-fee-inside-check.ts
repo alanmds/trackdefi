@@ -83,7 +83,7 @@ async function main() {
     delta0: w.delta0, delta1: w.delta1, posLiquidity: L, windowSec: w.windowSec,
     decimals0: 6, decimals1: 18, price0Usd: precos.u, price1Usd: precos.h, positionValueUsd: 193.04,
   });
-  const a = comIdade.get("rwa"), b = semIdade.get("rwa");
+  const a = comIdade.byTarget.get("rwa")?.[0], b = semIdade.byTarget.get("rwa")?.[0];
   console.log(`  COM guarda de idade : janela ${a ? a.windowSec / 60 + " min" : "—"} → ${apr(a)?.toFixed(2) ?? "—"}% a.a.`);
   console.log(`  SEM guarda de idade : janela ${b ? b.windowSec / 3600 + " h" : "—"} → ${apr(b)?.toFixed(2) ?? "—"}% a.a.`);
   console.log(`\n  deltas da janela escolhida (para o teste de regressão):`);

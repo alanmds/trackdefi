@@ -1,6 +1,6 @@
 import type { PositionDTO } from "../../core/service";
 import { CHAINS } from "../../core/chains";
-import { fmtAmount, fmtPct, fmtUsd, protocolLabel } from "./format";
+import { fmtAmount, fmtPct, fmtUsd, fmtUsdFine, fmtWindow, protocolLabel } from "./format";
 import RangeBar from "./RangeBar";
 
 function kindLabel(p: PositionDTO): string {
@@ -12,12 +12,23 @@ export default function PositionCard({ p }: { p: PositionDTO }) {
   const chain = CHAINS[p.chainId];
   const explorerUrl = chain?.explorerUrl ?? "https://basescan.org";
 
-  // "rendendo agora" (Receita C2): número da POSIÇÃO; APR do pool vira referência
+  /* "Rendendo agora" (Receitas C2 + G v2). Desde 15/09/2026 são VÁRIAS linhas:
+     uma por janela medida (24 h e 15 min), cada uma com o valor em dólar ao
+     lado. O percentual sozinho engana quem opera no dia — anualizar 15 minutos
+     multiplica por 35.040 —, então a escala em dinheiro anda junto sempre. */
   const e = p.earning;
   const poolRef = p.apr ? ` · pool ${fmtPct(p.apr.current)}` : "";
+  const janelas = e?.windows ?? [];
+
+  const tipJanelas =
+    `Swap fees this position actually earned, measured in the pool contract. ` +
+    `Each row shows one measurement window: the rate is annualised, the dollar figure is what was earned inside that window. ` +
+    `A short window running far above the long one means the pool is busy right now.` +
+    (p.apr ? ` Pool average of all in-range liquidity: ${fmtPct(p.apr.current)}/yr (${p.apr.source}).` : "");
+
   let earningSub = "";
   let earningTip = "";
-  if (e && e.nowPct === 0) {
+  if (e && e.nowPct === 0 && janelas.length === 0) {
     earningSub = `out of range${poolRef}`;
     earningTip =
       `Out of range: this position is earning no swap fees right now` +
@@ -65,8 +76,41 @@ export default function PositionCard({ p }: { p: PositionDTO }) {
         {p.positionId && <span className="badge">NFT #{p.positionId}</span>}
       </div>
 
-      {e ? (
-        // "rendendo agora" da POSIÇÃO (taxas + emissões); 0 fora do range
+      {e && janelas.length > 0 ? (
+        /* uma linha por janela medida — a curta em cima, que é a pergunta de
+           quem opera no dia; emissões entram como linha própria porque não são
+           medidas em janela, são a taxa corrente do gauge */
+        <div className="earning" title={tipJanelas}>
+          <div className="earning-head">
+            Earning now
+            {p.apr && <span className="earning-poolref">pool {fmtPct(p.apr.current)}</span>}
+          </div>
+          {janelas.map((w) => (
+            <div className="earning-row" key={w.windowSec}>
+              <span className="earning-when">Last {fmtWindow(w.windowSec)}</span>
+              <b className="earning-pct">{fmtPct(w.feePct)}/yr</b>
+              <span className="earning-usd">{fmtUsdFine(w.feeUsd)} in fees</span>
+            </div>
+          ))}
+          {e.emissionPct !== null && (
+            <div className="earning-row">
+              <span className="earning-when">Emissions</span>
+              <b className="earning-pct">{fmtPct(e.emissionPct)}/yr</b>
+              <span className="earning-usd">current rate</span>
+            </div>
+          )}
+        </div>
+      ) : e && e.tooNew ? (
+        /* A queixa que abriu esta frente foi um card MUDO. Posição nova demais
+           tem de dizer o que está acontecendo, não sumir com a linha. */
+        <div className="apr-line" title="This position was opened moments ago. Fees are measured over a window, and the shortest window the site uses is 15 minutes — so the first reading appears once the position is old enough to fill it.">
+          <span className="apr-main">
+            Earning now <b>—</b>
+          </span>
+          <span className="apr-sub">just opened · first reading in ~15 min{poolRef}</span>
+        </div>
+      ) : e ? (
+        // fora do range, ou estimativa sem medição no contrato
         <div className={`apr-line${e.nowPct === 0 ? " apr-zero" : ""}`} title={earningTip}>
           <span className="apr-main">
             Earning now <b>{fmtPct(e.nowPct)}</b>

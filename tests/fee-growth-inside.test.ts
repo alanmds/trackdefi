@@ -169,7 +169,7 @@ describe("posição RWA real: USDG/HIMS na Robinhood (15/09/2026)", () => {
       windowSec: 900,
     });
     expect(apr).not.toBeNull();
-    expect(apr as number).toBeCloseTo(44.45, 1);
+    expect(apr!.pct).toBeCloseTo(44.45, 1);
   });
 
   it("o número inflado do método antigo (971%) fica abaixo do teto e passaria — por isso o bug era invisível", () => {
@@ -181,7 +181,7 @@ describe("posição RWA real: USDG/HIMS na Robinhood (15/09/2026)", () => {
       windowSec: 900,
     });
     expect(apr).not.toBeNull();
-    expect(apr as number).toBeGreaterThan(900);
-    expect(apr as number).toBeLessThan(1000);
+    expect(apr!.pct).toBeGreaterThan(900);
+    expect(apr!.pct).toBeLessThan(1000);
   });
 });

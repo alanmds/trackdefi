@@ -38,11 +38,11 @@ async function main() {
   const janelas = await readPositionFeeWindows(reader, targets, bloco, info.secPerBlock, (m) => console.log("  aviso:", m));
 
   alvos.forEach((p, i) => {
-    const w = janelas.get(String(i));
+    const w = janelas.byTarget.get(String(i))?.[0];
     console.log(
       `  ${p.poolSymbol.padEnd(26)} ${w ? `janela ${w.windowSec / 3600} h · delta0=${w.delta0} delta1=${w.delta1}` : "SEM JANELA (caiu no fallback)"}`,
     );
   });
-  console.log(`\n  ${janelas.size}/${targets.length} posições medidas NO CONTRATO`);
+  console.log(`\n  ${janelas.byTarget.size}/${targets.length} posições medidas NO CONTRATO`);
 }
 main().catch((e) => { console.error("ERRO:", e); process.exit(1); });

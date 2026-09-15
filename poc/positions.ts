@@ -77,13 +77,27 @@ async function main() {
        Ficou anos fora daqui, e foi por isso que a investigação de 15/09/2026
        começou achando que a posição RWA não tinha APR nenhum: o CLI só
        imprimia o APR do pool (DefiLlama), que naquele caso é mesmo null. */
-    if (p.earning) {
+    if (p.earning && p.earning.windows.length > 0) {
+      // uma linha por janela medida, igual à tela (24 h e 15 min)
+      console.log(`   Rendendo agora:`);
+      for (const w of p.earning.windows) {
+        const rotulo = w.windowSec < 3600 ? `${Math.round(w.windowSec / 60)} min` : `${Math.round(w.windowSec / 3600)} h`;
+        console.log(
+          `     ${rotulo.padStart(6)}  ${w.feePct.toFixed(2).padStart(10)}% a.a.  ·  US$ ${w.feeUsd.toFixed(w.feeUsd < 0.01 ? 6 : 2)} em taxas`,
+        );
+      }
+      if (p.earning.emissionPct !== null) {
+        console.log(`     ${"emiss".padStart(6)}  ${p.earning.emissionPct.toFixed(2).padStart(10)}% a.a.  ·  taxa corrente do gauge`);
+      }
+    } else if (p.earning?.tooNew) {
+      console.log(`   Rendendo agora: — (posição recém-aberta; primeira leitura em ~15 min)`);
+    } else if (p.earning) {
       const e = p.earning;
       const partes = [
         `taxas ${e.feePct === null ? "—" : e.feePct.toFixed(2) + "%"}`,
         `emissões ${e.emissionPct === null ? "—" : e.emissionPct.toFixed(2) + "%"}`,
       ];
-      console.log(`   Rendendo agora: ${e.nowPct.toFixed(2)}% a.a. (${partes.join(" + ")}) · medido no contrato`);
+      console.log(`   Rendendo agora: ${e.nowPct.toFixed(2)}% a.a. (${partes.join(" + ")})`);
     } else if (p.range) {
       console.log(`   Rendendo agora: — (sem dado confiável)`);
     }

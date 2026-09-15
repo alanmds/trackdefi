@@ -62,7 +62,6 @@
 
 import { parseAbi, type Address } from "viem";
 import type { ChainReader } from "../types";
-import { MAX_SANE_EARNING } from "./positionApr";
 
 const MOD256 = 2n ** 256n;
 const Q128 = 2n ** 128n;
@@ -77,11 +76,33 @@ export function wrapSub(a: bigint, b: bigint): bigint {
   return (((a - b) % MOD256) + MOD256) % MOD256;
 }
 
-/** janela preferida. 24 h dilui o ruído do fluxo de swaps sem exigir arquivo profundo. */
+/** janela longa: dilui o ruído do fluxo de swaps sem exigir arquivo profundo. */
 export const DEFAULT_WINDOW_HOURS = 24;
 
-/** da maior para a menor: a primeira que couber na vida da posição vence */
-export const WINDOW_LADDER_HOURS = [DEFAULT_WINDOW_HOURS, 6, 1, 0.25];
+/**
+ * As janelas que a tela mostra, da mais longa para a mais curta — TODAS as que
+ * couberem na vida da posição são medidas, não só uma.
+ *
+ * Decisão do Alan em 15/09/2026, atendendo o perfil que opera no dia: com as
+ * duas lado a lado o número deixa de mudar de significado em silêncio, e a
+ * comparação entre elas vira SINAL — 15 min muito acima de 24 h é pool quente
+ * agora; muito abaixo é movimento que já passou.
+ */
+export const MEASURED_WINDOWS_HOURS = [DEFAULT_WINDOW_HOURS, 0.25];
+
+/**
+ * Barreira de ABSURDO ARITMÉTICO — não é juízo de plausibilidade.
+ *
+ * O teto antigo (1.000% a.a.) julgava se o rendimento era "crível" e, com a
+ * conta já corrigida, só escondia verdade: nos pools de RWA da Robinhood a
+ * própria DefiLlama reporta 70–800% em pools vizinhos. Saiu.
+ *
+ * O que ficou existe para UM caso: leitura corrompida do RPC. Como os
+ * acumuladores andam em aritmética mod 2^256, uma leitura inconsistente não
+ * produz número "alto", produz 10^68 — e sem barreira o card exibiria
+ * `Earning now 4,2e+70%`. Nenhum rendimento real deste mundo encosta aqui.
+ */
+export const ABSURD_APR_PCT = 100_000;
 
 export const poolFeeGrowthAbi = parseAbi([
   "function feeGrowthGlobal0X128() view returns (uint256)",
@@ -193,11 +214,21 @@ export interface OnchainFeeInputs {
   positionValueUsd: number | null;
 }
 
+export interface OnchainFeeResult {
+  /** % ao ano */
+  pct: number;
+  /** taxas que a posição ganhou DENTRO da janela, em US$ — é este número que
+   *  dá escala ao percentual: "3.504%/yr" e "US$ 0,21" dizem coisas diferentes */
+  feesUsd: number;
+  /** duração real da janela medida, em segundos */
+  windowSec: number;
+}
+
 /**
- * PURO e testável: dados os deltas, devolve o % ao ano de taxas da posição.
+ * PURO e testável: dados os deltas, devolve o rendimento de taxas da posição.
  * null = não dá para afirmar nada com honestidade.
  */
-export function computeOnchainFeeApr(i: OnchainFeeInputs): number | null {
+export function computeOnchainFeeApr(i: OnchainFeeInputs): OnchainFeeResult | null {
   if (
     i.posLiquidity === null ||
     i.posLiquidity <= 0n ||
@@ -219,8 +250,8 @@ export function computeOnchainFeeApr(i: OnchainFeeInputs): number | null {
   if (!Number.isFinite(feesUsd) || feesUsd < 0) return null;
 
   const pct = ((feesUsd / i.windowSec) * YEAR_SEC * 100) / i.positionValueUsd;
-  if (!Number.isFinite(pct) || pct < 0 || pct > MAX_SANE_EARNING) return null;
-  return pct;
+  if (!Number.isFinite(pct) || pct < 0 || pct > ABSURD_APR_PCT) return null;
+  return { pct, feesUsd, windowSec: i.windowSec };
 }
 
 // -------------------------------------------------------------- leitura on-chain
@@ -310,12 +341,24 @@ async function readSnapshots(
   return out;
 }
 
+export interface FeeWindowsResult {
+  /** janelas medidas por alvo — só as que couberam na vida da posição */
+  byTarget: Map<string, FeeGrowthWindow[]>;
+  /**
+   * Alvos recusados por IDADE em todas as janelas: a posição é mais nova que
+   * a menor delas. Diferente de "não consegui ler" — a tela diz ao usuário
+   * que a medição começa em alguns minutos, em vez de deixar um vazio mudo.
+   */
+  tooNew: Set<string>;
+}
+
 /**
- * Janela de feeGrowthInside por POSIÇÃO, com a escada de janelas.
+ * Mede TODAS as janelas de `MEASURED_WINDOWS_HOURS` para cada posição.
  *
- * Devolve só o que dá para afirmar: alvo sem RPC de arquivo, ou novo demais
- * até para a menor janela, simplesmente não entra no mapa (a UI mostra "—").
- * `onWarn` recebe o motivo, para o aviso aparecer na tela.
+ * Devolve só o que dá para afirmar: janela que não cabe na vida da posição
+ * não entra (viraria taxa de antes de ela existir), e alvo que o RPC não
+ * serviu simplesmente não aparece. `onWarn` recebe o motivo, separando
+ * "posição nova" de "RPC sem arquivo" — misturar os dois vira aviso que mente.
  */
 export async function readPositionFeeWindows(
   reader: ChainReader,
@@ -323,72 +366,67 @@ export async function readPositionFeeWindows(
   currentBlock: bigint,
   secPerBlock: number,
   onWarn: (msg: string) => void = () => {},
-): Promise<Map<string, FeeGrowthWindow>> {
-  const out = new Map<string, FeeGrowthWindow>();
-  if (targets.length === 0) return out;
+): Promise<FeeWindowsResult> {
+  const byTarget = new Map<string, FeeGrowthWindow[]>();
+  const tooNew = new Set<string>();
+  if (targets.length === 0) return { byTarget, tooNew };
 
   let agora: Map<string, TickSnapshot>;
   try {
     agora = await readSnapshots(reader, targets);
   } catch (e) {
     onWarn(`fee APR on-chain indisponível (leitura do pool falhou): ${(e as Error).message.split("\n")[0].slice(0, 60)}`);
-    return out;
+    return { byTarget, tooNew };
   }
 
-  let pendentes = targets.filter((t) => agora.has(t.key));
-  /* motivo da recusa, por alvo: "nova demais" e "não consegui ler" pedem
-     avisos diferentes — misturar os dois vira mensagem que mente. */
+  const legiveis = targets.filter((t) => agora.has(t.key));
   const recusadaPorIdade = new Set<string>();
+  let falhasDeLeitura = 0;
 
-  for (const horas of WINDOW_LADDER_HOURS) {
-    if (pendentes.length === 0) break;
+  for (const horas of MEASURED_WINDOWS_HOURS) {
     const blocos = BigInt(Math.max(1, Math.round((horas * 3600) / secPerBlock)));
     if (currentBlock <= blocos) continue; // rede jovem demais para esta janela
 
     let antes: Map<string, TickSnapshot>;
     try {
-      antes = await readSnapshots(reader, pendentes, currentBlock - blocos);
-    } catch (e) {
-      /* RPC sem arquivo: a janela menor também não passaria — o corte de um nó
-         podado fica em ~128 blocos, muito abaixo da menor janela da escada. */
-      onWarn(
-        `fee APR on-chain indisponível (RPC sem estado histórico): ${(e as Error).message.split("\n")[0].slice(0, 60)}`,
-      );
-      break;
+      antes = await readSnapshots(reader, legiveis, currentBlock - blocos);
+    } catch {
+      /* Uma janela pode falhar e a outra passar: um nó podado guarda poucos
+         blocos, o que às vezes cobre 15 min e nunca cobre 24 h. Por isso cada
+         janela é tentada por si, sem abortar as outras. */
+      falhasDeLeitura++;
+      continue;
     }
 
-    const restantes: FeeWindowTarget[] = [];
-    for (const t of pendentes) {
+    for (const t of legiveis) {
       const a = agora.get(t.key)!;
       const b = antes.get(t.key);
-      if (!b) {
-        restantes.push(t);
-        continue;
-      }
+      if (!b) continue;
       const [i0n, i1n] = feeGrowthInside(a, t.tickLower, t.tickUpper);
       const [i0o, i1o] = feeGrowthInside(b, t.tickLower, t.tickUpper);
       if (!windowFitsPosition(i0n, i0o, t.inside0Last)) {
-        recusadaPorIdade.add(t.key);
-        restantes.push(t); // posição mais nova que a janela — tenta a próxima, menor
+        recusadaPorIdade.add(t.key); // posição mais nova que ESTA janela
         continue;
       }
-      recusadaPorIdade.delete(t.key);
-      out.set(t.key, {
+      const lista = byTarget.get(t.key) ?? [];
+      lista.push({
         delta0: wrapSub(i0n, i0o),
         delta1: wrapSub(i1n, i1o),
         windowSec: Number(blocos) * secPerBlock,
       });
+      byTarget.set(t.key, lista);
     }
-    pendentes = restantes;
   }
 
-  const novas = pendentes.filter((t) => recusadaPorIdade.has(t.key)).length;
-  const ilegiveis = pendentes.length - novas;
-  if (novas > 0) {
-    onWarn(`${novas} posição(ões) recém-aberta(s) — o fee APR aparece depois de alguns minutos de vida`);
+  for (const t of legiveis) {
+    if (!byTarget.has(t.key) && recusadaPorIdade.has(t.key)) tooNew.add(t.key);
   }
-  if (ilegiveis > 0) {
-    onWarn(`fee APR on-chain indisponível em ${ilegiveis} pool(s) — o RPC não devolveu o estado passado`);
+  const semNada = legiveis.filter((t) => !byTarget.has(t.key) && !tooNew.has(t.key)).length;
+  if (tooNew.size > 0) {
+    onWarn(`${tooNew.size} posição(ões) recém-aberta(s) — o fee APR aparece depois de alguns minutos de vida`);
   }
-  return out;
+  if (semNada > 0 || (falhasDeLeitura > 0 && byTarget.size === 0)) {
+    onWarn(`fee APR on-chain indisponível em ${semNada || legiveis.length} pool(s) — o RPC não devolveu o estado passado`);
+  }
+  return { byTarget, tooNew };
 }
