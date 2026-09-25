@@ -21,6 +21,8 @@ import { buildResponse, type PositionsResponseDTO } from "../core/service";
 import { fetchUsdPrices } from "../core/prices/defillama";
 import { CHAIN_SLUG } from "../core/adapters/aerodrome/config";
 import type { ChainReader } from "../core/types";
+import { ABSURD_APR_PCT } from "../core/yields/onchain";
+import { MAX_SANE_EARNING } from "../core/yields/positionApr";
 
 const DEFAULT_WALLETS: Address[] = [
   "0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC", // Alan validou contra a Aerodrome (F1)
@@ -78,13 +80,36 @@ export function dtoInvariants(dto: PositionsResponseDTO): Check[] {
       if (p.apr.mean30d !== null && !Number.isFinite(p.apr.mean30d)) issues.push(`${p.poolSymbol}: média 30d não-finita`);
     }
     if (p.earning) {
-      // Receita C2: "rendendo agora" também passa nos guardas
-      if (!(p.earning.nowPct >= 0 && p.earning.nowPct <= 1000)) issues.push(`${p.poolSymbol}: earning fora do teto (${p.earning.nowPct}%)`);
+      /* Receita C2 + G v2. Desde 15/09/2026 as TAXAS MEDIDAS não têm teto de
+         plausibilidade (decisão do Alan: rendimento real de 2.000% aparece como
+         2.000%) — só a barreira de absurdo aritmético. Emissões seguem com o
+         teto de 1.000%. Cobrar 1.000% no total aqui reprovaria a produção
+         justamente no caso que a mudança quis mostrar. */
+      const teto = ABSURD_APR_PCT + MAX_SANE_EARNING;
+      if (!(p.earning.nowPct >= 0 && p.earning.nowPct <= teto)) issues.push(`${p.poolSymbol}: earning fora da barreira (${p.earning.nowPct}%)`);
+      for (const w of p.earning.windows ?? []) {
+        if (!(Number.isFinite(w.feePct) && w.feePct >= 0 && w.feePct <= ABSURD_APR_PCT)) issues.push(`${p.poolSymbol}: janela ${w.windowSec}s com % inválido`);
+        if (!(Number.isFinite(w.feeUsd) && w.feeUsd >= 0)) issues.push(`${p.poolSymbol}: janela ${w.windowSec}s com US$ inválido`);
+      }
       for (const c of [p.earning.feePct, p.earning.emissionPct]) {
         if (c !== null && !Number.isFinite(c)) issues.push(`${p.poolSymbol}: componente de earning não-finito`);
       }
       if (p.range && !p.range.inRange && p.earning.nowPct !== 0) issues.push(`${p.poolSymbol}: fora do range mas earning ≠ 0`);
     }
+  }
+
+  // locks (25/09/2026): as recompensas deles entram no total a receber, e o
+  // valor travado tem total próprio, separado do total em pools
+  const locks = dto.locks ?? [];
+  let sumLocked = 0;
+  for (const l of locks) {
+    if (l.valueUsd !== null) sumLocked += l.valueUsd;
+    if (l.rewardsUsd !== null) sumRewards += l.rewardsUsd;
+    for (const v of [l.valueUsd, l.rewardsUsd, l.token.amount, l.votingPower]) {
+      if (v !== null && !Number.isFinite(v)) issues.push(`lock #${l.lockId}: número não-finito`);
+    }
+    if (l.token.amount < 0 || l.votingPower < 0) issues.push(`lock #${l.lockId}: quantidade negativa`);
+    if (l.permanent && l.expired) issues.push(`lock #${l.lockId}: permanente marcado como vencido`);
   }
 
   const truncated = dto.totalPositions > dto.positions.length;
@@ -94,9 +119,14 @@ export function dtoInvariants(dto: PositionsResponseDTO): Check[] {
     detail: `${sumValue.toFixed(2)} vs ${dto.totals.valueUsd.toFixed(2)}`,
   });
   checks.push({
-    name: truncated ? "totals.rewardsUsd ≥ soma exibida (resposta cortada)" : "totals.rewardsUsd = soma das posições",
+    name: truncated ? "totals.rewardsUsd ≥ soma exibida (resposta cortada)" : "totals.rewardsUsd = soma das posições + locks",
     ok: truncated ? dto.totals.rewardsUsd >= sumRewards - 0.01 : Math.abs(sumRewards - dto.totals.rewardsUsd) < 0.01,
     detail: `${sumRewards.toFixed(2)} vs ${dto.totals.rewardsUsd.toFixed(2)}`,
+  });
+  checks.push({
+    name: "totals.lockedUsd = soma dos locks",
+    ok: Math.abs(sumLocked - (dto.totals.lockedUsd ?? 0)) < 0.01,
+    detail: `${sumLocked.toFixed(2)} vs ${(dto.totals.lockedUsd ?? 0).toFixed(2)}`,
   });
   checks.push({
     name: "contagem de posições sem preço",

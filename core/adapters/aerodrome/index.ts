@@ -12,11 +12,12 @@
  */
 
 import { erc20Abi, type Address } from "viem";
-import type { ChainReader, LpPosition, PositionKind, ProtocolAdapter, TokenInfo } from "../../types";
+import type { ChainReader, LockPosition, LpPosition, PositionKind, ProtocolAdapter, TokenInfo } from "../../types";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { mapLimit } from "../../util";
 import { factoryAbi, gaugeAbi, poolProbeAbi, sugarAbi, SUGAR_MAX_POSITIONS, type SugarPosition } from "./abi";
 import { AERODROME_BASE, CHAIN_ID, type SugarChainConfig } from "./config";
+import { buildLocks, rewardsSugarAbi, veSugarAbi, type RawLock, type RawVoteReward } from "./ve";
 
 const ZERO: Address = "0x0000000000000000000000000000000000000000";
 
@@ -77,6 +78,8 @@ export class AerodromeAdapter implements ProtocolAdapter {
   private readonly concurrency: number;
   private readonly poolWindow: bigint;
   private readonly warn: (msg: string) => void;
+  private readonly veSugar?: Address;
+  private readonly rewardsSugar?: Address;
 
   constructor(
     private readonly reader: ChainReader,
@@ -91,10 +94,61 @@ export class AerodromeAdapter implements ProtocolAdapter {
     this.concurrency = opts.concurrency ?? 8;
     this.poolWindow = opts.poolWindow ?? 200n;
     this.warn = opts.onWarn ?? (() => {});
+    this.veSugar = config.veSugar;
+    this.rewardsSugar = config.rewardsSugar;
   }
 
   async getPositions(account: Address): Promise<LpPosition[]> {
     return this.normalize(await this.fetchRawPositions(account));
+  }
+
+  /**
+   * Locks veAERO/veVELO da carteira (ver `ve.ts`). Rede sem `veSugar` na
+   * config (as redes-folha da Superchain) devolve vazio sem tocar na rede.
+   */
+  async getLocks(account: Address): Promise<LockPosition[]> {
+    if (!this.veSugar) return [];
+    const raw = (await this.reader.readContract({
+      address: this.veSugar,
+      abi: veSugarAbi,
+      functionName: "byAccount",
+      args: [account],
+    })) as readonly RawLock[];
+    if (raw.length === 0) return [];
+
+    // recompensas de voto: um pedido por (lock, pool votado), num multicall só
+    const pares = raw.flatMap((l) => l.votes.map((v) => ({ id: l.id, lp: v.lp })));
+    const rewardsByLock = new Map<bigint, RawVoteReward[]>();
+    if (this.rewardsSugar && pares.length > 0) {
+      const res = await this.reader.multicall({
+        contracts: pares.map((p) => ({
+          address: this.rewardsSugar!,
+          abi: rewardsSugarAbi,
+          functionName: "rewardsByAddress",
+          args: [p.id, p.lp],
+        })),
+        allowFailure: true,
+      });
+      let falhas = 0;
+      res.forEach((r, i) => {
+        if (r.status !== "success") {
+          falhas++;
+          return;
+        }
+        const lista = rewardsByLock.get(pares[i].id) ?? [];
+        lista.push(...(r.result as readonly RawVoteReward[]));
+        rewardsByLock.set(pares[i].id, lista);
+      });
+      if (falhas > 0) this.warn(`locks: recompensas de voto de ${falhas} pool(s) não responderam`);
+    }
+
+    const addrs = new Set<Address>(raw.map((l) => l.token));
+    for (const lista of rewardsByLock.values()) for (const r of lista) addrs.add(r.token);
+    const tokens = await this.loadTokens([...addrs]);
+    const porEndereco = new Map<string, TokenInfo>();
+    for (const [a, t] of tokens) porEndereco.set(a.toLowerCase(), t);
+
+    return buildLocks(raw, rewardsByLock, porEndereco, this.protocol, this.chainId);
   }
 
   /** Posições cruas do Sugar, deduplicadas e sem entradas vazias. */

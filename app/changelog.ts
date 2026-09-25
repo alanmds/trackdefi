@@ -44,6 +44,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 export const CHANGELOG: ChangeEntry[] = [
   {
     date: "2026-09-25",
+    kind: "feature",
+    title: "Governance locks: veAERO and veVELO",
+    body:
+      "Locked AERO and VELO now show up next to your LP positions: how much is locked, its voting power, the unlock date, and what is waiting to be claimed — the weekly rebase plus the fees and incentives from the pools the lock voted for. An expired lock is flagged as withdrawable: the tokens are still sitting in it, free to take out, and no longer voting.",
+  },
+  {
+    date: "2026-09-25",
     kind: "project",
     title: "An optional way to support the site",
     body:
@@ -150,13 +157,8 @@ export const CHANGELOG: ChangeEntry[] = [
 /** a entrada que a home mostra */
 export const LATEST: ChangeEntry = CHANGELOG[0];
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-/**
- * Formatação à mão de propósito: `toLocaleDateString` depende do locale de
- * quem renderiza, e a data sairia diferente no servidor e no navegador.
- */
-export function fmtDate(iso: string): string {
-  const [y, m, d] = iso.split("-");
-  return `${Number(d)} ${MONTHS[Number(m) - 1]} ${y}`;
-}
+/* A formatação de data mora em `ui/format.ts` desde 25/09/2026, porque o
+   card de lock (componente de navegador) também usa — e importar este arquivo
+   lá arrastaria o log inteiro para o bundle. Reexportada aqui para os imports
+   antigos seguirem valendo. */
+export { fmtDate } from "./ui/format";

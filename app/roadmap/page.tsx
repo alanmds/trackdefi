@@ -44,6 +44,13 @@ export default function Roadmap() {
         <li>
           <Status kind="live" />
           <span>
+            <strong>Governance locks · veAERO &amp; veVELO</strong>
+            {" — locked AERO and VELO next to your positions: amount, voting power, unlock date, and the rebase and voting rewards waiting to be claimed. Expired locks are flagged as withdrawable."}
+          </span>
+        </li>
+        <li>
+          <Status kind="live" />
+          <span>
             <strong>Base · Aerodrome</strong> — classic and concentrated (Slipstream) positions, including
             gauge-staked ones, with pending fees and AERO emissions.
           </span>

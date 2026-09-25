@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { PositionsResponseDTO } from "../../core/service";
 import { networksDotted, networksSentence } from "../site";
 import { fmtUsd, shortAddress } from "./format";
+import LockCard from "./LockCard";
 import PositionCard from "./PositionCard";
 
 type ViewState =
@@ -119,7 +120,7 @@ export default function PositionsView({ address }: { address: string }) {
         </div>
       )}
 
-      {state.phase === "done" && state.data.positions.length === 0 && (
+      {state.phase === "done" && state.data.positions.length === 0 && (state.data.locks ?? []).length === 0 && (
         <div className="state-box">
           <h2>No liquidity positions found</h2>
           <p>
@@ -132,7 +133,7 @@ export default function PositionsView({ address }: { address: string }) {
         </div>
       )}
 
-      {state.phase === "done" && state.data.positions.length > 0 && (
+      {state.phase === "done" && (state.data.positions.length > 0 || (state.data.locks ?? []).length > 0) && (
         <>
           <div className="kpis">
             <div className="kpi">
@@ -145,10 +146,23 @@ export default function PositionsView({ address }: { address: string }) {
                 </div>
               )}
             </div>
+            {(state.data.locks ?? []).length > 0 && (
+              <div className="kpi">
+                <div className="label">Locked</div>
+                <div className="value">{fmtUsd(state.data.totals.lockedUsd ?? 0)}</div>
+                <div className="hint">
+                  {[...new Set((state.data.locks ?? []).map((l) => `ve${l.token.symbol}`))].join(" + ")} governance locks
+                </div>
+              </div>
+            )}
             <div className="kpi">
               <div className="label">Claimable rewards</div>
               <div className="value">{fmtUsd(state.data.totals.rewardsUsd)}</div>
-              <div className="hint">fees + emissions</div>
+              <div className="hint">
+                {(state.data.locks ?? []).some((l) => l.rewards.length > 0)
+                  ? "fees, emissions & lock rewards"
+                  : "fees + emissions"}
+              </div>
             </div>
             <div className="kpi">
               <div className="label">Positions</div>
@@ -171,9 +185,29 @@ export default function PositionsView({ address }: { address: string }) {
             </p>
           )}
 
+          {/* Locks vêm ANTES das posições: são poucos (1 a 3, em geral) e
+              costumam ser o maior valor da carteira — na demo, 83% dela. No fim
+              de uma lista de 44 posições ninguém os veria. Sem lock, a tela
+              fica exatamente como antes, sem títulos de seção. */}
+          {(state.data.locks ?? []).length > 0 && (
+            <>
+              <h2 className="section-title">Governance locks</h2>
+              <div className="positions-grid">
+                {(state.data.locks ?? []).map((l) => (
+                  <LockCard key={`${l.chainId}-${l.lockId}`} l={l} />
+                ))}
+              </div>
+              {state.data.positions.length > 0 && <h2 className="section-title">Liquidity positions</h2>}
+            </>
+          )}
+
           <div className="positions-grid">
+            {/* a rede entra na chave: nas redes-folha da Superchain o MESMO
+                endereço de pool existe em várias redes (deploy determinístico)
+                e o id do NFT recomeça em cada uma — o pool 0xc2026f… com o NFT
+                #2 aparecia em Ink, Unichain e Soneium com a mesma chave */}
             {state.data.positions.map((p) => (
-              <PositionCard key={`${p.poolAddress}-${p.positionId ?? "v2"}`} p={p} />
+              <PositionCard key={`${p.chainId}-${p.poolAddress}-${p.positionId ?? "v2"}`} p={p} />
             ))}
           </div>
         </>

@@ -9,7 +9,7 @@
  */
 
 import { formatUnits, type Address } from "viem";
-import type { LpPosition, PositionKind, ProtocolAdapter } from "./types";
+import type { LockPosition, LpPosition, PositionKind, ProtocolAdapter } from "./types";
 import { buildAdapters } from "./adapters/registry";
 import { chainInfo } from "./chains";
 import { defillamaPrices } from "./prices/defillama";
@@ -119,6 +119,38 @@ export interface PositionDTO {
   earning: EarningDTO | null;
 }
 
+/** recompensa pendente de um lock: rebase ou voto (taxas + incentivos) */
+export interface LockRewardDTO {
+  kind: "rebase" | "vote";
+  symbol: string;
+  address: string;
+  amount: number;
+  priceUsd: number | null;
+  valueUsd: number | null;
+}
+
+/** lock de governança veAERO/veVELO — ver `LockPosition` em core/types.ts */
+export interface LockDTO {
+  protocol: string;
+  chainId: number;
+  lockId: string;
+  token: { symbol: string; address: string; decimals: number; amount: number; priceUsd: number | null };
+  /** valor do que está travado; null = token sem preço confiável */
+  valueUsd: number | null;
+  /** poder de voto atual, em unidades do token (decai até o vencimento) */
+  votingPower: number;
+  /** unix segundos; 0 = sem vencimento */
+  expiresAt: number;
+  permanent: boolean;
+  /** depositado neste lock gerenciado (relay); null = não está */
+  managedId: string | null;
+  /** passou do vencimento: o token está LIBERADO para saque, sem poder de voto */
+  expired: boolean;
+  rewards: LockRewardDTO[];
+  /** soma das recompensas; null se alguma não tiver preço */
+  rewardsUsd: number | null;
+}
+
 export interface PositionsResponseDTO {
   address: string;
   /** redes varridas nesta resposta (cada posição diz a sua via chainId) */
@@ -129,12 +161,17 @@ export interface PositionsResponseDTO {
   scanMs: number;
   totals: {
     valueUsd: number;
+    /** recompensas a receber — das posições E dos locks */
     rewardsUsd: number;
     positionsWithoutPrice: number;
+    /** valor travado em veAERO/veVELO (separado de `valueUsd`, que é só pools) */
+    lockedUsd: number;
   };
   /** total real de posições; `positions` traz no máximo as top N por valor */
   totalPositions: number;
   positions: PositionDTO[];
+  /** locks de governança, maiores primeiro */
+  locks: LockDTO[];
   warnings: string[];
 }
 
@@ -172,6 +209,10 @@ export function buildResponse(params: {
   /** janelas de feeGrowth por posição — fee APR medido no contrato
    *  (Receita G). Ausente = cai no apyBase da DefiLlama. */
   feeWindows?: FeeWindowsResult;
+  /** locks veAERO/veVELO; ausente = nenhum */
+  locks?: LockPosition[];
+  /** relógio injetável: decide se um lock venceu (testes fixam o valor) */
+  nowSec?: number;
 }): PositionsResponseDTO {
   const {
     address,
@@ -184,6 +225,8 @@ export function buildResponse(params: {
     chains = ["base"],
     yields = null,
     feeWindows,
+    locks: locksRaw = [],
+    nowSec = Math.floor(Date.now() / 1000),
   } = params;
 
   const positions: PositionDTO[] = normalized.map((p) => {
@@ -333,11 +376,15 @@ export function buildResponse(params: {
     };
   });
 
+  const locks = buildLockDTOs(locksRaw, prices, nowSec);
+
   // totais sobre TODAS as posições, antes de qualquer corte
   const totals = {
     valueUsd: positions.reduce((s, p) => s + (p.valueUsd ?? 0), 0),
-    rewardsUsd: positions.reduce((s, p) => s + (p.rewardsUsd ?? 0), 0),
+    rewardsUsd:
+      positions.reduce((s, p) => s + (p.rewardsUsd ?? 0), 0) + locks.reduce((s, l) => s + (l.rewardsUsd ?? 0), 0),
     positionsWithoutPrice: positions.filter((p) => p.valueUsd === null).length,
+    lockedUsd: locks.reduce((s, l) => s + (l.valueUsd ?? 0), 0),
   };
 
   // maiores valores primeiro; sem preço por último
@@ -352,8 +399,38 @@ export function buildResponse(params: {
     totals,
     totalPositions: positions.length,
     positions: positions.length > maxPositions ? positions.slice(0, maxPositions) : positions,
+    locks,
     warnings,
   };
+}
+
+/** Locks crus + preços → DTO, maiores primeiro. PURO. */
+export function buildLockDTOs(locks: LockPosition[], prices: Map<string, number>, nowSec: number): LockDTO[] {
+  const out = locks.map((l): LockDTO => {
+    const price = priceOf(prices, l.chainId, l.token.address);
+    const amount = human(l.amountRaw, l.token.decimals);
+    const rewards = l.rewards.map((r): LockRewardDTO => {
+      const pr = priceOf(prices, l.chainId, r.token.address);
+      const amt = human(r.raw, r.token.decimals);
+      return { kind: r.kind, symbol: r.token.symbol, address: r.token.address, amount: amt, priceUsd: pr, valueUsd: pr !== null ? amt * pr : null };
+    });
+    return {
+      protocol: l.protocol,
+      chainId: l.chainId,
+      lockId: l.lockId,
+      token: { symbol: l.token.symbol, address: l.token.address, decimals: l.token.decimals, amount, priceUsd: price },
+      valueUsd: price !== null ? amount * price : null,
+      votingPower: human(l.votingPowerRaw, l.token.decimals),
+      expiresAt: l.expiresAt,
+      permanent: l.permanent,
+      managedId: l.managedId,
+      // lock permanente não vence; expiresAt 0 = sem data
+      expired: !l.permanent && l.expiresAt > 0 && l.expiresAt <= nowSec,
+      rewards,
+      rewardsUsd: rewards.every((r) => r.valueUsd !== null) ? rewards.reduce((s, r) => s + (r.valueUsd ?? 0), 0) : null,
+    };
+  });
+  return out.sort((a, b) => (b.valueUsd ?? -1) + (b.rewardsUsd ?? 0) - ((a.valueUsd ?? -1) + (a.rewardsUsd ?? 0)));
 }
 
 /**
@@ -373,8 +450,22 @@ export async function getWalletPositions(
   const t0 = Date.now();
   // APR (DefiLlama) baixa em paralelo com a varredura on-chain; falha vira "—"
   const yieldsPromise = getYieldsIndex((m) => warnings.push(m));
-  const settled = await Promise.allSettled(adapters.map((a) => a.getPositions(address)));
+  // locks correm JUNTO com as posições; adapter sem getLocks devolve vazio
+  const [settled, settledLocks] = await Promise.all([
+    Promise.allSettled(adapters.map((a) => a.getPositions(address))),
+    Promise.allSettled(adapters.map((a) => (a.getLocks ? a.getLocks(address) : Promise.resolve([])))),
+  ]);
   const scanMs = Date.now() - t0;
+
+  // falha ao ler lock vira aviso — nunca derruba a resposta das posições
+  const locks: LockPosition[] = [];
+  settledLocks.forEach((r, i) => {
+    if (r.status === "fulfilled") locks.push(...r.value);
+    else
+      warnings.push(
+        `locks ${adapters[i].protocol}@${chainInfo(adapters[i].chainId).label} indisponíveis: ${(r.reason as Error)?.message?.split("\n")[0] ?? "erro"}`,
+      );
+  });
 
   const normalized: LpPosition[] = [];
   settled.forEach((r, i) => {
@@ -400,6 +491,12 @@ export async function getWalletPositions(
     if (p.earningInputs?.emissionToken) set.add(p.earningInputs.emissionToken.address);
     byChain.set(p.chainId, set);
   }
+  for (const l of locks) {
+    const set = byChain.get(l.chainId) ?? new Set<string>();
+    set.add(l.token.address);
+    for (const r of l.rewards) set.add(r.token.address);
+    byChain.set(l.chainId, set);
+  }
   const prices = new Map<string, number>();
   await Promise.all(
     [...byChain.entries()].map(async ([chainId, addrs]) => {
@@ -419,6 +516,7 @@ export async function getWalletPositions(
     chains: [...new Set(adapters.map((a) => chainInfo(a.chainId).priceSlug))],
     yields: await yieldsPromise,
     feeWindows: await readFeeWindows(normalized, (m) => warnings.push(m)),
+    locks,
   });
 }
 

@@ -469,6 +469,15 @@ button {
 
 /* KPI row — stat tiles: número-herói + rótulo, sem enfeite */
 
+/* título de seção na página da carteira — só aparece quando há locks, para
+   separar "Governance locks" de "Liquidity positions" */
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  margin: 26px 0 12px;
+}
+
 .kpis {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

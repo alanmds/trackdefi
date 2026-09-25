@@ -57,6 +57,23 @@ export function fmtWindow(sec: number): string {
   return `${h % 1 === 0 ? h : h.toFixed(1)} h`;
 }
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/**
+ * Data em inglês a partir de ISO (AAAA-MM-DD): "15 Sep 2026".
+ * Formatação à mão de propósito: `toLocaleDateString` depende do locale de
+ * quem renderiza, e a data sairia diferente no servidor e no navegador.
+ */
+export function fmtDate(iso: string): string {
+  const [y, m, d] = iso.split("-");
+  return `${Number(d)} ${MONTHS[Number(m) - 1]} ${y}`;
+}
+
+/** unix segundos → "27 Aug 2026" (em UTC, igual no servidor e no navegador) */
+export function fmtUnixDate(sec: number): string {
+  return fmtDate(new Date(sec * 1000).toISOString().slice(0, 10));
+}
+
 export function shortAddress(addr: string): string {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }

@@ -87,10 +87,53 @@ export interface EarningInputsOnchain {
   feeGrowthInside0LastX128: bigint | null;
 }
 
+/** Recompensa pendente de um lock: rebase (emissão para quem trava) ou voto
+ *  (taxas + incentivos dos pools em que o lock votou). */
+export interface LockReward {
+  token: TokenInfo;
+  raw: bigint;
+  kind: "rebase" | "vote";
+}
+
+/**
+ * Lock de governança ve(3,3) — veAERO / veVELO (um NFT por lock).
+ *
+ * NÃO é posição de LP — um token só, sem faixa, sem par —, por isso tipo
+ * próprio em vez de forçar dentro do `LpPosition`. Entrou em 25/09/2026: na
+ * carteira demo, um único lock era 77% da diferença de cobertura contra o
+ * Zerion, e quem faz LP na Aerodrome/Velodrome quase sempre trava para votar.
+ */
+export interface LockPosition {
+  protocol: string;
+  chainId: number;
+  /** id do veNFT */
+  lockId: string;
+  token: TokenInfo;
+  /** quantidade travada, unidades cruas */
+  amountRaw: bigint;
+  /** poder de voto atual — decai até o vencimento; 0 = vencido */
+  votingPowerRaw: bigint;
+  /** unix segundos; 0 = sem vencimento (lock permanente) */
+  expiresAt: number;
+  permanent: boolean;
+  /**
+   * Id do lock GERENCIADO (relay) onde este foi depositado; null = não está.
+   * Depositado, ele fica com quantidade 0 e sem vencimento próprio — o token
+   * mora no gerenciado. Sem este campo a tela mostrava "vence 1970-01-01".
+   */
+  managedId: string | null;
+  rewards: LockReward[];
+}
+
 export interface ProtocolAdapter {
   readonly protocol: string;
   readonly chainId: number;
   getPositions(account: Address): Promise<LpPosition[]>;
+  /**
+   * Locks de governança da carteira. OPCIONAL: só protocolos ve(3,3) têm, e
+   * só nas redes onde a governança mora (as redes-folha da Superchain não).
+   */
+  getLocks?(account: Address): Promise<LockPosition[]>;
 }
 
 /**

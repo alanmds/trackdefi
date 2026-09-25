@@ -21,6 +21,15 @@ export interface SugarChainConfig {
   emissionsToken: Address;
   /** carteira de teste do próprio repo sugar (PoC/bateria) */
   testWallet: Address;
+  /**
+   * Locks de governança (veAERO/veVELO). Só existem onde a governança mora:
+   * Base e Optimism. As redes-folha da Superchain NÃO têm `VE_SUGAR` no
+   * `.env` — ausente = o adapter não procura lock ali.
+   * Conferidos em 25/09/2026 nos `deployments/<rede>.env` e provados em
+   * `poc/probe-venft.ts` (bateu com o Zerion a 1,4%, diferença de preço).
+   */
+  veSugar?: Address;
+  rewardsSugar?: Address;
 }
 
 /** Base — conferido em 10/07/2026 (deployments/base.env) */
@@ -36,6 +45,8 @@ export const AERODROME_BASE: SugarChainConfig = {
   ],
   emissionsToken: "0x940181a94A35A4569E4529A3CDfB74e38FD98631", // AERO
   testWallet: "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac",
+  veSugar: "0x4d6A741cEE6A8cC5632B2d948C050303F6246D24", // VE_SUGAR_ADDRESS_8453
+  rewardsSugar: "0x1b121EfDaF4ABb8785a315C51D29BCE0552A7678", // REWARDS_SUGAR_ADDRESS_8453
 };
 
 /** Optimism — conferido em 12/07/2026 (deployments/optimism.env).
@@ -51,6 +62,8 @@ export const VELODROME_OPTIMISM: SugarChainConfig = {
   ],
   emissionsToken: "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db", // VELO
   testWallet: "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac",
+  veSugar: "0xFE0a44d356a9F52c9F1bE0ba0f0877d986438c9C", // VE_SUGAR_ADDRESS_10
+  rewardsSugar: "0x62CCFB2496f49A80B0184AD720379B529E9152fB", // REWARDS_SUGAR_ADDRESS_10
 };
 
 /**

@@ -115,7 +115,31 @@ async function main() {
     console.log("");
   });
 
+  // locks de governança (veAERO/veVELO) — não são posição de LP, seção própria
+  const locks = dto.locks ?? [];
+  if (locks.length > 0) {
+    console.log(`── Locks de governança (${locks.length}) ──`);
+    for (const l of locks) {
+      const net = CHAINS[l.chainId]?.label ?? l.chainId;
+      const status = l.permanent
+        ? "PERMANENTE"
+        : l.managedId
+          ? `depositado no lock gerenciado #${l.managedId}`
+          : l.expired
+          ? `⚠️ VENCIDO em ${new Date(l.expiresAt * 1000).toISOString().slice(0, 10)} — liberado para saque`
+          : `vence ${new Date(l.expiresAt * 1000).toISOString().slice(0, 10)}`;
+      console.log(`   ve${l.token.symbol} #${l.lockId} [${l.protocol} · ${net}]  ${amt(l.token.amount)} ${l.token.symbol} travados ≈ ${usd(l.valueUsd)}  · ${status}`);
+      for (const r of l.rewards) {
+        console.log(`      a receber (${r.kind === "rebase" ? "rebase" : "voto"}): ${amt(r.amount)} ${r.symbol} ≈ ${usd(r.valueUsd)}`);
+      }
+    }
+    console.log("");
+  }
+
   console.log(`══════════════════════════════════════════════`);
+  console.log(
+    `TOTAL travado:    ${usd(dto.totals.lockedUsd ?? 0)}`,
+  );
   console.log(
     `TOTAL em pools:   ${usd(dto.totals.valueUsd)}${dto.totals.positionsWithoutPrice ? `  (+ ${dto.totals.positionsWithoutPrice} sem preço)` : ""}`,
   );
