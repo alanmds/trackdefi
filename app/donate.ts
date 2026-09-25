@@ -65,7 +65,7 @@ export const DONATION_PHRASES: readonly string[] = [
 /**
  * Estado da rotação, guardado no navegador de quem visita (localStorage).
  * É só uma fila de números de frase — não identifica ninguém e nunca sai do
- * navegador, então não contraria o "we don't build a profile of you".
+ * navegador.
  */
 export interface PhraseBag {
   /** frases que ainda faltam neste ciclo, na ordem em que vão aparecer */

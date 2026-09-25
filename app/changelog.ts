@@ -45,13 +45,6 @@ export const CHANGELOG: ChangeEntry[] = [
   {
     date: "2026-09-25",
     kind: "project",
-    title: "A more precise privacy note",
-    body:
-      "The “How it works” page used to say we don't store your searches. That wasn't precise: our cookieless analytics counts which pages are opened, and a wallet page's link includes the address. It still can't tell who you are or follow you from one day to the next — and the page now says exactly that.",
-  },
-  {
-    date: "2026-09-25",
-    kind: "project",
     title: "An optional way to support the site",
     body:
       "trackdefi is free and stays free — no account, no paywall. If it saves you time, there is now a tip address at the bottom of every page, the same on any EVM network. Tips help pay for servers and blockchain nodes and for the work of adding networks; nothing changes for anyone who doesn't send one.",
