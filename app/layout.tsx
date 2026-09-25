@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Fraunces, Inter } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
 import { COVERAGE, humanList, NETWORK_NAMES, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "./site";
 import DonateLine from "./ui/DonateLine";
+import SiteAnalytics from "./ui/SiteAnalytics";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -114,7 +114,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </span>
           </div>
         </footer>
-        <Analytics />
+        {/* Vercel Analytics + saída do dono via ?notrack=1 (app/analytics-optout.ts) */}
+        <SiteAnalytics />
       </body>
     </html>
   );
