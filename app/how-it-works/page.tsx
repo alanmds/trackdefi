@@ -62,7 +62,14 @@ export default function HowItWorks() {
 
       <h2>What we don&apos;t do</h2>
       <ul>
-        <li>We don&apos;t store your searches or build a profile of you.</li>
+        {/* Até 25/09/2026 dizia "We don't store your searches" — não era
+            preciso: o Vercel Analytics registra o caminho de cada página, e o
+            da página de carteira contém o endereço. Mantido de propósito (o
+            Alan quer medir usuários frequentes); a frase agora diz o que é. */}
+        <li>
+          We don&apos;t build a profile of you — no account, no cookies. Our analytics counts which pages are opened,
+          wallet pages included, but not who opened them, and it can&apos;t follow a visitor from one day to the next.
+        </li>
         <li>We don&apos;t give financial advice. Figures are informational; verify on-chain before acting.</li>
         <li>We don&apos;t guarantee prices or completeness — data can lag the chain by up to a minute.</li>
       </ul>

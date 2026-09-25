@@ -43,8 +43,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
-    // ⚠️ a data é a do dia em que for AO AR — se o push ficar para outro dia,
-    // trocar aqui junto
+    date: "2026-09-25",
+    kind: "project",
+    title: "A more precise privacy note",
+    body:
+      "The “How it works” page used to say we don't store your searches. That wasn't precise: our cookieless analytics counts which pages are opened, and a wallet page's link includes the address. It still can't tell who you are or follow you from one day to the next — and the page now says exactly that.",
+  },
+  {
     date: "2026-09-25",
     kind: "project",
     title: "An optional way to support the site",
