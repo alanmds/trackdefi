@@ -140,6 +140,97 @@ button {
   gap: 6px;
 }
 
+/* linha de apoio (rodapé, todas as páginas): discreta, mas visível — vem
+   antes do texto legal, com a frase na fonte de título. A frase é sorteada
+   no navegador; o espaço fica reservado para o rodapé não pular. */
+
+.donate {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 14px;
+  margin-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+}
+
+.donate-phrase {
+  margin: 0;
+  min-height: 1.45em;
+  font-family: var(--font-display);
+  font-size: 16.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.donate-in {
+  animation: donate-in 0.45s ease both;
+}
+
+@keyframes donate-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.donate-how {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.donate-addr {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  color: var(--accent);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 7px;
+  user-select: all;
+  overflow-wrap: anywhere;
+}
+
+.donate-copy {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.donate-copy:hover {
+  background: var(--card-2);
+}
+
+.donate-note {
+  color: var(--ink-3);
+}
+
+@media (max-width: 560px) {
+  /* frase de até 90 caracteres = até duas linhas no celular */
+  .donate-phrase {
+    min-height: 2.9em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .donate-in {
+    animation: none;
+  }
+}
+
 /* ------------------------------------------------------------ landing */
 
 .hero {

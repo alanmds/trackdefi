@@ -18,7 +18,7 @@
  *    mesmo quando a cobertura mudar. NÃO derivar isto de `NETWORKS`.
  */
 
-export type ChangeKind = "network" | "exchange" | "feature" | "improvement" | "maintenance";
+export type ChangeKind = "network" | "exchange" | "feature" | "improvement" | "maintenance" | "project";
 
 export interface ChangeEntry {
   /** AAAA-MM-DD — o dia em que foi ao ar */
@@ -37,10 +37,20 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
   feature: "New feature",
   improvement: "Improved",
   maintenance: "Maintenance",
+  project: "Project news",
 };
 
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
+  {
+    // ⚠️ a data é a do dia em que for AO AR — se o push ficar para outro dia,
+    // trocar aqui junto
+    date: "2026-09-25",
+    kind: "project",
+    title: "An optional way to support the site",
+    body:
+      "trackdefi is free and stays free — no account, no paywall. If it saves you time, there is now a tip address at the bottom of every page, the same on any EVM network. Tips help pay for servers and blockchain nodes and for the work of adding networks; nothing changes for anyone who doesn't send one.",
+  },
   {
     date: "2026-09-15",
     kind: "feature",

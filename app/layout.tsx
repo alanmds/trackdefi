@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Fraunces, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { COVERAGE, humanList, NETWORK_NAMES, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "./site";
+import DonateLine from "./ui/DonateLine";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -99,6 +100,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {children}
         <footer className="site-footer">
           <div className="container">
+            {/* apoio voluntário: frase rotativa + endereço (app/donate.ts) */}
+            <DonateLine />
             <span>
               <strong>{SITE_NAME}</strong> reads public blockchain data only. It never asks for private keys or seed
               phrases, and cannot move funds. <Link href="/how-it-works">How it works &amp; why it&apos;s safe →</Link>
