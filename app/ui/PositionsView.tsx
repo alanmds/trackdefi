@@ -130,6 +130,12 @@ export default function PositionsView({ address }: { address: string }) {
           <Link href="/" className="btn">
             Track another wallet
           </Link>
+          {/* "nenhuma posição" com posição de verdade é o retorno mais útil que
+              existe: diz exatamente qual carteira reproduz o buraco */}
+          <p className="missing-hint">
+            Sure there&apos;s a position here?{" "}
+            <Link href={`/feedback?type=missing&wallet=${address}`}>Tell us what&apos;s missing →</Link>
+          </p>
         </div>
       )}
 
@@ -210,6 +216,11 @@ export default function PositionsView({ address }: { address: string }) {
               <PositionCard key={`${p.chainId}-${p.poolAddress}-${p.positionId ?? "v2"}`} p={p} />
             ))}
           </div>
+
+          <p className="missing-hint">
+            Something missing?{" "}
+            <Link href={`/feedback?type=missing&wallet=${address}`}>Tell us which position →</Link>
+          </p>
         </>
       )}
     </main>

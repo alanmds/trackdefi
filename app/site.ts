@@ -8,6 +8,13 @@
 export const SITE_NAME = "trackdefi";
 
 /**
+ * Caixa de contato pública (25/09/2026). Recebe e-mail direto e é também o
+ * destino do formulário de sugestões. Caixa DEDICADA ao site, na Hostinger,
+ * com os registros no DNS da Vercel — ver privado/INFRA_E_DOMINIO.md.
+ */
+export const FEEDBACK_EMAIL = "hello@trackdefi.app";
+
+/**
  * Redes suportadas, na ordem em que aparecem nos textos.
  *
  * Vive aqui, e não em `core/chains.ts`, porque componentes client importam

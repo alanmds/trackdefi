@@ -45,6 +45,13 @@ export const CHANGELOG: ChangeEntry[] = [
   {
     date: "2026-09-25",
     kind: "feature",
+    title: "Send us feedback",
+    body:
+      "Found a position we don't show, want a network added, or spotted a number that looks off? There's now a feedback form — and a shortcut on every wallet page that opens it with the wallet already filled in, so we can see exactly what you're seeing. Prefer email? hello@trackdefi.app works too.",
+  },
+  {
+    date: "2026-09-25",
+    kind: "feature",
     title: "Governance locks: veAERO and veVELO",
     body:
       "Locked AERO and VELO now show up next to your LP positions: how much is locked, its voting power, the unlock date, and what is waiting to be claimed — the weekly rebase plus the fees and incentives from the pools the lock voted for. An expired lock is flagged as withdrawable: the tokens are still sitting in it, free to take out, and no longer voting.",

@@ -112,6 +112,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               {COVERAGE.map((c) => `${c.protocol} (${humanList(c.networks, "&")})`).join(" · ")} —{" "}
               <Link href="/roadmap">see the roadmap</Link> · <Link href="/changelog">what&apos;s new</Link>.
             </span>
+            <span>
+              Missing a position, or have an idea? <Link href="/feedback">Send feedback →</Link>
+            </span>
           </div>
         </footer>
         {/* Vercel Analytics + saída do dono via ?notrack=1 (app/analytics-optout.ts) */}
