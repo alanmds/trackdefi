@@ -113,7 +113,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <Link href="/roadmap">see the roadmap</Link> · <Link href="/changelog">what&apos;s new</Link>.
             </span>
             <span>
-              Missing a position, or have an idea? <Link href="/feedback">Send feedback →</Link>
+              <Link href="/feedback">Feedback</Link>
             </span>
           </div>
         </footer>

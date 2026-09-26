@@ -1,45 +1,29 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { FEEDBACK_KINDS, KIND_LABELS, MAX_MESSAGE, type FeedbackKind } from "../../core/feedback";
-import { FEEDBACK_EMAIL } from "../site";
+import { MAX_MESSAGE, MIN_MESSAGE } from "../../core/feedback";
 
-type Status =
-  | { s: "idle" }
-  | { s: "sending" }
-  | { s: "sent"; withEmail: boolean }
-  | { s: "error"; msg: string };
+type Status = { s: "idle" } | { s: "sending" } | { s: "sent"; withEmail: boolean } | { s: "error"; msg: string };
 
 const ERRORS: Record<string, string> = {
   message_too_short: "Please write a few more words.",
   message_too_long: `Please keep it under ${MAX_MESSAGE.toLocaleString("en-US")} characters.`,
   invalid_email: "That email address doesn't look right.",
-  invalid_wallet: "That wallet address doesn't look right.",
   rate_limited: "Too many messages in a row — please wait a few minutes.",
 };
+const GENERICO = "Couldn't send right now. Please try again in a moment.";
 
-/**
- * Formulário de sugestões. Chega pré-preenchido quando vem do atalho
- * "Something missing?" da página da carteira (`?type=missing&wallet=0x…`).
- */
+/** Formulário de feedback: mensagem + e-mail opcional. O destino não aparece. */
 export default function FeedbackForm() {
-  const [kind, setKind] = useState<FeedbackKind>("suggestion");
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
-  const [wallet, setWallet] = useState("");
   const [website, setWebsite] = useState(""); // campo-isca: pessoa nunca vê
   const [status, setStatus] = useState<Status>({ s: "idle" });
-  const [copied, setCopied] = useState(false);
   const startedAt = useRef(0);
 
+  // marcado no navegador, não no servidor: é o relógio de "quando abriu"
   useEffect(() => {
-    // marcado no navegador, não no servidor: é o relógio de "quando abriu"
     startedAt.current = Date.now();
-    const q = new URLSearchParams(window.location.search);
-    const t = q.get("type");
-    if (t && (FEEDBACK_KINDS as readonly string[]).includes(t)) setKind(t as FeedbackKind);
-    const w = q.get("wallet");
-    if (w) setWallet(w);
   }, []);
 
   async function submit(e: React.FormEvent) {
@@ -50,10 +34,8 @@ export default function FeedbackForm() {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          kind,
           message,
           email,
-          wallet,
           website,
           startedAt: startedAt.current,
           page: document.referrer ? new URL(document.referrer).pathname : null,
@@ -64,22 +46,9 @@ export default function FeedbackForm() {
         setStatus({ s: "sent", withEmail: email.trim() !== "" });
         return;
       }
-      setStatus({
-        s: "error",
-        msg: ERRORS[body.error ?? ""] ?? `Couldn't send right now. You can email us at ${FEEDBACK_EMAIL} instead.`,
-      });
+      setStatus({ s: "error", msg: ERRORS[body.error ?? ""] ?? GENERICO });
     } catch {
-      setStatus({ s: "error", msg: `Couldn't send right now. You can email us at ${FEEDBACK_EMAIL} instead.` });
-    }
-  }
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(FEEDBACK_EMAIL);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      /* sem permissão de área de transferência: o endereço está visível na tela */
+      setStatus({ s: "error", msg: GENERICO });
     }
   }
 
@@ -107,89 +76,49 @@ export default function FeedbackForm() {
     );
   }
 
-  const podeEnviar = message.trim().length >= 5 && status.s !== "sending";
-
   return (
-    <>
-      <form className="feedback-form" onSubmit={submit} noValidate>
-        <fieldset className="feedback-kinds">
-          <legend>What is it about?</legend>
-          {FEEDBACK_KINDS.map((k) => (
-            <label key={k} className={`chip chip-radio${kind === k ? " is-on" : ""}`}>
-              <input type="radio" name="kind" value={k} checked={kind === k} onChange={() => setKind(k)} />
-              {KIND_LABELS[k]}
-            </label>
-          ))}
-        </fieldset>
+    <form className="feedback-form" onSubmit={submit} noValidate>
+      <label className="feedback-field">
+        <span>Your message</span>
+        <textarea
+          required
+          rows={7}
+          maxLength={MAX_MESSAGE}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="An idea, a network you'd like to see, a position we missed, something that looks off…"
+        />
+      </label>
 
-        <label className="feedback-field">
-          <span>Your message</span>
-          <textarea
-            required
-            rows={6}
-            maxLength={MAX_MESSAGE}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder={
-              kind === "missing"
-                ? "Which position is missing? The exchange and network help a lot — e.g. “my WETH/USDC on Aerodrome, Base”."
-                : "An idea, a network you'd like to see, something that looks off…"
-            }
-          />
-        </label>
+      <label className="feedback-field">
+        <span>
+          Your email <em>(optional — only if you want a reply)</em>
+        </span>
+        <input
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+        />
+      </label>
 
-        {(kind === "missing" || wallet !== "") && (
-          <label className="feedback-field">
-            <span>Wallet address</span>
-            <input
-              type="text"
-              inputMode="text"
-              autoComplete="off"
-              spellCheck={false}
-              value={wallet}
-              onChange={(e) => setWallet(e.target.value)}
-              placeholder="0x… — lets us see exactly what's missing"
-            />
-          </label>
-        )}
+      {/* campo-isca: fora da tela para pessoas, irresistível para robôs */}
+      <label className="hp" aria-hidden="true">
+        Website
+        <input type="text" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
+      </label>
 
-        <label className="feedback-field">
-          <span>
-            Your email <em>(optional — only if you want a reply)</em>
-          </span>
-          <input
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-          />
-        </label>
-
-        {/* campo-isca: fora da tela para pessoas, irresistível para robôs */}
-        <label className="hp" aria-hidden="true">
-          Website
-          <input type="text" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
-        </label>
-
-        <div className="feedback-actions">
-          <button type="submit" className="btn" disabled={!podeEnviar}>
-            {status.s === "sending" ? "Sending…" : "Send"}
-          </button>
-        </div>
-        {status.s === "error" && (
-          <p className="form-error" role="alert">
-            {status.msg}
-          </p>
-        )}
-      </form>
-
-      <p className="feedback-alt">
-        Prefer email? Write to <strong>{FEEDBACK_EMAIL}</strong>{" "}
-        <button type="button" className="btn btn-ghost btn-sm" onClick={copy}>
-          {copied ? "Copied" : "Copy"}
+      <div className="feedback-actions">
+        <button type="submit" className="btn" disabled={message.trim().length < MIN_MESSAGE || status.s === "sending"}>
+          {status.s === "sending" ? "Sending…" : "Send"}
         </button>
-      </p>
-    </>
+      </div>
+      {status.s === "error" && (
+        <p className="form-error" role="alert">
+          {status.msg}
+        </p>
+      )}
+    </form>
   );
 }

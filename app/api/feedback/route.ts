@@ -1,32 +1,33 @@
 /**
- * POST /api/feedback — formulário de sugestões.
+ * POST /api/feedback — formulário de feedback.
  *
  * Casca fina de HTTP sobre `core/feedback.ts`: limite por IP, teto de tamanho,
- * validação e entrega por e-mail pelo Resend (API HTTPS, sem pacote npm).
+ * validação e entrega no Gmail do Alan por um Google Apps Script publicado na
+ * conta dele (`scripts/feedback-apps-script.gs`).
+ *
+ * O endereço de destino NÃO existe neste código nem no navegador: o script
+ * manda para o próprio dono. O que fica na Vercel é só a URL do script, que é
+ * longa e aleatória — ela é o segredo. Vazada, o pior caso é alguém mandar
+ * e-mail para o Alan (limitado a 100/dia pelo Google); ninguém lê a caixa.
  *
  * SEM cabeçalho de CORS de propósito: ao contrário de `/api/positions`, que é
- * pública, esta rota só deve receber do próprio site. Navegador em outra
- * origem é barrado no preflight; robô que chama direto esbarra no limite por
- * IP e nas defesas de `core/feedback.ts`.
+ * pública, esta rota só deve receber do próprio site.
  *
- * Configuração (painel da Vercel — não viaja por git, ver INFRA_E_DOMINIO.md):
- *   RESEND_API_KEY  obrigatória em produção
- *   FEEDBACK_TO     padrão hello@trackdefi.app
- *   FEEDBACK_FROM   padrão "trackdefi feedback <feedback@trackdefi.app>"
- *                   (o domínio precisa estar verificado no Resend)
+ * Configuração (painel da Vercel — não viaja por git):
+ *   FEEDBACK_WEBHOOK_URL   a URL de implantação do Apps Script (termina em /exec)
  *
  * Respostas:
  *   200 { ok: true }                 — entregue (ou robô descartado em silêncio)
- *   400 { error: "<motivo>" }        — mensagem curta/longa, e-mail ou carteira inválidos
+ *   400 { error: "<motivo>" }        — mensagem curta/longa ou e-mail inválido
  *   413 { error: "too_large" }
  *   429 { error: "rate_limited" }
- *   502 { error: "upstream" }        — o Resend falhou
- *   503 { error: "not_configured" }  — falta a chave em produção
+ *   502 { error: "upstream" }        — o script não confirmou o envio
+ *   503 { error: "not_configured" }  — falta a URL em produção
  */
 
 import { buildFeedbackEmail, validateFeedback, type FeedbackInput } from "../../../core/feedback";
 import { FixedWindowLimiter } from "../../../core/guards";
-import { FEEDBACK_EMAIL, SITE_URL } from "../../site";
+import { SITE_URL } from "../../site";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -61,12 +62,12 @@ export async function POST(request: Request): Promise<Response> {
   if (r.spam) return json({ ok: true }, 200); // robô: "ok" e descarte, sem pista
 
   const { subject, text } = buildFeedbackEmail(r.value, SITE_URL);
-  const key = process.env.RESEND_API_KEY?.trim();
+  const url = process.env.FEEDBACK_WEBHOOK_URL?.trim();
 
-  if (!key) {
-    // Modo local: sem chave e fora da Vercel, só imprime no terminal — dá para
-    // testar a tela inteira sem conta no Resend. Em produção, falta de chave é
-    // erro de configuração, nunca "ok" mentiroso.
+  if (!url) {
+    // Modo local: sem URL e fora da Vercel, só imprime no terminal — dá para
+    // testar a tela inteira sem o script. Em produção, falta de URL é erro de
+    // configuração, nunca "ok" mentiroso.
     if (!process.env.VERCEL) {
       console.log(`\n[feedback — modo local, NÃO enviado]\n${subject}\n${text}\n`);
       return json({ ok: true }, 200);
@@ -75,20 +76,17 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    // O Apps Script responde com um redirecionamento para a saída do script;
+    // o fetch segue sozinho. Só vale como entregue se o script disser "ok" —
+    // erro de script volta como página HTML com status 200.
+    const res = await fetch(url, {
       method: "POST",
-      headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
-      body: JSON.stringify({
-        from: process.env.FEEDBACK_FROM?.trim() || "trackdefi feedback <feedback@trackdefi.app>",
-        to: [process.env.FEEDBACK_TO?.trim() || FEEDBACK_EMAIL],
-        // responder direto ao visitante, quando ele deixou e-mail
-        ...(r.value.email ? { reply_to: r.value.email } : {}),
-        subject,
-        text,
-      }),
-      signal: AbortSignal.timeout(10_000),
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ subject, text, replyTo: r.value.email ?? "" }),
+      signal: AbortSignal.timeout(15_000),
     });
-    if (!res.ok) return json({ error: "upstream" }, 502);
+    const resposta = (await res.text()).trim();
+    if (!res.ok || resposta !== "ok") return json({ error: "upstream" }, 502);
     return json({ ok: true }, 200);
   } catch {
     return json({ error: "upstream" }, 502);

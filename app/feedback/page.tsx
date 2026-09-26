@@ -5,7 +5,7 @@ import FeedbackForm from "../ui/FeedbackForm";
 
 export const metadata: Metadata = pageMetadata({
   path: "/feedback",
-  title: "Send feedback",
+  title: "Feedback",
   description:
     "Suggest a feature, ask for a network, or tell us about a position trackdefi missed. Every message is read by a person.",
 });
@@ -13,10 +13,10 @@ export const metadata: Metadata = pageMetadata({
 export default function FeedbackPage() {
   return (
     <main className="container prose">
-      <h1>Send feedback</h1>
+      <h1>Feedback</h1>
       <p className="prose-lede">
-        An idea, a network or exchange you&apos;d like to see, a position we missed, a number that looks off —
-        it all lands in the same inbox, and every message is read by a person.
+        An idea, a network or exchange you&apos;d like to see, a position we missed, a number that looks off — every
+        message is read by a person.
       </p>
 
       <FeedbackForm />

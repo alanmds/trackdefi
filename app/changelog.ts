@@ -47,7 +47,7 @@ export const CHANGELOG: ChangeEntry[] = [
     kind: "feature",
     title: "Send us feedback",
     body:
-      "Found a position we don't show, want a network added, or spotted a number that looks off? There's now a feedback form — and a shortcut on every wallet page that opens it with the wallet already filled in, so we can see exactly what you're seeing. Prefer email? hello@trackdefi.app works too.",
+      "Found a position we don't show, want a network added, or spotted a number that looks off? There's now a Feedback link at the bottom of every page. Every message is read by a person — leave an email if you'd like a reply.",
   },
   {
     date: "2026-09-25",
