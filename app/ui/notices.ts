@@ -3,7 +3,7 @@
  *
  * Nasceu de uma queixa de 26/09/2026: a tela dizia "1 warning during the scan
  * — some data may be incomplete. Refresh to retry." para QUALQUER aviso, sem
- * dizer qual. Quem via um token sem preço (AA, na Robinhood) ao lado concluía
+ * dizer qual. Quem via um token sem preço ao lado concluía
  * que era aquilo e que recarregar resolveria — e não resolve nunca.
  *
  * Duas regras daqui:
@@ -60,7 +60,7 @@ export function noticeText(n: ScanNotice): { text: string; retry: boolean } {
   }
 }
 
-/** "AA", "AA and XYZ", "AA, XYZ and FOO" */
+/** "XYZ", "XYZ and ABC", "XYZ, ABC and FOO" */
 function listSymbols(symbols: string[]): string {
   const u = [...new Set(symbols)];
   if (u.length <= 1) return u[0] ?? "this token";

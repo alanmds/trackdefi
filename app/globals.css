@@ -666,7 +666,7 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  /* o detalhe ("fees 34.5% + emissions 121.8% · pool 114.7%") pode não caber
+  /* o detalhe ("fees X% + emissions Y% · pool Z%") pode não caber
      ao lado do número num card estreito: desce para a linha de baixo em vez de
      vazar pela borda e espremer "Earning now" em três linhas */
   flex-wrap: wrap;

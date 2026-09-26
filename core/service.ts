@@ -406,8 +406,8 @@ export function buildResponse(params: {
   const locks = buildLockDTOs(locksRaw, prices, nowSec);
 
   /* Recompensas somam ITEM A ITEM, não card a card: antes, um único token sem
-     preço (AA, na Robinhood) zerava o card inteiro na soma do topo, e os
-     US$ 50 em USDG ao lado dele sumiam calados. Agora o que tem preço entra,
+     preço zerava o card inteiro na soma do topo, e as recompensas COM preço
+     ao lado dele sumiam caladas. Agora o que tem preço entra,
      e o que não tem é contado à parte para a tela avisar. */
   const allRewards = [...positions.flatMap((p) => p.rewards), ...locks.flatMap((l) => l.rewards)];
 

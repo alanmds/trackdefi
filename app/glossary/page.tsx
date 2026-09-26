@@ -111,7 +111,7 @@ const SECTIONS: Section[] = [
     terms: [
       {
         id: "pool-name",
-        term: "Pool name (e.g. CL10-WETH/cbBTC)",
+        term: "Pool name (e.g. CL100-WETH/USDC)",
         def: (
           <>
             The two tokens in the pool, plus a prefix or suffix that says what kind of pool it is:
@@ -125,7 +125,7 @@ const SECTIONS: Section[] = [
                 tokens that should trade near 1:1.
               </li>
               <li>
-                <strong>A percentage (e.g. USDG/AA 5%)</strong> — a Uniswap pool and its fee tier: the share of every
+                <strong>A percentage (e.g. WETH/USDC 0.05%)</strong> — a Uniswap pool and its fee tier: the share of every
                 swap paid to the pool&apos;s liquidity.
               </li>
             </ul>
@@ -255,7 +255,7 @@ const SECTIONS: Section[] = [
     terms: [
       {
         id: "token-rows",
-        term: "Token rows (e.g. WETH 5.0764 $13,663.64)",
+        term: "Token rows (e.g. WETH 1.5 $4,500.00)",
         def: "How much of each token the position holds right now, and what that is worth. The mix changes with the price: as one token gets more expensive, the pool sells it from your position in exchange for the other.",
       },
       {
@@ -271,8 +271,8 @@ const SECTIONS: Section[] = [
       },
       {
         id: "price-unit",
-        term: "Price unit (e.g. WETH/cbBTC)",
-        def: "The unit of the range numbers: how many of the first token one of the second token is worth. WETH/cbBTC at 31.25 means 1 cbBTC = 31.25 WETH.",
+        term: "Price unit (e.g. USDC/WETH)",
+        def: "The unit of the range numbers: how many of the first token one of the second token is worth. USDC/WETH at 3,000 means 1 WETH = 3,000 USDC.",
       },
     ],
   },
@@ -293,7 +293,7 @@ const SECTIONS: Section[] = [
       {
         id: "total-claimable",
         term: "Total claimable",
-        def: "The dollar sum of the rows above. When some of them have no price, it shows the priced part followed by the names of the others (e.g. “$50.09 + AA”).",
+        def: "The dollar sum of the rows above. When some of them have no price, it shows the priced part followed by the names of the others (e.g. “$12.40 + XYZ”).",
       },
     ],
   },

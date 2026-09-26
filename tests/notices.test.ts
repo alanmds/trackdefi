@@ -55,20 +55,20 @@ describe("noticeText", () => {
 
 describe("tooltip de preço ausente", () => {
   it("sem falha na fonte: não é erro e recarregar não muda", () => {
-    const t = noPriceTip(["AA"], false);
-    expect(t).toContain("AA");
+    const t = noPriceTip(["XYZ"], false);
+    expect(t).toContain("XYZ");
     expect(t).toContain("isn't an error");
     expect(t).toContain("refreshing won't change it");
   });
 
   it("com falha na fonte nesta varredura: não promete que é permanente", () => {
-    const t = noPriceTip(["AA"], true);
+    const t = noPriceTip(["XYZ"], true);
     expect(t).not.toContain("won't change");
     expect(noPriceSummaryTip("positions", true)).toContain("refreshing may bring those back");
   });
 
   it("vários tokens viram lista, sem repetir", () => {
-    expect(noPriceTip(["AA", "XYZ", "AA"], false)).toContain("AA and XYZ");
-    expect(noPriceTip(["AA", "XYZ"], false)).toContain("doesn't cover them");
+    expect(noPriceTip(["XYZ", "ABC", "XYZ"], false)).toContain("XYZ and ABC");
+    expect(noPriceTip(["XYZ", "ABC"], false)).toContain("doesn't cover them");
   });
 });
