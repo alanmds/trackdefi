@@ -2,9 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SearchForm from "./ui/SearchForm";
 import { fmtDate, LATEST } from "./changelog";
-import { COVERAGE, coverageSentence, humanList, networksOf, networksSentence, pageMetadata, SITE_NAME } from "./site";
-
-const DEMO_WALLET = "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac";
+import {
+  COVERAGE,
+  coverageSentence,
+  DEMO_WALLET,
+  humanList,
+  networksOf,
+  networksSentence,
+  pageMetadata,
+  SITE_NAME,
+} from "./site";
 
 export const metadata: Metadata = pageMetadata({ path: "/" });
 

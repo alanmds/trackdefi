@@ -7,12 +7,15 @@
 
 import type { PositionsResponseDTO } from "../core/service";
 import { dtoInvariants, type Check } from "./validate-batch";
+import { DEMO_WALLET } from "../app/site";
 
 const BASE = (process.argv[2] ?? "https://trackdefi.app").replace(/\/$/, "");
 
 /**
- * Carteira-gabarito: a carteira de teste do próprio repo `sugar`, que é também
- * a carteira demo da landing.
+ * Carteira-gabarito: a carteira de teste do próprio repo `sugar`. Até 26/09/2026
+ * era também a demo da home; hoje a demo é outra (`DEMO_WALLET`, em app/site.ts),
+ * e esta segue como gabarito JUSTAMENTE por ser bagunçada — cobre fora da
+ * faixa, sem preço e clássicas, que a vitrine não deve mostrar.
  *
  * Trocada em 25/07/2026. Antes era a carteira do dono do projeto, com dois NFTs
  * fixados pelo id — e ela envelheceu: uma das posições foi retirada, o teste passou
@@ -118,6 +121,29 @@ async function main() {
       { name: `endereço inválido → 400 (veio ${inv.status})`, ok: inv.status === 400 },
       { name: `sem parâmetro → 400 (veio ${missing.status})`, ok: missing.status === 400 },
     ]) && allOk;
+
+  /* Saúde da VITRINE (o botão "Try a demo wallet"). Não reprova o deploy: a
+     carteira é de terceiro e as faixas são manuais — ela piora sozinha com o
+     mercado. Serve para saber QUANDO trocar (candidatas em
+     privado/DEMO_CANDIDATAS.md). */
+  console.log(`━━ carteira demo da home ${DEMO_WALLET.slice(0, 10)}… (informativo)`);
+  const demo = await hit(`/api/positions?address=${DEMO_WALLET}`);
+  const dd = demo.body as PositionsResponseDTO | null;
+  if (demo.status !== 200 || !dd?.positions) {
+    console.log(`   ⚠ não carregou (HTTP ${demo.status}) — a home está oferecendo uma demo quebrada`);
+  } else {
+    const cl = dd.positions.filter((p) => p.range);
+    const fora = cl.filter((p) => !p.range!.inRange).length;
+    const semPreco = dd.positions.filter((p) => p.valueUsd === null).length;
+    const avisos = (dd.notices ?? []).length;
+    const linha = (ok: boolean, txt: string) => console.log(`   ${ok ? "✅" : "⚠"} ${txt}`);
+    linha(dd.positions.length > 0, `${dd.positions.length} posições · US$ ${Math.round(dd.totals.valueUsd).toLocaleString("en-US")}`);
+    linha(fora === 0, `${cl.length - fora} de ${cl.length} concentradas dentro da faixa`);
+    linha(semPreco === 0, `${semPreco} posição(ões) sem preço`);
+    linha(avisos === 0, `${avisos} aviso(s) amarelo(s) na tela`);
+    if (fora > Math.max(1, cl.length / 3) || semPreco > 0 || dd.positions.length === 0)
+      console.log("   ⚠ a vitrine piorou — considerar trocar a DEMO_WALLET");
+  }
 
   console.log(`\n${allOk ? "✅ PRODUÇÃO VALIDADA" : "❌ DIVERGÊNCIAS ENCONTRADAS"}`);
   if (!allOk) process.exit(1);
