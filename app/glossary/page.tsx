@@ -356,12 +356,12 @@ const SECTIONS: Section[] = [
       {
         id: "dash",
         term: "—",
-        def: "No reliable number to show, so we show nothing rather than guess. For a price, it almost always means our price source doesn't cover that token; hover over it to see which one.",
+        def: "No reliable number to show, so we show nothing rather than guess. For a price, it almost always means our price source doesn't cover that token; hover over it (or tap it) to see which one.",
       },
       {
         id: "dotted",
         term: "Dotted underline",
-        def: "Text with a dotted underline has an explanation: hover over it (or long-press on a phone).",
+        def: "Text with a dotted underline has an explanation: hover over it with a mouse, or tap it on a phone. The Earning now box and the badges on a lock work the same way.",
       },
     ],
   },

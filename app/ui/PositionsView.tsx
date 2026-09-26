@@ -14,6 +14,13 @@ type ViewState =
   | { phase: "error"; code: string; message: string }
   | { phase: "done"; data: PositionsResponseDTO };
 
+/* Valor de 7 dígitos ("$1,234,987.65") não cabe na caixa com a fonte cheia
+   quando há 4 caixas lado a lado — medido em 26/09/2026 no iPhone deitado e
+   no computador. A partir de 12 caracteres a fonte encolhe; o resto não muda. */
+function KpiValue({ text }: { text: string }) {
+  return <div className={text.length > 11 ? "value value-long" : "value"}>{text}</div>;
+}
+
 const ERROR_COPY: Record<string, { title: string; body: string }> = {
   invalid_address: { title: "Invalid address", body: "That doesn't look like a valid wallet address." },
   rate_limited: { title: "Too many requests", body: "Please wait a few seconds and try again." },
@@ -145,7 +152,7 @@ export default function PositionsView({ address }: { address: string }) {
           <div className="kpis">
             <div className="kpi">
               <div className="label">Total in pools</div>
-              <div className="value">{fmtUsd(state.data.totals.valueUsd)}</div>
+              <KpiValue text={fmtUsd(state.data.totals.valueUsd)} />
               {state.data.totals.positionsWithoutPrice > 0 && (
                 <div className="hint has-tip" title={noPriceSummaryTip("positions", pricesFailed)}>
                   + {state.data.totals.positionsWithoutPrice} position
@@ -156,7 +163,7 @@ export default function PositionsView({ address }: { address: string }) {
             {(state.data.locks ?? []).length > 0 && (
               <div className="kpi">
                 <div className="label">Locked</div>
-                <div className="value">{fmtUsd(state.data.totals.lockedUsd ?? 0)}</div>
+                <KpiValue text={fmtUsd(state.data.totals.lockedUsd ?? 0)} />
                 <div className="hint">
                   {[...new Set((state.data.locks ?? []).map((l) => `ve${l.token.symbol}`))].join(" + ")} governance locks
                 </div>
@@ -164,7 +171,7 @@ export default function PositionsView({ address }: { address: string }) {
             )}
             <div className="kpi">
               <div className="label">Claimable rewards</div>
-              <div className="value">{fmtUsd(state.data.totals.rewardsUsd)}</div>
+              <KpiValue text={fmtUsd(state.data.totals.rewardsUsd)} />
               <div className="hint">
                 {(state.data.locks ?? []).some((l) => l.rewards.length > 0)
                   ? "fees, emissions & lock rewards"

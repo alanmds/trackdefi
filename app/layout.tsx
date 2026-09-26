@@ -5,6 +5,7 @@ import { Fraunces, Inter } from "next/font/google";
 import { COVERAGE, humanList, NETWORK_NAMES, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "./site";
 import DonateLine from "./ui/DonateLine";
 import SiteAnalytics from "./ui/SiteAnalytics";
+import TapTips from "./ui/TapTips";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -18,6 +19,10 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
+  /* O Safari do iPhone transforma sequência de dígitos em link de telefone —
+     "NFT #1234567" virava um "ligar para…" azul no meio do card. Endereço e
+     data também são detectados à toa em quantias e faixas de preço. */
+  formatDetection: { telephone: false, address: false, date: false, email: false },
   /* as redes saem de NETWORK_NAMES: rede nova entra sozinha, e nenhuma fica
      de fora por esquecimento (a Robinhood Chain ficou, entre 02 e 06/08). */
   keywords: [
@@ -115,6 +120,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </span>
           </div>
         </footer>
+        {/* tooltips no toque: o iPhone não mostra `title` (app/ui/TapTips.tsx) */}
+        <TapTips />
         {/* Vercel Analytics + saída do dono via ?notrack=1 (app/analytics-optout.ts) */}
         <SiteAnalytics />
       </body>

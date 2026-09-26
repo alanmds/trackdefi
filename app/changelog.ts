@@ -44,6 +44,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 export const CHANGELOG: ChangeEntry[] = [
   {
     date: "2026-09-26",
+    kind: "improvement",
+    title: "Explanations open with a tap on phones",
+    body:
+      "The details behind the numbers — what adds up to Earning now, why a price shows \"—\", what a lock's status means — used to appear only when a mouse hovered over them, which a phone can't do. Now a tap opens them at the bottom of the screen. Cards also fit iPhones set to a larger display zoom, and long numbers no longer turn into phone-number links in Safari.",
+  },
+  {
+    date: "2026-09-26",
     kind: "feature",
     title: "A glossary for every number on the page",
     body:

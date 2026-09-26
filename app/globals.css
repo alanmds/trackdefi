@@ -30,6 +30,13 @@
   box-sizing: border-box;
 }
 
+/* iPhone deitado: sem isto o Safari aumenta o texto sozinho e o layout estoura
+   (o zoom de acessibilidade do usuário continua funcionando) */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 html,
 body {
   margin: 0;
@@ -210,8 +217,10 @@ button {
   cursor: pointer;
 }
 
-.donate-copy:hover {
-  background: var(--card-2);
+@media (hover: hover) {
+  .donate-copy:hover {
+    background: var(--card-2);
+  }
 }
 
 .donate-note {
@@ -295,8 +304,12 @@ button {
   transition: background 0.15s ease;
 }
 
-.btn:hover {
-  background: #46331e;
+/* hover só com mouse: no iPhone o estado gruda depois do toque e o botão fica
+   escurecido até se tocar em outro lugar */
+@media (hover: hover) {
+  .btn:hover {
+    background: #46331e;
+  }
 }
 
 .btn:disabled {
@@ -311,8 +324,10 @@ button {
   box-shadow: none;
 }
 
-.btn-ghost:hover {
-  background: var(--card-2);
+@media (hover: hover) {
+  .btn-ghost:hover {
+    background: var(--card-2);
+  }
 }
 
 .form-error {
@@ -356,7 +371,7 @@ button {
 
 .features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   gap: 14px;
   padding: 34px 0 20px;
 }
@@ -412,8 +427,10 @@ button {
   list-style-position: inside;
 }
 
-.faq-item summary:hover {
-  color: var(--accent);
+@media (hover: hover) {
+  .faq-item summary:hover {
+    color: var(--accent);
+  }
 }
 
 .faq-item p {
@@ -480,7 +497,7 @@ button {
 
 .kpis {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
   gap: 14px;
   margin-bottom: 22px;
 }
@@ -509,6 +526,11 @@ button {
   line-height: 1.15;
 }
 
+/* milhões: 13+ caracteres — ver KpiValue em PositionsView */
+.kpi .value.value-long {
+  font-size: clamp(20px, 2.6vw, 26px);
+}
+
 .kpi .hint {
   font-size: 12.5px;
   color: var(--ink-2);
@@ -519,7 +541,7 @@ button {
 
 .positions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   gap: 14px;
   padding-bottom: 40px;
 }
@@ -1076,7 +1098,7 @@ a.chip:hover {
 
 .skeleton-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   gap: 14px;
   padding-bottom: 40px;
 }
@@ -1114,5 +1136,75 @@ a.chip:hover {
 
   .header-note {
     display: none;
+  }
+}
+
+/* ------------------------------------------------------- tooltips no toque
+   O Safari do iPhone não mostra `title`; app/ui/TapTips.tsx abre o texto
+   neste balão ao tocar. Só vale em aparelho sem mouse. */
+@media (hover: none) {
+  /* sem `cursor: pointer` o Safari do iOS nem entrega o toque em elemento que
+     não é link — o balão nunca abriria */
+  main [title]:not(a):not(button) {
+    cursor: pointer;
+  }
+  /* um "—" sozinho tem ~12px: pequeno demais para o dedo. A área de toque
+     cresce sem mexer no desenho (a margem negativa devolve o espaço) */
+  .has-tip {
+    padding: 8px 6px;
+    margin: -8px -6px;
+  }
+}
+
+.tap-tip {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 50;
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 10px 12px 14px;
+  background: var(--ink);
+  color: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px -8px rgba(46, 32, 19, 0.55);
+  font-size: 14px;
+  line-height: 1.45;
+  animation: tap-tip-in 0.16s ease-out;
+}
+
+.tap-tip p {
+  margin: 0;
+  flex: 1;
+}
+
+.tap-tip-close {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  margin: -6px -2px -6px 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--card);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@keyframes tap-tip-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tap-tip {
+    animation: none;
   }
 }
