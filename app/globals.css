@@ -851,6 +851,67 @@ button {
   margin-top: 28px;
 }
 
+/* ------------------------------------------------------- glossário (/glossary)
+   Termo em cima, explicação embaixo: o termo é o que o olho procura, vindo de
+   uma carteira aberta na outra aba. */
+.glossary-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin: 22px 0 6px;
+}
+
+.glossary-toc a {
+  font-size: 13px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.glossary-toc a:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+
+.glossary-section {
+  scroll-margin-top: 16px;
+}
+
+.glossary {
+  margin: 14px 0 0;
+}
+
+.glossary-item {
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  scroll-margin-top: 16px;
+}
+
+.glossary-item:target {
+  background: var(--warn-bg);
+  margin: 0 -10px;
+  padding: 12px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.glossary dt {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.glossary dd {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.glossary dd ul {
+  margin: 6px 0;
+  gap: 4px;
+}
+
 /* ------------------------------------------------------- changelog (/changelog)
    Lista cronológica: a DATA é o que o olho procura, então ela vem antes do
    título e fica na mesma linha do selo de tipo. */

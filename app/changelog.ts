@@ -44,6 +44,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 export const CHANGELOG: ChangeEntry[] = [
   {
     date: "2026-09-26",
+    kind: "feature",
+    title: "A glossary for every number on the page",
+    body:
+      "Not sure what \"Earning now\", \"Staked in gauge\" or a price range like WETH/cbBTC means? The new glossary explains every label and figure on a wallet page in plain English, in the order they appear on screen. It's linked at the bottom of every page.",
+  },
+  {
+    date: "2026-09-26",
     kind: "improvement",
     title: "Warnings that say what happened",
     body:
