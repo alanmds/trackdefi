@@ -54,13 +54,19 @@ export function dtoInvariants(dto: PositionsResponseDTO): Check[] {
   const checks: Check[] = [];
   let sumValue = 0;
   let sumRewards = 0;
+  let rewardsWithoutPrice = 0;
   let withoutPrice = 0;
   let issues: string[] = [];
 
   for (const p of dto.positions) {
     if (p.valueUsd !== null) sumValue += p.valueUsd;
     else withoutPrice++;
-    if (p.rewardsUsd !== null) sumRewards += p.rewardsUsd;
+    /* item a item desde 26/09/2026: um token sem preço não apaga mais o resto
+       do card no total (antes somava p.rewardsUsd, que é null nesse caso) */
+    for (const r of p.rewards) {
+      if (r.valueUsd !== null) sumRewards += r.valueUsd;
+      else rewardsWithoutPrice++;
+    }
 
     if (p.kind === "concentrated" && !p.range) issues.push(`${p.poolSymbol}: concentrada sem range`);
     if (p.kind !== "concentrated" && p.range) issues.push(`${p.poolSymbol}: clássica com range`);
@@ -104,7 +110,10 @@ export function dtoInvariants(dto: PositionsResponseDTO): Check[] {
   let sumLocked = 0;
   for (const l of locks) {
     if (l.valueUsd !== null) sumLocked += l.valueUsd;
-    if (l.rewardsUsd !== null) sumRewards += l.rewardsUsd;
+    for (const r of l.rewards) {
+      if (r.valueUsd !== null) sumRewards += r.valueUsd;
+      else rewardsWithoutPrice++;
+    }
     for (const v of [l.valueUsd, l.rewardsUsd, l.token.amount, l.votingPower]) {
       if (v !== null && !Number.isFinite(v)) issues.push(`lock #${l.lockId}: número não-finito`);
     }
@@ -123,6 +132,13 @@ export function dtoInvariants(dto: PositionsResponseDTO): Check[] {
     ok: truncated ? dto.totals.rewardsUsd >= sumRewards - 0.01 : Math.abs(sumRewards - dto.totals.rewardsUsd) < 0.01,
     detail: `${sumRewards.toFixed(2)} vs ${dto.totals.rewardsUsd.toFixed(2)}`,
   });
+  if (!truncated && dto.totals.rewardsWithoutPrice !== undefined) {
+    checks.push({
+      name: "totals.rewardsWithoutPrice = recompensas sem preço",
+      ok: dto.totals.rewardsWithoutPrice === rewardsWithoutPrice,
+      detail: `${rewardsWithoutPrice} vs ${dto.totals.rewardsWithoutPrice}`,
+    });
+  }
   checks.push({
     name: "totals.lockedUsd = soma dos locks",
     ok: Math.abs(sumLocked - (dto.totals.lockedUsd ?? 0)) < 0.01,
