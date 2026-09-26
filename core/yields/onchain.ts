@@ -11,8 +11,8 @@
  * ===================== v2 (15/09/2026) — feeGrowth INSIDE ===================
  * A v1 usava `feeGrowthGlobal × L`, que atribui à posição as taxas do pool
  * INTEIRO — inclusive as geradas enquanto o preço estava FORA da faixa dela.
- * Numa faixa estreita isso infla sem limite: a posição USDG/HIMS (RWA) na
- * Robinhood marcou 971,94% em produção, com o teto de sanidade em 1.000% — e
+ * Numa faixa estreita isso infla sem limite: uma posição RWA na Robinhood
+ * marcou 971,94% em produção, com o teto de sanidade em 1.000% — e
  * quando o número passava do teto o site não mostrava APR NENHUM.
  *
  * A conta certa é a que o próprio pool usa para pagar a posição:

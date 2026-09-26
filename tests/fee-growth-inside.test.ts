@@ -2,8 +2,10 @@
  * Receita G v2 — feeGrowth INSIDE (parte pura).
  *
  * Os números da posição real vêm do PoC `poc/probe-fee-inside-check.ts`
- * rodado em 15/09/2026 contra a posição USDG/HIMS (RWA) na Robinhood Chain,
- * para o teste falar a mesma língua da medição.
+ * rodado em 15/09/2026 contra uma posição RWA real na Robinhood Chain, para o
+ * teste falar a mesma língua da medição. Liquidez e valor da posição estão
+ * multiplicados pelo MESMO fator (×3): o APR não muda, e os números deixam de
+ * apontar para a posição de origem (repo público — limpeza de 26/09/2026).
  *
  * O que estes testes travam, em ordem de importância:
  *  1. faixa estreita que o preço abandonou NÃO pode receber as taxas do pool
@@ -150,15 +152,15 @@ describe("layout do pool por protocolo (provado on-chain em 15/09/2026)", () => 
   });
 });
 
-describe("posição RWA real: USDG/HIMS na Robinhood (15/09/2026)", () => {
-  const L = 816442828566610n;
+describe("posição RWA real na Robinhood (15/09/2026, L e valor ×3)", () => {
+  const L = 2_449_328_485_699_830n;
   const comum = {
     posLiquidity: L,
-    decimals0: 6, // USDG
-    decimals1: 18, // HIMS
+    decimals0: 6, // stablecoin
+    decimals1: 18, // ação tokenizada
     price0Usd: 1.0,
     price1Usd: 28.21,
-    positionValueUsd: 193.04,
+    positionValueUsd: 579.12,
   };
 
   it("janela de 15 min que CABE na vida da posição → 44,45% a.a.", () => {

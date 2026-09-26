@@ -11,16 +11,19 @@ import { amountsForLiquidity } from "../core/math/liquidity";
 import { getSqrtRatioAtTick } from "../core/math/tickmath";
 import type { ChainReader } from "../core/types";
 
-const OWNER = "0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC" as Address;
+const OWNER = "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac" as Address; // carteira demo, de terceiro
 const WETH = "0x4200000000000000000000000000000000000006" as Address;
 const USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" as Address;
 const POOL = "0xd0b53D9277642d899DF5C87A3966A349A798F224" as Address;
 const NFPM = "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1";
 
-const TICK_LOWER = -203189;
-const TICK_UPPER = -200313;
+// faixa e liquidez de exemplo, redondas — nada copiado de posição real (repo público)
+const TICK_LOWER = -203100;
+const TICK_UPPER = -200400;
 const TICK_CUR = -201500;
-const LIQ = 8184687151171n;
+const LIQ = 5_000_000_000_000n;
+/** preço de WETH (18) em USDC (6) num tick — fórmula própria, independente do código */
+const usdcPorWeth = (tick: number) => 1.0001 ** tick * 1e12;
 
 // positions(tokenId) na ordem do ABI (12 campos)
 function rawPosition(liquidity: bigint, owed0: bigint, owed1: bigint) {
@@ -104,8 +107,10 @@ describe("UniswapV3Adapter", () => {
     const adapter = new UniswapV3Adapter(makeReader(), { onWarn: () => {} });
     const active = (await adapter.getPositions(OWNER)).find((p) => p.positionId === "111")!;
     expect(active.range!.inRange).toBe(true);
-    expect(active.range!.priceLower).toBeCloseTo(1499.87, 1);
-    expect(active.range!.priceUpper).toBeCloseTo(1999.64, 1);
+    expect(active.range!.priceLower).toBeCloseTo(usdcPorWeth(TICK_LOWER), 6);
+    expect(active.range!.priceUpper).toBeCloseTo(usdcPorWeth(TICK_UPPER), 6);
+    expect(active.range!.priceLower).toBeGreaterThan(1000); // faixa de ETH plausível
+    expect(active.range!.priceUpper).toBeLessThan(5000);
   });
 
   it("taxas pendentes vêm do collect() simulado", async () => {

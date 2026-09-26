@@ -14,8 +14,8 @@ const BASE = (process.argv[2] ?? "https://trackdefi.app").replace(/\/$/, "");
  * Carteira-gabarito: a carteira de teste do próprio repo `sugar`, que é também
  * a carteira demo da landing.
  *
- * Trocada em 25/07/2026. Antes era a carteira do Alan, com dois NFTs fixados
- * pelo id — e ela envelheceu: ele retirou a posição `1774608`, o teste passou
+ * Trocada em 25/07/2026. Antes era a carteira do dono do projeto, com dois NFTs
+ * fixados pelo id — e ela envelheceu: uma das posições foi retirada, o teste passou
  * a falhar e a falha PARECIA bug do site. Um gabarito que quebra quando o dono
  * mexe no próprio dinheiro é um alarme que a gente aprende a ignorar.
  *

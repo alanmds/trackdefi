@@ -8,7 +8,7 @@ import type { Address } from "viem";
 import { getWalletPositions } from "../core/service";
 import type { LpPosition, ProtocolAdapter } from "../core/types";
 
-const ADDR = "0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC" as Address;
+const ADDR = "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac" as Address; // carteira demo, de terceiro
 
 function fakePosition(protocol: string): LpPosition {
   const t = (s: string, a: Address) => ({ address: a, symbol: s, decimals: 18 });

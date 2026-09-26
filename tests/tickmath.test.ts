@@ -1,7 +1,8 @@
 /**
  * Vetores de teste EXATOS:
- * - 4 pares tick↔sqrt_ratio de posições reais (fixture 0x05963CdC, em que o
- *   Sugar da Aerodrome entregou os dois valores — verdade on-chain);
+ * - 4 pares tick↔sqrt_ratio de posições reais da carteira demo (de terceiro —
+ *   ver tests/demo-fixture.ts), em que o Sugar entregou os dois valores —
+ *   verdade on-chain; um deles bem perto do extremo negativo;
  * - extremos canônicos MIN/MAX_SQRT_RATIO do contrato TickMath (exercitam
  *   TODOS os 20 coeficientes mágicos);
  * - tick 0 → exatamente 2^96.
@@ -11,14 +12,14 @@ import { describe, expect, it } from "vitest";
 import { getSqrtRatioAtTick, MAX_TICK, MIN_TICK } from "../core/math/tickmath";
 
 describe("getSqrtRatioAtTick (port exato do TickMath)", () => {
-  it("bate com os sqrt ratios reais do fixture (posição WETH/USDC #1774608)", () => {
-    expect(getSqrtRatioAtTick(-203189)).toBe(3068365595550320841079178n);
-    expect(getSqrtRatioAtTick(-200313)).toBe(3542872543332906218966988n);
+  it("bate com os sqrt ratios reais do fixture (posição demo USDC/WETH #47980865, Optimism)", () => {
+    expect(getSqrtRatioAtTick(197000)).toBe(1501296094141917074055633258303303n);
+    expect(getSqrtRatioAtTick(201200)).toBe(1852096607021549532536340860415785n);
   });
 
-  it("bate com os sqrt ratios reais do fixture (posição USDC/cbBTC #1774557)", () => {
-    expect(getSqrtRatioAtTick(-66850)).toBe(2801062856536558260772180222n);
-    expect(getSqrtRatioAtTick(-63805)).toBe(3261676492785699539064262614n);
+  it("bate com os sqrt ratios reais do fixture (posição demo WETH/AERO #3970481, Base)", () => {
+    expect(getSqrtRatioAtTick(-367400)).toBe(834235802021488591083n);
+    expect(getSqrtRatioAtTick(92200)).toBe(7959339820541314895926346603111n);
   });
 
   it("tick 0 → exatamente 2^96", () => {

@@ -1,7 +1,7 @@
 /**
  * PoC — Receita G v2: fee APR da posição medido com feeGrowth**Inside**.
  *
- * O MOTIVO (achado de 15/09/2026, posição USDG/HIMS na Robinhood):
+ * O MOTIVO (achado de 15/09/2026, numa posição RWA de faixa estreita na Robinhood):
  * o `core/yields/onchain.ts` usa `feeGrowthGlobal × L`, que atribui à posição
  * as taxas do pool INTEIRO — inclusive as geradas enquanto o preço estava
  * FORA da faixa dela. Numa faixa estreita isso infla o APR sem limite; a
@@ -85,27 +85,30 @@ async function main() {
   const chainId = 4663;
   const info = CHAINS[chainId];
   const reader = createReader(chainId) as any;
-  const nft = 1181755n;
+  /* NFT e pool vêm por argumento, sem padrão: o repo é público, e um NFT
+     fixo aqui ligava o projeto à carteira dona dele (limpeza de 26/09/2026). */
+  const [nftArg, poolArg] = process.argv.slice(2);
+  if (!nftArg || !poolArg) throw new Error("uso: npx tsx <este-arquivo> <nft-id> <endereço-do-pool>");
+  const nft = BigInt(nftArg);
 
   const pos = (await reader.readContract({
     address: UNISWAP_V3_ROBINHOOD.nfpm, abi: nfpmAbi, functionName: "positions", args: [nft],
   })) as any[];
-  const [, , , , , tickLowerRaw, tickUpperRaw, liquidity] = pos;
+  const [, , token0, token1, , tickLowerRaw, tickUpperRaw, liquidity] = pos;
   const lower = Number(tickLowerRaw), upper = Number(tickUpperRaw);
   const L = liquidity as bigint;
 
-  const pool = "0xC8C90d3a1c1a24967E773ac2aD0d456BA3E31F64" as Address;
-  const dec0 = 6, dec1 = 18; // USDG, HIMS
+  const pool = poolArg as Address;
+  const decAbi = [{ type: "function", name: "decimals", stateMutability: "view", inputs: [], outputs: [{ type: "uint8" }] }] as const;
+  const dec0 = Number(await reader.readContract({ address: token0, abi: decAbi, functionName: "decimals" }));
+  const dec1 = Number(await reader.readContract({ address: token1, abi: decAbi, functionName: "decimals" }));
 
   // preços pela MESMA fonte da produção
   const { defillamaPrices } = await import("../core/prices/defillama");
-  const precos = await defillamaPrices.fetchUsdPrices(info.priceSlug, [
-    "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
-    "0xCceE82fE024c36fA15E1005edE3E9e4787e23D09",
-  ] as Address[]);
-  const price0 = precos.get("0x5fc5360d0400a0fd4f2af552add042d716f1d168") ?? null;
-  const price1 = precos.get("0xccee82fe024c36fa15e1005ede3e9e4787e23d09") ?? null;
-  console.log(`preços: USDG=${price0} HIMS=${price1}`);
+  const precos = await defillamaPrices.fetchUsdPrices(info.priceSlug, [token0, token1] as Address[]);
+  const price0 = precos.get(String(token0).toLowerCase()) ?? null;
+  const price1 = precos.get(String(token1).toLowerCase()) ?? null;
+  console.log(`preços: token0=${price0} token1=${price1}`);
   if (price0 === null || price1 === null) throw new Error("sem preço — abortando");
 
   const bloco = (await reader.getBlockNumber()) as bigint;

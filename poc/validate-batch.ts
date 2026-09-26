@@ -25,7 +25,6 @@ import { ABSURD_APR_PCT } from "../core/yields/onchain";
 import { MAX_SANE_EARNING } from "../core/yields/positionApr";
 
 const DEFAULT_WALLETS: Address[] = [
-  "0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC", // Alan validou contra a Aerodrome (F1)
   "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac", // demo (v2 staked + CL fora de stake)
   "0x0000000000000000000000000000000000000001", // vazia (fluxo de zero posições)
 ];

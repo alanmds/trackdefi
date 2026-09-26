@@ -1,0 +1,452 @@
+{
+  "account": "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac",
+  "capturedAt": "2026-09-26T20:35:03.286Z",
+  "base": {
+    "chainId": 8453,
+    "protocol": "aerodrome",
+    "emissionsToken": "0x940181a94A35A4569E4529A3CDfB74e38FD98631",
+    "positions": [
+      {
+        "id": "0",
+        "lp": "0xF89042057D079debe2a65A1a899E48E0E825105F",
+        "liquidity": "0",
+        "staked": "210634510024797771712",
+        "amount0": "0",
+        "amount1": "0",
+        "staked0": "17041655999037447",
+        "staked1": "2603796767908292561636606",
+        "unstaked_earned0": "0",
+        "unstaked_earned1": "0",
+        "emissions_earned": "170360921233363629605",
+        "tick_lower": 0,
+        "tick_upper": 0,
+        "sqrt_ratio_lower": "0",
+        "sqrt_ratio_upper": "0",
+        "locker": "0x0000000000000000000000000000000000000000",
+        "unlocks_at": 0,
+        "alm": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "id": "0",
+        "lp": "0x2C4909355b0C036840819484c3A882A95659aBf3",
+        "liquidity": "2412123481723",
+        "staked": "90115545385438497614",
+        "amount0": "1553036409",
+        "amount1": "3754100586005140",
+        "staked0": "58020546666570044",
+        "staked1": "140251037852338706333838",
+        "unstaked_earned0": "1432236492",
+        "unstaked_earned1": "886512460024551",
+        "emissions_earned": "262999393838090480275",
+        "tick_lower": 0,
+        "tick_upper": 0,
+        "sqrt_ratio_lower": "0",
+        "sqrt_ratio_upper": "0",
+        "locker": "0x0000000000000000000000000000000000000000",
+        "unlocks_at": 0,
+        "alm": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "id": "0",
+        "lp": "0x20000FbfeDFD172821821C9c59284129B04ffB2e",
+        "liquidity": "0",
+        "staked": "249009804803219129552",
+        "amount0": "0",
+        "amount1": "0",
+        "staked0": "4196136300451903637358387",
+        "staked1": "14781315243714640",
+        "unstaked_earned0": "0",
+        "unstaked_earned1": "0",
+        "emissions_earned": "284096270978526604843",
+        "tick_lower": 0,
+        "tick_upper": 0,
+        "sqrt_ratio_lower": "0",
+        "sqrt_ratio_upper": "0",
+        "locker": "0x0000000000000000000000000000000000000000",
+        "unlocks_at": 0,
+        "alm": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "id": "0",
+        "lp": "0xb83026C879557F27C4D8F85Da9a4E0d3Fd9a585e",
+        "liquidity": "9999999999999999000",
+        "staked": "0",
+        "amount0": "627083986158654",
+        "amount1": "159539355865710247720600",
+        "staked0": "0",
+        "staked1": "0",
+        "unstaked_earned0": "12139349059819",
+        "unstaked_earned1": "1675054330002305611654",
+        "emissions_earned": "0",
+        "tick_lower": 0,
+        "tick_upper": 0,
+        "sqrt_ratio_lower": "0",
+        "sqrt_ratio_upper": "0",
+        "locker": "0x0000000000000000000000000000000000000000",
+        "unlocks_at": 0,
+        "alm": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "id": "0",
+        "lp": "0x640A1f93fE0f9868b6C6d83794EC4BA988Db3B12",
+        "liquidity": "1871865648505590",
+        "staked": "0",
+        "amount0": "38008350761115436593",
+        "amount1": "92194636939",
+        "staked0": "0",
+        "staked1": "0",
+        "unstaked_earned0": "1176473257851167934",
+        "unstaked_earned1": "507718766914",
+        "emissions_earned": "0",
+        "tick_lower": 0,
+        "tick_upper": 0,
+        "sqrt_ratio_lower": "0",
+        "sqrt_ratio_upper": "0",
+        "locker": "0x0000000000000000000000000000000000000000",
+        "unlocks_at": 0,
+        "alm": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "id": "3970481",
+        "lp": "0x82321f3BEB69f503380D6B233857d5C43562e2D0",
+        "liquidity": "74058657164145",
+        "staked": "0",
+        "amount0": "597522342801",
+        "amount1": "4109269058890035",
+        "staked0": "0",
+        "staked1": "0",
+        "unstaked_earned0": "159279517506",
+        "unstaked_earned1": "1267934878308720",
+        "emissions_earned": "0",
+        "tick_lower": -367400,
+        "tick_upper": 92200,
+        "sqrt_ratio_lower": "834235802021488591083",
+        "sqrt_ratio_upper": "7959339820541314895926346603111",
+        "locker": "0x0000000000000000000000000000000000000000",
+        "unlocks_at": 0,
+        "alm": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "id": "7665206",
+        "lp": "0x56b92E5B391DbFb8b8028AC95A4b97f52ffEB416",
+        "liquidity": "1025652596030472",
+        "staked": "0",
+        "amount0": "0",
+        "amount1": "262965063053765",
+        "staked0": "0",
+        "staked1": "0",
+        "unstaked_earned0": "29513659357",
+        "unstaked_earned1": "77835891474533",
+        "emissions_earned": "0",
+        "tick_lower": 78700,
+        "tick_upper": 78800,
+        "sqrt_ratio_lower": "4052685740144021834925775373626",
+        "sqrt_ratio_upper": "4072998893771118498911129821546",
+        "locker": "0x0000000000000000000000000000000000000000",
+        "unlocks_at": 0,
+        "alm": "0x0000000000000000000000000000000000000000"
+      }
+    ],
+    "pools": {
+      "0xF89042057D079debe2a65A1a899E48E0E825105F": {
+        "kind": "v2-volatile",
+        "spacing": null,
+        "tick": null,
+        "symbol": "vAMM-WETH/DOG",
+        "token0": "0x4200000000000000000000000000000000000006",
+        "token1": "0x9E53e88dCff56d3062510A745952DEC4cEFDff9E"
+      },
+      "0x2C4909355b0C036840819484c3A882A95659aBf3": {
+        "kind": "v2-volatile",
+        "spacing": null,
+        "tick": null,
+        "symbol": "vAMM-WETH/DEGEN",
+        "token0": "0x4200000000000000000000000000000000000006",
+        "token1": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed"
+      },
+      "0x20000FbfeDFD172821821C9c59284129B04ffB2e": {
+        "kind": "v2-volatile",
+        "spacing": null,
+        "tick": null,
+        "symbol": "vAMM-TYBG/WETH",
+        "token0": "0x0d97F261b1e88845184f678e2d1e7a98D9FD38dE",
+        "token1": "0x4200000000000000000000000000000000000006"
+      },
+      "0xb83026C879557F27C4D8F85Da9a4E0d3Fd9a585e": {
+        "kind": "v2-volatile",
+        "spacing": null,
+        "tick": null,
+        "symbol": "vAMM-WETH/member",
+        "token0": "0x4200000000000000000000000000000000000006",
+        "token1": "0x7d89E05c0B93B24B5Cb23A073E60D008FEd1aCF9"
+      },
+      "0x640A1f93fE0f9868b6C6d83794EC4BA988Db3B12": {
+        "kind": "v2-volatile",
+        "spacing": null,
+        "tick": null,
+        "symbol": "vAMM-CREATOR/WETH",
+        "token0": "0x0FD122a924c4528A78a8141bdDd38A0e5bA35FA5",
+        "token1": "0x4200000000000000000000000000000000000006"
+      },
+      "0x82321f3BEB69f503380D6B233857d5C43562e2D0": {
+        "kind": "concentrated",
+        "spacing": 200,
+        "tick": 80326,
+        "symbol": null,
+        "token0": "0x4200000000000000000000000000000000000006",
+        "token1": "0x940181a94A35A4569E4529A3CDfB74e38FD98631",
+        "activeLiquidity": "281339837438950015199406",
+        "poolStakedLiquidity": "2844129470013302804627",
+        "gauge": "0xdE8FF0D3e8ab225110B088a250b546015C567E27",
+        "emissionRatePerSec": "151916281777765901"
+      },
+      "0x56b92E5B391DbFb8b8028AC95A4b97f52ffEB416": {
+        "kind": "concentrated",
+        "spacing": 100,
+        "tick": 89258,
+        "symbol": null,
+        "token0": "0x4200000000000000000000000000000000000006",
+        "token1": "0x98d0baa52b2D063E780DE12F615f963Fe8537553",
+        "activeLiquidity": "3529095552540095404151",
+        "poolStakedLiquidity": "3506369856113526097294",
+        "gauge": "0x6205DfbE68444cFF504A20a712cEa794c6b6Cf04",
+        "emissionRatePerSec": "614523961894929"
+      }
+    },
+    "tokens": {
+      "0x940181a94A35A4569E4529A3CDfB74e38FD98631": {
+        "address": "0x940181a94A35A4569E4529A3CDfB74e38FD98631",
+        "symbol": "AERO",
+        "decimals": 18
+      },
+      "0x4200000000000000000000000000000000000006": {
+        "address": "0x4200000000000000000000000000000000000006",
+        "symbol": "WETH",
+        "decimals": 18
+      },
+      "0x9E53e88dCff56d3062510A745952DEC4cEFDff9E": {
+        "address": "0x9E53e88dCff56d3062510A745952DEC4cEFDff9E",
+        "symbol": "DOG",
+        "decimals": 18
+      },
+      "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed": {
+        "address": "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
+        "symbol": "DEGEN",
+        "decimals": 18
+      },
+      "0x0d97F261b1e88845184f678e2d1e7a98D9FD38dE": {
+        "address": "0x0d97F261b1e88845184f678e2d1e7a98D9FD38dE",
+        "symbol": "TYBG",
+        "decimals": 18
+      },
+      "0x7d89E05c0B93B24B5Cb23A073E60D008FEd1aCF9": {
+        "address": "0x7d89E05c0B93B24B5Cb23A073E60D008FEd1aCF9",
+        "symbol": "member",
+        "decimals": 18
+      },
+      "0x0FD122a924c4528A78a8141bdDd38A0e5bA35FA5": {
+        "address": "0x0FD122a924c4528A78a8141bdDd38A0e5bA35FA5",
+        "symbol": "CREATOR",
+        "decimals": 18
+      },
+      "0x98d0baa52b2D063E780DE12F615f963Fe8537553": {
+        "address": "0x98d0baa52b2D063E780DE12F615f963Fe8537553",
+        "symbol": "KAITO",
+        "decimals": 18
+      }
+    }
+  },
+  "optimism": {
+    "chainId": 10,
+    "protocol": "velodrome",
+    "emissionsToken": "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db",
+    "positions": [
+      {
+        "id": "0",
+        "lp": "0x58e6433A6903886E440Ddf519eCC573c4046a6b2",
+        "liquidity": "39327028361352419",
+        "staked": "26218018907568280",
+        "amount0": "145896670096932",
+        "amount1": "10604209510865119385",
+        "staked0": "97264446731288",
+        "staked1": "7069473007243413103",
+        "unstaked_earned0": "106478507954865",
+        "unstaked_earned1": "4557848739572606276",
+        "emissions_earned": "10755491518089675059",
+        "tick_lower": 0,
+        "tick_upper": 0,
+        "sqrt_ratio_lower": "0",
+        "sqrt_ratio_upper": "0",
+        "locker": "0x0000000000000000000000000000000000000000",
+        "unlocks_at": 0,
+        "alm": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "id": "0",
+        "lp": "0xe9581d0F1A628B038fC8B2a7F5A7d904f0e2f937",
+        "liquidity": "0",
+        "staked": "42003766251961719",
+        "amount0": "0",
+        "amount1": "0",
+        "staked0": "21249239600140623",
+        "staked1": "83050021082381561",
+        "unstaked_earned0": "0",
+        "unstaked_earned1": "0",
+        "emissions_earned": "112864628864599903",
+        "tick_lower": 0,
+        "tick_upper": 0,
+        "sqrt_ratio_lower": "0",
+        "sqrt_ratio_upper": "0",
+        "locker": "0x0000000000000000000000000000000000000000",
+        "unlocks_at": 0,
+        "alm": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "id": "47980865",
+        "lp": "0x478946BcD4a5a22b316470F5486fAfb928C0bA25",
+        "liquidity": "0",
+        "staked": "69033465884",
+        "amount0": "0",
+        "amount1": "0",
+        "staked0": "185532",
+        "staked1": "7298240095488",
+        "unstaked_earned0": "0",
+        "unstaked_earned1": "0",
+        "emissions_earned": "7854665923116316878",
+        "tick_lower": 197000,
+        "tick_upper": 201200,
+        "sqrt_ratio_lower": "1501296094141917074055633258303303",
+        "sqrt_ratio_upper": "1852096607021549532536340860415785",
+        "locker": "0x0000000000000000000000000000000000000000",
+        "unlocks_at": 0,
+        "alm": "0xcd975e6a5F55137755487F0918b8ca74aCCe7925"
+      },
+      {
+        "id": "471",
+        "lp": "0xEE1baC98527a9fDd57fcCf967817215B083cE1F0",
+        "liquidity": "198938141054",
+        "staked": "0",
+        "amount0": "0",
+        "amount1": "30862447789291",
+        "staked0": "0",
+        "staked1": "0",
+        "unstaked_earned0": "3170",
+        "unstaked_earned1": "2444606361396",
+        "emissions_earned": "0",
+        "tick_lower": 192900,
+        "tick_upper": 193100,
+        "sqrt_ratio_lower": "1223039369485268445639072514051175",
+        "sqrt_ratio_upper": "1235330501874880207709407957588633",
+        "locker": "0x0000000000000000000000000000000000000000",
+        "unlocks_at": 0,
+        "alm": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "id": "1491712",
+        "lp": "0xF0AB9385894EA749BFA79BAFcd192d65a1571c2a",
+        "liquidity": "347464890701",
+        "staked": "0",
+        "amount0": "306432",
+        "amount1": "85511733917172",
+        "staked0": "0",
+        "staked1": "0",
+        "unstaked_earned0": "21518",
+        "unstaked_earned1": "10534173522477",
+        "emissions_earned": "0",
+        "tick_lower": 197100,
+        "tick_upper": 197700,
+        "sqrt_ratio_lower": "1508820994949790024872505362131020",
+        "sqrt_ratio_upper": "1554769103170329101377156983274021",
+        "locker": "0x0000000000000000000000000000000000000000",
+        "unlocks_at": 0,
+        "alm": "0x0000000000000000000000000000000000000000"
+      }
+    ],
+    "pools": {
+      "0x58e6433A6903886E440Ddf519eCC573c4046a6b2": {
+        "kind": "v2-volatile",
+        "spacing": null,
+        "tick": null,
+        "symbol": "vAMMV2-WETH/VELO",
+        "token0": "0x4200000000000000000000000000000000000006",
+        "token1": "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db"
+      },
+      "0xe9581d0F1A628B038fC8B2a7F5A7d904f0e2f937": {
+        "kind": "v2-volatile",
+        "spacing": null,
+        "tick": null,
+        "symbol": "vAMMV2-OP/VELO",
+        "token0": "0x4200000000000000000000000000000000000042",
+        "token1": "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db"
+      },
+      "0x478946BcD4a5a22b316470F5486fAfb928C0bA25": {
+        "kind": "concentrated",
+        "spacing": 100,
+        "tick": 197371,
+        "symbol": null,
+        "token0": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+        "token1": "0x4200000000000000000000000000000000000006",
+        "activeLiquidity": "335039099239925308",
+        "poolStakedLiquidity": "334717432210878623",
+        "gauge": "0xa75127121d28a9BF848F3B70e7Eea26570aa7700",
+        "emissionRatePerSec": "1152785804208172108"
+      },
+      "0xEE1baC98527a9fDd57fcCf967817215B083cE1F0": {
+        "kind": "concentrated",
+        "spacing": 100,
+        "tick": 195183,
+        "symbol": null,
+        "token0": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+        "token1": "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb",
+        "activeLiquidity": "13794493193419843",
+        "poolStakedLiquidity": "12523607451202707",
+        "gauge": "0xded023B976de3bbe6aEA56678564e992113f8Ea1",
+        "emissionRatePerSec": "100204580974199905"
+      },
+      "0xF0AB9385894EA749BFA79BAFcd192d65a1571c2a": {
+        "kind": "concentrated",
+        "spacing": 100,
+        "tick": 197356,
+        "symbol": null,
+        "token0": "0x1217BfE6c773EEC6cc4A38b5Dc45B92292B6E189",
+        "token1": "0x4200000000000000000000000000000000000006",
+        "activeLiquidity": "348560884133",
+        "poolStakedLiquidity": "1095993432",
+        "gauge": "0x8AdB4Dc31BF5F87f448a521b647A003D493c8747",
+        "emissionRatePerSec": "44798411329131758"
+      }
+    },
+    "tokens": {
+      "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db": {
+        "address": "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db",
+        "symbol": "VELO",
+        "decimals": 18
+      },
+      "0x4200000000000000000000000000000000000006": {
+        "address": "0x4200000000000000000000000000000000000006",
+        "symbol": "WETH",
+        "decimals": 18
+      },
+      "0x4200000000000000000000000000000000000042": {
+        "address": "0x4200000000000000000000000000000000000042",
+        "symbol": "OP",
+        "decimals": 18
+      },
+      "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85": {
+        "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+        "symbol": "USDC",
+        "decimals": 6
+      },
+      "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb": {
+        "address": "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb",
+        "symbol": "wstETH",
+        "decimals": 18
+      },
+      "0x1217BfE6c773EEC6cc4A38b5Dc45B92292B6E189": {
+        "address": "0x1217BfE6c773EEC6cc4A38b5Dc45B92292B6E189",
+        "symbol": "oUSDT",
+        "decimals": 6
+      }
+    }
+  }
+}

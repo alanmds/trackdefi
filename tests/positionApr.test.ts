@@ -1,6 +1,9 @@
 /**
  * Receita C2: APR "rendendo agora" da posição. Números derivados dos PoCs
- * reais (poc/probe-emissions.ts e poc/probe-fee-apr.ts, 18-19/07/2026).
+ * reais (poc/probe-emissions.ts e poc/probe-fee-apr.ts, 18-19/07/2026), com a
+ * liquidez e o valor DA POSIÇÃO multiplicados pelo mesmo fator (×3): o APR não
+ * muda, e os números deixam de apontar para a posição de origem (repo público —
+ * limpeza de 26/09/2026). Os números do POOL ficam como estavam: são públicos.
  */
 
 import { describe, expect, it } from "vitest";
@@ -9,10 +12,10 @@ import { computeEarning, MAX_SANE_EARNING, MIN_POOL_TVL_USD, type EarningInputs 
 // base: posição Uniswap em range, sem stake (só taxas) — USDC/WETH 0.05% Ethereum
 const base: EarningInputs = {
   inRange: true,
-  valueUsd: 149.91,
+  valueUsd: 449.73,
   poolFeeAprPct: 12.97, // apyBase da DefiLlama
   poolTvlUsd: 94_105_827,
-  posLiquidity: 35_597_051_938_309n,
+  posLiquidity: 106_791_155_814_927n,
   activeLiquidity: 6_430_520_150_839_322_559n,
   staked: false,
   rewardRatePerSec: null,
@@ -51,14 +54,14 @@ describe("computeEarning — taxas (Uniswap real do PoC)", () => {
 describe("computeEarning — emissões (Aerodrome staked real do PoC)", () => {
   const staked: EarningInputs = {
     inRange: true,
-    valueUsd: 158.0,
+    valueUsd: 474.0,
     poolFeeAprPct: null, // pool CL1: match() da DefiLlama rejeita (apyReward absurdo)
     poolTvlUsd: null,
     posLiquidity: null,
     activeLiquidity: null,
     staked: true,
     rewardRatePerSec: 23_917_758_245_082_985n,
-    posStakedLiquidity: 43_010_803n,
+    posStakedLiquidity: 129_032_409n,
     poolStakedLiquidity: 957_469_780_522n,
     emissionPriceUsd: 0.41543967,
     emissionDecimals: 18,
@@ -80,7 +83,7 @@ describe("computeEarning — emissões (Aerodrome staked real do PoC)", () => {
       ...staked,
       poolFeeAprPct: 20,
       poolTvlUsd: 5_000_000,
-      posLiquidity: 43_010_803n,
+      posLiquidity: 129_032_409n,
       activeLiquidity: 957_469_780_522n,
     })!;
     expect(e.feePct).not.toBeNull();

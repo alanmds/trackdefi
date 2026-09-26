@@ -17,7 +17,7 @@ delete process.env.TRACKDEFI_FIXTURE;
 const { GET } = await import("../app/api/positions/route");
 
 const t0 = Date.now();
-const res = await GET(new Request("http://localhost/api/positions?address=0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC"));
+const res = await GET(new Request("http://localhost/api/positions?address=0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac"));
 const ms = Date.now() - t0;
 const body = (await res.json()) as { error?: string; message?: string };
 

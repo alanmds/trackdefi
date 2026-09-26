@@ -8,7 +8,7 @@ import type { Address } from "viem";
 import { AerodromeAdapter, toLpPosition, type PoolMeta } from "../core/adapters/aerodrome/index";
 import { AERODROME_BASE, VELODROME_OPTIMISM } from "../core/adapters/aerodrome/config";
 import type { ChainReader, TokenInfo } from "../core/types";
-import fixture from "../poc/fixture-0x05963CdC.json";
+import { EMISSION, poolMeta, rawBy, tokens } from "./demo-fixture";
 
 const deadReader: ChainReader = {
   readContract: async () => {
@@ -36,52 +36,24 @@ describe("SugarChainConfig (Receita A)", () => {
     expect(VELODROME_OPTIMISM.factories.length).toBeGreaterThan(0);
   });
 
-  it("toLpPosition etiqueta protocolo/rede recebidos (posição real do fixture)", () => {
-    const j = fixture.positions[2];
-    const raw = {
-      id: BigInt(j.id),
-      lp: j.lp as Address,
-      liquidity: BigInt(j.liquidity),
-      staked: BigInt(j.staked),
-      amount0: BigInt(j.amount0),
-      amount1: BigInt(j.amount1),
-      staked0: BigInt(j.staked0),
-      staked1: BigInt(j.staked1),
-      unstaked_earned0: BigInt(j.unstaked_earned0),
-      unstaked_earned1: BigInt(j.unstaked_earned1),
-      emissions_earned: BigInt(j.emissions_earned),
-      tick_lower: j.tick_lower,
-      tick_upper: j.tick_upper,
-      sqrt_ratio_lower: BigInt(j.sqrt_ratio_lower),
-      sqrt_ratio_upper: BigInt(j.sqrt_ratio_upper),
-      locker: j.locker as Address,
-      unlocks_at: j.unlocks_at,
-      alm: j.alm as Address,
-    };
-    const WETH: TokenInfo = { address: "0x4200000000000000000000000000000000000006", symbol: "WETH", decimals: 18 };
-    const USDC: TokenInfo = { address: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85", symbol: "USDC", decimals: 6 };
-    const VELO: TokenInfo = { address: VELODROME_OPTIMISM.emissionsToken, symbol: "VELO", decimals: 18 };
-    const pool: PoolMeta = { kind: "concentrated", spacing: 1, tick: -201500, symbol: null, token0: WETH.address, token1: USDC.address };
-    const tokens = new Map<Address, TokenInfo>([
-      [WETH.address, WETH],
-      [USDC.address, USDC],
-    ]);
-
-    const pos = toLpPosition(raw, pool, tokens, VELO, "velodrome", 10);
+  it("toLpPosition etiqueta protocolo/rede recebidos (posição real da carteira demo)", () => {
+    const raw = rawBy("optimism", (_, p) => p.id === "47980865");
+    const tk = tokens("optimism");
+    const pos = toLpPosition(raw, poolMeta("optimism", raw.lp), tk, tk.get(EMISSION.optimism)!, "velodrome", 10);
     expect(pos.protocol).toBe("velodrome");
     expect(pos.chainId).toBe(10);
     expect(pos.rewards.find((r) => r.kind === "emission")?.token.symbol).toBe("VELO");
   });
 
   it("retrocompatibilidade: sem os novos parâmetros, continua aerodrome/Base", () => {
-    const j = fixture.positions[0];
+    const j = rawBy("base", (m) => m.symbol === "vAMM-WETH/member");
     const raw = {
-      id: BigInt(j.id),
-      lp: j.lp as Address,
-      liquidity: BigInt(j.liquidity),
+      id: j.id,
+      lp: j.lp,
+      liquidity: j.liquidity,
       staked: 0n,
-      amount0: BigInt(j.amount0),
-      amount1: BigInt(j.amount1),
+      amount0: j.amount0,
+      amount1: j.amount1,
       staked0: 0n,
       staked1: 0n,
       unstaked_earned0: 0n,

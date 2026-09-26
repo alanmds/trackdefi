@@ -25,6 +25,12 @@ import { createReader } from "../core/chain";
 import { CHAINS } from "../core/chains";
 import { UNISWAP_V3_CHAINS } from "../core/adapters/uniswap-v3/config";
 
+// NFT por argumento, sem padrão: um NFT fixo num repo público liga o
+// projeto à carteira dona dele (limpeza de 26/09/2026)
+function die(msg: string): never {
+  throw new Error(msg);
+}
+
 const nfpmAbi = parseAbi([
   "function positions(uint256 tokenId) view returns (uint96 nonce, address operator, address token0, address token1, uint24 fee, int24 tickLower, int24 tickUpper, uint128 liquidity, uint256 feeGrowthInside0LastX128, uint256 feeGrowthInside1LastX128, uint128 tokensOwed0, uint128 tokensOwed1)",
 ]);
@@ -38,7 +44,7 @@ const fmtDur = (s: number) =>
 
 async function main() {
   const chainId = Number(process.argv[2] ?? 4663);
-  const ids = (process.argv[3] ?? "1181755").split(",").map((s) => BigInt(s.trim()));
+  const ids = (process.argv[3] ?? die("uso: npx tsx poc/probe-idade-lote.ts <chainId> <nft-id[,nft-id…]>")).split(",").map((s) => BigInt(s.trim()));
   const info = CHAINS[chainId];
   const cfg = UNISWAP_V3_CHAINS.find((c) => c.chainId === chainId)!;
   const r = createReader(chainId) as any;

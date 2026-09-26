@@ -1,119 +1,92 @@
 /**
- * Testes do adapter Aerodrome usando o fixture REAL congelado na Fase 1
- * (carteira 0x05963CdC, validada pelo Alan contra o site da Aerodrome).
+ * Testes do adapter Aerodrome/Velodrome com posições REAIS congeladas da
+ * carteira demo (de terceiro) — ver tests/demo-fixture.ts.
  */
 
 import { describe, expect, it } from "vitest";
-import type { Address } from "viem";
 import {
   AerodromeAdapter,
   dedupeRaw,
   hasSubstance,
   toLpPosition,
-  type PoolMeta,
 } from "../core/adapters/aerodrome/index";
 import type { SugarPosition } from "../core/adapters/aerodrome/abi";
-import type { ChainReader, TokenInfo } from "../core/types";
-import fixture from "../poc/fixture-0x05963CdC.json";
+import type { ChainReader } from "../core/types";
+import { DEMO_ACCOUNT, EMISSION, poolMeta, rawBy, tokens } from "./demo-fixture";
 
-// fixture JSON guarda bigints como string — reidrata para o tipo do Sugar
-function revive(j: (typeof fixture)["positions"][number]): SugarPosition {
-  return {
-    id: BigInt(j.id),
-    lp: j.lp as Address,
-    liquidity: BigInt(j.liquidity),
-    staked: BigInt(j.staked),
-    amount0: BigInt(j.amount0),
-    amount1: BigInt(j.amount1),
-    staked0: BigInt(j.staked0),
-    staked1: BigInt(j.staked1),
-    unstaked_earned0: BigInt(j.unstaked_earned0),
-    unstaked_earned1: BigInt(j.unstaked_earned1),
-    emissions_earned: BigInt(j.emissions_earned),
-    tick_lower: j.tick_lower,
-    tick_upper: j.tick_upper,
-    sqrt_ratio_lower: BigInt(j.sqrt_ratio_lower),
-    sqrt_ratio_upper: BigInt(j.sqrt_ratio_upper),
-    locker: j.locker as Address,
-    unlocks_at: j.unlocks_at,
-    alm: j.alm as Address,
-  };
-}
+/** preço do token0 em token1 num tick — fórmula própria, independente do código */
+const precoNoTick = (tick: number, d0: number, d1: number) => 1.0001 ** tick * 10 ** (d0 - d1);
+const perto = (a: number, b: number) => Math.abs(a / b - 1) < 1e-9;
 
-const WETH: TokenInfo = { address: "0x4200000000000000000000000000000000000006", symbol: "WETH", decimals: 18 };
-const USDC: TokenInfo = { address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", symbol: "USDC", decimals: 6 };
-const CBXEN: TokenInfo = { address: "0x1000000000000000000000000000000000000001", symbol: "cbXEN", decimals: 18 };
-const AEROTK: TokenInfo = { address: "0x940181a94A35A4569E4529A3CDfB74e38FD98631", symbol: "AERO", decimals: 18 };
+describe("toLpPosition — concentrada em stake e gerida por ALM (CL100-USDC/WETH na Optimism)", () => {
+  const raw = rawBy("optimism", (_, p) => p.id === "47980865");
+  const tk = tokens("optimism");
+  const pos = toLpPosition(raw, poolMeta("optimism", raw.lp), tk, tk.get(EMISSION.optimism)!, "velodrome", 10);
 
-function tokenMap(...ts: TokenInfo[]): Map<Address, TokenInfo> {
-  return new Map(ts.map((t) => [t.address, t]));
-}
-
-describe("toLpPosition — concentrada em stake (WETH/USDC #1774608 do fixture)", () => {
-  const raw = revive(fixture.positions[2]);
-  const pool: PoolMeta = {
-    kind: "concentrated",
-    spacing: 1,
-    tick: -201500, // dentro de [-203189, -200313)
-    symbol: null,
-    token0: WETH.address,
-    token1: USDC.address,
-  };
-  const pos = toLpPosition(raw, pool, tokenMap(WETH, USDC), AEROTK);
-
-  it("identifica tipo, NFT e stake", () => {
+  it("identifica tipo, NFT, stake e ALM", () => {
     expect(pos.kind).toBe("concentrated");
-    expect(pos.positionId).toBe("1774608");
+    expect(pos.positionId).toBe("47980865");
     expect(pos.staked).toBe(true);
-    expect(pos.managedByAlm).toBeNull();
-    expect(pos.poolSymbol).toBe("CL1-WETH/USDC");
+    expect(pos.managedByAlm).toBe(raw.alm);
+    expect(pos.poolSymbol).toBe("CL100-USDC/WETH");
   });
 
   it("principal = depositado + em stake, em unidades cruas", () => {
-    expect(pos.amount0Raw).toBe(10096204202506029n);
-    expect(pos.amount1Raw).toBe(29885708n);
+    expect(pos.amount0Raw).toBe(raw.amount0 + raw.staked0);
+    expect(pos.amount0Raw).toBe(185532n);
+    expect(pos.amount1Raw).toBe(7298240095488n);
   });
 
-  it("recompensas: 2 taxas + emissões AERO", () => {
-    expect(pos.rewards).toHaveLength(3);
-    expect(pos.rewards[0]).toMatchObject({ kind: "fee", raw: 98502432214178n });
-    expect(pos.rewards[0].token.symbol).toBe("WETH");
-    expect(pos.rewards[1]).toMatchObject({ kind: "fee", raw: 164614n });
-    expect(pos.rewards[2]).toMatchObject({ kind: "emission", raw: 1353136881445108160n });
-    expect(pos.rewards[2].token.symbol).toBe("AERO");
+  it("em stake na Velodrome: só emissões VELO, sem taxa de swap para o LP", () => {
+    expect(pos.rewards).toHaveLength(1);
+    expect(pos.rewards[0]).toMatchObject({ kind: "emission", raw: 7854665923116316878n });
+    expect(pos.rewards[0].token.symbol).toBe("VELO");
   });
 
-  it("faixa em USDC por WETH bate com o site da Aerodrome", () => {
-    expect(pos.range).not.toBeNull();
+  it("faixa bate com a fórmula do tick, e dá um preço de ETH plausível", () => {
     expect(pos.range!.inRange).toBe(true);
-    expect(pos.range!.priceLower).toBeCloseTo(1499.87, 1);
-    expect(pos.range!.priceUpper).toBeCloseTo(1999.64, 1);
+    expect(perto(pos.range!.priceLower, precoNoTick(197000, 6, 18))).toBe(true);
+    expect(perto(pos.range!.priceUpper, precoNoTick(201200, 6, 18))).toBe(true);
+    // WETH por USDC → invertido é USDC por WETH: o ETH do dia tem de caber aqui
+    expect(1 / pos.range!.priceUpper).toBeGreaterThan(1000);
+    expect(1 / pos.range!.priceLower).toBeLessThan(5000);
   });
 });
 
-describe("toLpPosition — clássica volátil (USDC/cbXEN do fixture)", () => {
-  const raw = revive(fixture.positions[0]);
-  const pool: PoolMeta = {
-    kind: "v2-volatile",
-    spacing: null,
-    tick: null,
-    symbol: "vAMM-USDC/cbXEN",
-    token0: USDC.address,
-    token1: CBXEN.address,
-  };
-  const pos = toLpPosition(raw, pool, tokenMap(USDC, CBXEN), AEROTK);
+describe("toLpPosition — concentrada FORA da faixa (CL100-WETH/KAITO na Base)", () => {
+  const raw = rawBy("base", (_, p) => p.id === "7665206");
+  const tk = tokens("base");
+  const pos = toLpPosition(raw, poolMeta("base", raw.lp), tk, tk.get(EMISSION.base)!);
+
+  it("preço acima da faixa → fora dela, e a posição inteira virou o token1", () => {
+    expect(pos.range!.inRange).toBe(false);
+    expect(pos.range!.priceCurrent).toBeGreaterThan(pos.range!.priceUpper);
+    expect(pos.amount0Raw).toBe(0n);
+    expect(pos.amount1Raw).toBe(262965063053765n);
+  });
+
+  it("taxas acumuladas antes de sair da faixa continuam a receber", () => {
+    expect(pos.rewards.map((r) => r.kind)).toEqual(["fee", "fee"]);
+    expect(pos.staked).toBe(false);
+  });
+});
+
+describe("toLpPosition — clássica volátil sem stake (vAMM-WETH/member na Base)", () => {
+  const raw = rawBy("base", (m) => m.symbol === "vAMM-WETH/member");
+  const tk = tokens("base");
+  const pos = toLpPosition(raw, poolMeta("base", raw.lp), tk, tk.get(EMISSION.base)!);
 
   it("clássica: sem NFT, sem faixa, sem stake", () => {
     expect(pos.kind).toBe("v2-volatile");
     expect(pos.positionId).toBeNull();
     expect(pos.range).toBeNull();
     expect(pos.staked).toBe(false);
-    expect(pos.poolSymbol).toBe("vAMM-USDC/cbXEN");
+    expect(pos.poolSymbol).toBe("vAMM-WETH/member");
   });
 
   it("quantidades e taxas pendentes", () => {
-    expect(pos.amount0Raw).toBe(253626n);
-    expect(pos.amount1Raw).toBe(24271189510760105110149906955n);
+    expect(pos.amount0Raw).toBe(627083986158654n);
+    expect(pos.amount1Raw).toBe(159539355865710247720600n);
     expect(pos.rewards).toHaveLength(2);
     expect(pos.rewards.every((r) => r.kind === "fee")).toBe(true);
   });
@@ -200,7 +173,7 @@ describe("varredura com proteção contra truncamento (MAX_POSITIONS = 200)", ()
       factories: ["0x420DD381b31aEf6683db6B902084cB0FFECe40Da"],
       onWarn: () => {},
     });
-    const raw = await adapter.fetchRawPositions("0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC");
+    const raw = await adapter.fetchRawPositions(DEMO_ACCOUNT);
 
     expect(raw).toHaveLength(180); // sem a proteção seriam 200 fantasmas truncados
     expect(calls).toContainEqual([100n, 0n]);

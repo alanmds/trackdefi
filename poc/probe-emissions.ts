@@ -26,9 +26,14 @@ import { AERODROME_BASE } from "../core/adapters/aerodrome/config";
 import { fetchUsdPrices } from "../core/prices/defillama";
 import type { ChainReader } from "../core/types";
 
-const ACCOUNT = "0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC" as Address;
-const POOL = "0x9D14ff91AE2c6e3D1A760542248B6c7F206894b0" as Address; // CL1-USDC/cbBTC
-const NFT_ID = 1774557n;
+/* conta, pool e NFT por argumento, sem padrão: fixos num repo público, eles
+   ligavam o projeto à carteira dona da posição (limpeza de 26/09/2026) */
+const [contaArg, poolArg, nftArg] = process.argv.slice(2);
+if (!contaArg || !poolArg || !nftArg)
+  throw new Error("uso: npx tsx poc/probe-emissions.ts <conta> <pool-CL-em-stake> <nft-id>");
+const ACCOUNT = contaArg as Address;
+const POOL = poolArg as Address;
+const NFT_ID = BigInt(nftArg);
 const AERO = AERODROME_BASE.emissionsToken;
 const YEAR = 365 * 24 * 3600;
 
@@ -52,7 +57,7 @@ async function main() {
   const reader = createReader(8453);
 
   console.log("═══ PoC emissões da posição (Aerodrome/Base) ═══");
-  console.log(`Conta ${ACCOUNT}\nPool ${POOL} (CL1-USDC/cbBTC), NFT #${NFT_ID}\n`);
+  console.log(`Conta ${ACCOUNT}\nPool ${POOL}, NFT #${NFT_ID}\n`);
 
   // 1) posição crua do Sugar: L em stake, emissões pendentes, ticks
   const adapter = new AerodromeAdapter(reader, { onWarn: (m) => console.log(`   [warn] ${m}`) });
