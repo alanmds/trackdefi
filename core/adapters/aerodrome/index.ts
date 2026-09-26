@@ -12,7 +12,7 @@
  */
 
 import { erc20Abi, type Address } from "viem";
-import type { ChainReader, LockPosition, LpPosition, PositionKind, ProtocolAdapter, TokenInfo } from "../../types";
+import type { ChainReader, LockPosition, LpPosition, PositionKind, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { mapLimit } from "../../util";
 import { factoryAbi, gaugeAbi, poolProbeAbi, sugarAbi, SUGAR_MAX_POSITIONS, type SugarPosition } from "./abi";
@@ -63,7 +63,7 @@ export interface AerodromeOptions {
   concurrency?: number;
   /** pools por janela de varredura (default 200) */
   poolWindow?: bigint;
-  onWarn?: (msg: string) => void;
+  onWarn?: WarnSink;
 }
 
 /** Adapter do ecossistema Sugar — atende Aerodrome (Base), Velodrome
@@ -77,7 +77,7 @@ export class AerodromeAdapter implements ProtocolAdapter {
   private readonly factories: Address[];
   private readonly concurrency: number;
   private readonly poolWindow: bigint;
-  private readonly warn: (msg: string) => void;
+  private readonly warn: WarnSink;
   private readonly veSugar?: Address;
   private readonly rewardsSugar?: Address;
 
@@ -317,7 +317,7 @@ export class AerodromeAdapter implements ProtocolAdapter {
         });
       } else {
         if (stable.status !== "success") {
-          this.warn(`pool ${lp} não é concentrado nem respondeu stable() — assumindo clássico volátil`);
+          this.warn(`pool ${lp} não é concentrado nem respondeu stable() — assumindo clássico volátil`, null);
         }
         out.set(lp, {
           kind: stable.status === "success" && (stable.result as boolean) ? "v2-stable" : "v2-volatile",
@@ -384,7 +384,7 @@ export class AerodromeAdapter implements ProtocolAdapter {
       const sym = res[i * 2];
       const dec = res[i * 2 + 1];
       if (sym.status !== "success" || dec.status !== "success") {
-        this.warn(`token ${a} sem symbol/decimals — usando padrão (18 casas)`);
+        this.warn(`token ${a} sem symbol/decimals — usando padrão (18 casas)`, null);
       }
       out.set(a, {
         address: a,

@@ -131,6 +131,44 @@ describe("buildResponse", () => {
     expect(p.rewardsUsd).not.toBeNull();
   });
 
+  it("recompensas somam item a item: token sem preço não apaga o resto do card (26/09/2026)", () => {
+    // USDC/cbXEN tem taxas em USDC (com preço) E em cbXEN (sem) — antes, o
+    // card inteiro virava null e os USDC sumiam do total do topo
+    const misto = bySymbol("vAMM-USDC/cbXEN");
+    expect(misto.rewardsUsd).toBeNull();
+    const usdc = misto.rewards.find((r) => r.symbol === "USDC")!;
+    expect(usdc.valueUsd).toBeGreaterThan(0);
+
+    const todas = dto.positions.flatMap((p) => p.rewards);
+    const comPreco = todas.reduce((s, r) => s + (r.valueUsd ?? 0), 0);
+    expect(dto.totals.rewardsUsd).toBeCloseTo(comPreco, 9);
+    expect(dto.totals.rewardsWithoutPrice).toBe(todas.filter((r) => r.valueUsd === null).length);
+    expect(dto.totals.rewardsWithoutPrice).toBeGreaterThan(0);
+  });
+
+  it("avisos para o visitante: repetidos viram um, e 'faltou um pedaço' some se o adapter caiu inteiro", () => {
+    const d = buildResponse({
+      address: fixture.account,
+      normalized: [],
+      prices: PRICES,
+      scanMs: 1,
+      warnings: [],
+      notices: [
+        { kind: "partial", protocol: "uniswap-v4", chainId: 4663 },
+        { kind: "partial", protocol: "uniswap-v4", chainId: 4663 },
+        { kind: "partial", protocol: "aerodrome", chainId: 8453 },
+        { kind: "source", protocol: "aerodrome", chainId: 8453 },
+        { kind: "prices" },
+        { kind: "prices" },
+      ],
+    });
+    expect(d.notices).toEqual([
+      { kind: "partial", protocol: "uniswap-v4", chainId: 4663 },
+      { kind: "source", protocol: "aerodrome", chainId: 8453 },
+      { kind: "prices" },
+    ]);
+  });
+
   it("DTO é 100% serializável — sem bigint vazando", () => {
     const round = JSON.parse(JSON.stringify(dto));
     expect(typeof round.positions[0].token0.amountRaw).toBe("string");

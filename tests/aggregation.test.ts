@@ -58,6 +58,8 @@ describe("getWalletPositions (agregação)", () => {
     expect(dto.totalPositions).toBe(1);
     expect(dto.positions[0].protocol).toBe("aerodrome");
     expect(dto.warnings.some((w) => w.includes("uniswap-v3") && w.includes("RPC morreu"))).toBe(true);
+    // e o visitante fica sabendo QUAL caiu, em forma de dado (texto na tela)
+    expect(dto.notices).toContainEqual({ kind: "source", protocol: "uniswap-v3", chainId: 8453 });
   });
 
   it("todos os protocolos caídos → erro (vira 502 na API)", async () => {

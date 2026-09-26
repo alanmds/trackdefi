@@ -666,7 +666,11 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 8px;
+  /* o detalhe ("fees 34.5% + emissions 121.8% · pool 114.7%") pode não caber
+     ao lado do número num card estreito: desce para a linha de baixo em vez de
+     vazar pela borda e espremer "Earning now" em três linhas */
+  flex-wrap: wrap;
+  gap: 2px 8px;
   font-size: 13px;
   color: var(--ink-2);
   background: var(--card-2);
@@ -677,6 +681,10 @@ button {
   cursor: help;
 }
 
+.apr-line .apr-main {
+  white-space: nowrap;
+}
+
 .apr-line .apr-main b {
   color: var(--good);
   font-size: 14px;
@@ -685,7 +693,7 @@ button {
 .apr-line .apr-sub {
   font-size: 11.5px;
   color: var(--ink-3);
-  white-space: nowrap;
+  min-width: 0;
 }
 
 /* fora do range: o rendimento corrente é zero (destaque de alerta) */
@@ -938,6 +946,21 @@ a.chip:hover {
   border-radius: var(--radius-sm);
   padding: 8px 12px;
   margin: 0 0 14px;
+}
+
+/* um aviso por linha (lista sem marcador: o ⚠ já faz esse papel) */
+.scan-notices {
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+
+/* texto com explicação no tooltip — o sublinhado pontilhado diz "passe o mouse" */
+.has-tip {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 /* estados */

@@ -9,7 +9,7 @@
  */
 
 import { formatUnits, type Address } from "viem";
-import type { LockPosition, LpPosition, PositionKind, ProtocolAdapter } from "./types";
+import type { AdapterNotice, LockPosition, LpPosition, PositionKind, ProtocolAdapter } from "./types";
 import { buildAdapters } from "./adapters/registry";
 import { chainInfo } from "./chains";
 import { defillamaPrices } from "./prices/defillama";
@@ -164,6 +164,8 @@ export interface PositionsResponseDTO {
     /** recompensas a receber — das posições E dos locks */
     rewardsUsd: number;
     positionsWithoutPrice: number;
+    /** recompensas (itens) fora de `rewardsUsd` por falta de preço */
+    rewardsWithoutPrice: number;
     /** valor travado em veAERO/veVELO (separado de `valueUsd`, que é só pools) */
     lockedUsd: number;
   };
@@ -172,8 +174,31 @@ export interface PositionsResponseDTO {
   positions: PositionDTO[];
   /** locks de governança, maiores primeiro */
   locks: LockDTO[];
+  /** log interno, em português — para CLI e depuração, NUNCA para a tela */
   warnings: string[];
+  /** o que o visitante precisa saber da varredura; a tela escreve o texto */
+  notices: ScanNotice[];
 }
+
+/**
+ * Aviso de varredura para o VISITANTE, em forma de dado (texto em
+ * `app/ui/notices.ts`). O que importa em cada tipo é se recarregar ajuda:
+ * falha de leitura sim; limite conhecido (teto de NFTs, hook, RPC sem
+ * histórico) não — dizer "Refresh to retry" ali é mandar a pessoa tentar à toa.
+ */
+export type ScanNotice =
+  /** o adapter caiu inteiro: as posições daquela rede/protocolo faltam */
+  | { kind: "source"; protocol: string; chainId: number }
+  /** parte da leitura falhou: pode faltar posição ou recompensa */
+  | { kind: "partial"; protocol: string; chainId: number }
+  | { kind: "locks"; protocol: string; chainId: number }
+  /** a fonte de preços não respondeu para um lote */
+  | { kind: "prices" }
+  /** APR de pool (DefiLlama) não carregou */
+  | { kind: "apr" }
+  /** taxa medida no contrato indisponível: o card mostra estimativa */
+  | { kind: "fees"; positions: number }
+  | ({ protocol: string; chainId: number } & AdapterNotice);
 
 /** Carteiras-lixeira acumulam dezenas de milhares de posições de spam
  * (achado da Fase 5: 0x…0001 tem 27.786). Resposta traz só as top N por
@@ -202,6 +227,7 @@ export function buildResponse(params: {
   prices: Map<string, number>;
   scanMs: number;
   warnings: string[];
+  notices?: ScanNotice[];
   maxPositions?: number;
   protocols?: string[];
   chains?: string[];
@@ -220,6 +246,7 @@ export function buildResponse(params: {
     prices,
     scanMs,
     warnings,
+    notices = [],
     maxPositions = MAX_POSITIONS_IN_RESPONSE,
     protocols = ["aerodrome"],
     chains = ["base"],
@@ -378,12 +405,18 @@ export function buildResponse(params: {
 
   const locks = buildLockDTOs(locksRaw, prices, nowSec);
 
+  /* Recompensas somam ITEM A ITEM, não card a card: antes, um único token sem
+     preço (AA, na Robinhood) zerava o card inteiro na soma do topo, e os
+     US$ 50 em USDG ao lado dele sumiam calados. Agora o que tem preço entra,
+     e o que não tem é contado à parte para a tela avisar. */
+  const allRewards = [...positions.flatMap((p) => p.rewards), ...locks.flatMap((l) => l.rewards)];
+
   // totais sobre TODAS as posições, antes de qualquer corte
   const totals = {
     valueUsd: positions.reduce((s, p) => s + (p.valueUsd ?? 0), 0),
-    rewardsUsd:
-      positions.reduce((s, p) => s + (p.rewardsUsd ?? 0), 0) + locks.reduce((s, l) => s + (l.rewardsUsd ?? 0), 0),
+    rewardsUsd: allRewards.reduce((s, r) => s + (r.valueUsd ?? 0), 0),
     positionsWithoutPrice: positions.filter((p) => p.valueUsd === null).length,
+    rewardsWithoutPrice: allRewards.filter((r) => r.valueUsd === null).length,
     lockedUsd: locks.reduce((s, l) => s + (l.valueUsd ?? 0), 0),
   };
 
@@ -401,7 +434,22 @@ export function buildResponse(params: {
     positions: positions.length > maxPositions ? positions.slice(0, maxPositions) : positions,
     locks,
     warnings,
+    notices: dedupeNotices(notices),
   };
+}
+
+/** mesmo aviso repetido (dez leituras falhas do mesmo adapter) vira um só; e
+ *  se o adapter caiu inteiro, o "faltou um pedaço" dele é redundante */
+function dedupeNotices(list: ScanNotice[]): ScanNotice[] {
+  const caiu = new Set(list.filter((n) => n.kind === "source").map((n) => `${n.protocol}@${n.chainId}`));
+  const vistos = new Set<string>();
+  return list.filter((n) => {
+    if (n.kind === "partial" && caiu.has(`${n.protocol}@${n.chainId}`)) return false;
+    const k = JSON.stringify(n);
+    if (vistos.has(k)) return false;
+    vistos.add(k);
+    return true;
+  });
 }
 
 /** Locks crus + preços → DTO, maiores primeiro. PURO. */
@@ -445,11 +493,24 @@ export async function getWalletPositions(
   priceProvider: PriceProvider = defillamaPrices,
 ): Promise<PositionsResponseDTO> {
   const warnings: string[] = [];
-  const adapters = adaptersOverride ?? buildAdapters({ onWarn: (m) => warnings.push(m) });
+  const notices: ScanNotice[] = [];
+  const adapters =
+    adaptersOverride ??
+    buildAdapters({
+      onWarn: (m, notice, src) => {
+        warnings.push(m);
+        if (notice === null) return; // só log interno
+        const at = { protocol: src.protocol, chainId: src.chainId };
+        notices.push(notice ? { ...at, ...notice } : { kind: "partial", ...at });
+      },
+    });
 
   const t0 = Date.now();
   // APR (DefiLlama) baixa em paralelo com a varredura on-chain; falha vira "—"
-  const yieldsPromise = getYieldsIndex((m) => warnings.push(m));
+  const yieldsPromise = getYieldsIndex((m) => {
+    warnings.push(m);
+    notices.push({ kind: "apr" });
+  });
   // locks correm JUNTO com as posições; adapter sem getLocks devolve vazio
   const [settled, settledLocks] = await Promise.all([
     Promise.allSettled(adapters.map((a) => a.getPositions(address))),
@@ -461,19 +522,23 @@ export async function getWalletPositions(
   const locks: LockPosition[] = [];
   settledLocks.forEach((r, i) => {
     if (r.status === "fulfilled") locks.push(...r.value);
-    else
+    else {
+      notices.push({ kind: "locks", protocol: adapters[i].protocol, chainId: adapters[i].chainId });
       warnings.push(
         `locks ${adapters[i].protocol}@${chainInfo(adapters[i].chainId).label} indisponíveis: ${(r.reason as Error)?.message?.split("\n")[0] ?? "erro"}`,
       );
+    }
   });
 
   const normalized: LpPosition[] = [];
   settled.forEach((r, i) => {
     if (r.status === "fulfilled") normalized.push(...r.value);
-    else
+    else {
+      notices.push({ kind: "source", protocol: adapters[i].protocol, chainId: adapters[i].chainId });
       warnings.push(
         `${adapters[i].protocol}@${chainInfo(adapters[i].chainId).label} indisponível: ${(r.reason as Error)?.message?.split("\n")[0] ?? "erro"}`,
       );
+    }
   });
   if (settled.length > 0 && settled.every((r) => r.status === "rejected")) {
     throw new Error(`todos os protocolos falharam: ${warnings.join(" | ")}`);
@@ -501,10 +566,16 @@ export async function getWalletPositions(
   await Promise.all(
     [...byChain.entries()].map(async ([chainId, addrs]) => {
       const slug = chainInfo(chainId).priceSlug;
-      const chainPrices = await priceProvider.fetchUsdPrices(slug, [...addrs] as Address[], (m) => warnings.push(m));
+      const chainPrices = await priceProvider.fetchUsdPrices(slug, [...addrs] as Address[], (m) => {
+        warnings.push(m);
+        notices.push({ kind: "prices" });
+      });
       for (const [addr, price] of chainPrices) prices.set(priceKey(chainId, addr), price);
     }),
   );
+
+  const feeWindows = await readFeeWindows(normalized, (m) => warnings.push(m));
+  if (feeWindows.unmeasured > 0) notices.push({ kind: "fees", positions: feeWindows.unmeasured });
 
   return buildResponse({
     address,
@@ -512,10 +583,11 @@ export async function getWalletPositions(
     prices,
     scanMs,
     warnings,
+    notices,
     protocols: [...new Set(adapters.map((a) => a.protocol))],
     chains: [...new Set(adapters.map((a) => chainInfo(a.chainId).priceSlug))],
     yields: await yieldsPromise,
-    feeWindows: await readFeeWindows(normalized, (m) => warnings.push(m)),
+    feeWindows,
     locks,
   });
 }
@@ -544,7 +616,7 @@ async function readFeeWindows(
   positions: LpPosition[],
   onWarn: (msg: string) => void,
 ): Promise<FeeWindowsResult> {
-  const out: FeeWindowsResult = { byTarget: new Map(), tooNew: new Set() };
+  const out: FeeWindowsResult = { byTarget: new Map(), tooNew: new Set(), unmeasured: 0 };
   const porRede = new Map<number, FeeWindowTarget[]>();
 
   for (const p of positions) {
@@ -584,7 +656,10 @@ async function readFeeWindows(
         const r = await readPositionFeeWindows(reader, fatia, bloco, info.secPerBlock, onWarn);
         for (const [k, v] of r.byTarget) out.byTarget.set(k, v);
         for (const k of r.tooNew) out.tooNew.add(k);
+        // os que passaram do teto também ficam na estimativa
+        out.unmeasured += r.unmeasured + (alvos.length - fatia.length);
       } catch (e) {
+        out.unmeasured += alvos.length;
         onWarn(`fee APR on-chain indisponível em ${info.label}: ${(e as Error).message.split("\n")[0].slice(0, 60)}`);
       }
     }),

@@ -350,6 +350,12 @@ export interface FeeWindowsResult {
    * que a medição começa em alguns minutos, em vez de deixar um vazio mudo.
    */
   tooNew: Set<string>;
+  /**
+   * Faixas em range que ficaram SEM medição (RPC sem arquivo, leitura falhou).
+   * É o número que a tela usa para avisar "estas taxas são estimativa" — as
+   * novas demais ficam de fora, o próprio card já explica o caso delas.
+   */
+  unmeasured: number;
 }
 
 /**
@@ -369,14 +375,14 @@ export async function readPositionFeeWindows(
 ): Promise<FeeWindowsResult> {
   const byTarget = new Map<string, FeeGrowthWindow[]>();
   const tooNew = new Set<string>();
-  if (targets.length === 0) return { byTarget, tooNew };
+  if (targets.length === 0) return { byTarget, tooNew, unmeasured: 0 };
 
   let agora: Map<string, TickSnapshot>;
   try {
     agora = await readSnapshots(reader, targets);
   } catch (e) {
     onWarn(`fee APR on-chain indisponível (leitura do pool falhou): ${(e as Error).message.split("\n")[0].slice(0, 60)}`);
-    return { byTarget, tooNew };
+    return { byTarget, tooNew, unmeasured: targets.length };
   }
 
   const legiveis = targets.filter((t) => agora.has(t.key));
@@ -428,5 +434,6 @@ export async function readPositionFeeWindows(
   if (semNada > 0 || (falhasDeLeitura > 0 && byTarget.size === 0)) {
     onWarn(`fee APR on-chain indisponível em ${semNada || legiveis.length} pool(s) — o RPC não devolveu o estado passado`);
   }
-  return { byTarget, tooNew };
+  // alvo que nem o estado ATUAL devolveu também ficou sem medição
+  return { byTarget, tooNew, unmeasured: targets.length - legiveis.length + semNada };
 }

@@ -13,7 +13,7 @@
  */
 
 import { erc20Abi, type Address } from "viem";
-import type { ChainReader, LpPosition, ProtocolAdapter, TokenInfo } from "../../types";
+import type { ChainReader, LpPosition, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
 import { amountsForLiquidity } from "../../math/liquidity";
 import { getSqrtRatioAtTick } from "../../math/tickmath";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
@@ -28,7 +28,7 @@ export interface UniswapV3Options {
   nfpm?: Address;
   factory?: Address;
   maxNfts?: number;
-  onWarn?: (msg: string) => void;
+  onWarn?: WarnSink;
 }
 
 export class UniswapV3Adapter implements ProtocolAdapter {
@@ -38,7 +38,7 @@ export class UniswapV3Adapter implements ProtocolAdapter {
   private readonly nfpm: Address;
   private readonly factory: Address;
   private readonly maxNfts: number;
-  private readonly warn: (msg: string) => void;
+  private readonly warn: WarnSink;
 
   constructor(
     private readonly reader: ChainReader,
@@ -131,7 +131,10 @@ export class UniswapV3Adapter implements ProtocolAdapter {
 
     const count = Number(balance > BigInt(this.maxNfts) ? BigInt(this.maxNfts) : balance);
     if (balance > BigInt(this.maxNfts)) {
-      this.warn(`uniswap: carteira tem ${balance} NFTs de posição; enumerando só os primeiros ${this.maxNfts}`);
+      this.warn(`uniswap: carteira tem ${balance} NFTs de posição; enumerando só os primeiros ${this.maxNfts}`, {
+        kind: "capped",
+        checked: this.maxNfts,
+      });
     }
 
     const idResults = await this.reader.multicall({
