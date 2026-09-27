@@ -51,7 +51,18 @@ function falha(error: string, status: number, detail: string): Response {
 /** O Google devolve erro de script como página HTML com status 200: o título diz o que foi. */
 function resumoResposta(texto: string): string {
   const titulo = /<title>([^<]*)<\/title>/i.exec(texto)?.[1]?.trim();
-  if (titulo) return `html: ${titulo.slice(0, 120)}`;
+  if (titulo) {
+    // a página de erro do Apps Script tem título "Error"; o motivo está no corpo
+    const corpo = (/<body[^>]*>([\s\S]*)<\/body>/i.exec(texto)?.[1] ?? "")
+      .replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, "&")
+      .replace(/\s+/g, " ")
+      .trim();
+    return `html: ${titulo.slice(0, 60)}${corpo ? ` — ${corpo.slice(0, 240)}` : ""}`;
+  }
   return `texto: ${texto.replace(/\s+/g, " ").slice(0, 120) || "(vazio)"}`;
 }
 
