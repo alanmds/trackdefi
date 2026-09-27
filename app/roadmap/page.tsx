@@ -107,7 +107,7 @@ export default function Roadmap() {
           <Status kind="live" />
           <span>
             <strong>Lisk, Swell, Metal L2, Superseed &amp; Celo · Velodrome</strong>
-            {" — the rest of Velodrome's Superchain deployment, read the same way as the first five. Positions, amounts, staked positions and pending XVELO emissions are all exact. Public price data barely covers Swell, Metal L2 and Superseed yet, so many positions there show “—” in place of a dollar value."}
+            {" — the rest of Velodrome's Superchain deployment, read the same way as the first five. Positions, amounts, staked positions and pending XVELO emissions are all exact. Where public price data doesn't reach yet (Swell, Metal L2, Superseed), dollar values are read from the networks' own pools."}
           </span>
         </li>
       </ul>

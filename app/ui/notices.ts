@@ -82,7 +82,7 @@ export function noPriceTip(symbols: string[], pricesFailed: boolean): string {
  * onde ele veio, sem esconder nem "corrigir".
  */
 export function poolPriceTip(symbol: string): string {
-  return `Priced from this pool: our price source doesn't cover ${symbol}, so this is ${symbol}'s price inside this pool right now. A small or thin pool can price it differently from other markets.`;
+  return `Priced from a pool: our price sources don't cover ${symbol}, so this is ${symbol}'s price inside a pool on this network right now — this position's own pool whenever it can be. A small or thin pool can price it differently from other markets.`;
 }
 
 /** tooltip dos avisos de "sem preço" no topo da página */

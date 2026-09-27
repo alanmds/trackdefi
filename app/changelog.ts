@@ -47,7 +47,14 @@ export const CHANGELOG: ChangeEntry[] = [
     kind: "network",
     title: "Five more networks: Lisk, Swell, Metal L2, Superseed and Celo",
     body:
-      "Velodrome positions on Lisk, Swell, Metal L2, Superseed and Celo now show up too — staked ones included, with pending XVELO emissions. That completes Velodrome's Superchain deployment. Public price data barely covers Swell, Metal L2 and Superseed yet, so many positions there show exact amounts with \"—\" in place of a dollar value.",
+      "Velodrome positions on Lisk, Swell, Metal L2, Superseed and Celo now show up too — staked ones included, with pending XVELO emissions. That completes Velodrome's Superchain deployment. Where public price data doesn't reach yet (Swell, Metal L2, Superseed), dollar values are read from the networks' own pools.",
+  },
+  {
+    date: "2026-09-27",
+    kind: "improvement",
+    title: "Even fewer \"—\": DexScreener and network-wide pool prices",
+    body:
+      "When DefiLlama has no price for a token, we now ask DexScreener too. If neither has it, the price comes from any pool on the same network that trades it — not only the position's own pool — so rewards like XVELO get a dollar value too. Wrapped ETH on Superchain networks is priced as ETH, since it's exchangeable one-for-one. Prices read from a pool keep their dotted underline.",
   },
   {
     date: "2026-09-27",

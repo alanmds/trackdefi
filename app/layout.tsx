@@ -111,7 +111,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <strong>{SITE_NAME}</strong> reads public blockchain data only. It never asks for private keys or seed
               phrases, and cannot move funds. <Link href="/how-it-works">How it works &amp; why it&apos;s safe →</Link>
             </span>
-            <span>Not financial advice. Verify data on-chain before acting. Prices by DefiLlama.</span>
+            <span>Not financial advice. Verify data on-chain before acting. Prices by DefiLlama and DexScreener, or read from the pools themselves.</span>
             <span>
               Coverage:{" "}
               {COVERAGE.map((c) => `${c.protocol} (${humanList(c.networks, "&")})`).join(" · ")} —{" "}

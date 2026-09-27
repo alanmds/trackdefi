@@ -277,7 +277,7 @@ const SECTIONS: Section[] = [
       {
         id: "pool-price",
         term: "Dollar value with a dotted underline",
-        def: "Our price source doesn't cover that token, so its price comes from the position's own pool: the other token's market price times the exchange rate inside the pool. It is the pool's real price — shown as it is, even when a small or thin pool prices the token differently from other markets.",
+        def: "Our price sources don't cover that token, so its price comes from a pool on the same network — the position's own pool whenever possible: the other token's market price times the exchange rate inside the pool. It is the pool's real price — shown as it is, even when a small or thin pool prices the token differently from other markets.",
       },
     ],
   },
@@ -361,7 +361,7 @@ const SECTIONS: Section[] = [
       {
         id: "dash",
         term: "—",
-        def: "No reliable number to show, so we show nothing rather than guess. For a price, it means neither our price source nor the position's own pool can price that token — for example, when neither token in the pair has a market price. Hover over it (or tap it) to see which one.",
+        def: "No reliable number to show, so we show nothing rather than guess. For a price, it means neither our price sources nor any pool on that network could price the token. Hover over it (or tap it) to see which one.",
       },
       {
         id: "dotted",

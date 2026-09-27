@@ -42,6 +42,19 @@ export interface ChainInfo {
   secPerBlock: number;
   /** env que injeta RPC(s) pagos, separados por vírgula */
   rpcEnv: string;
+  /**
+   * chainId da rede na DexScreener (segunda fonte de preço). Ausente = a
+   * DexScreener não indexa a rede (conferido em 27/09/2026 com
+   * poc/probe-precos-alternativos.ts).
+   */
+  dexSlug?: string;
+  /**
+   * true = rede OP Stack com o WETH-padrão no predeploy 0x4200…0006
+   * ("Wrapped Ether", 18 casas — conferido on-chain no mesmo PoC). Ele é
+   * trocável 1 por 1 por ETH por construção, então, se nenhuma fonte der
+   * preço a ele, vale o preço do ETH.
+   */
+  opStackWeth?: boolean;
   defaultRpcs: string[];
 }
 
@@ -55,6 +68,8 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "BaseScan",
     secPerBlock: 2,
     rpcEnv: "BASE_RPC_URLS",
+    dexSlug: "base",
+    opStackWeth: true,
     defaultRpcs: ["https://mainnet.base.org", "https://base-rpc.publicnode.com", "https://base.llamarpc.com"],
   },
   10: {
@@ -66,6 +81,8 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "OP Etherscan",
     secPerBlock: 2,
     rpcEnv: "OPTIMISM_RPC_URLS",
+    dexSlug: "optimism",
+    opStackWeth: true,
     defaultRpcs: [
       "https://mainnet.optimism.io",
       "https://optimism-rpc.publicnode.com",
@@ -81,6 +98,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "Etherscan",
     secPerBlock: 12,
     rpcEnv: "ETHEREUM_RPC_URLS",
+    dexSlug: "ethereum",
     defaultRpcs: [
       "https://ethereum-rpc.publicnode.com",
       "https://eth.llamarpc.com",
@@ -115,6 +133,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "Arbiscan",
     secPerBlock: 0.25,
     rpcEnv: "ARBITRUM_RPC_URLS",
+    dexSlug: "arbitrum",
     defaultRpcs: [
       "https://arb1.arbitrum.io/rpc",
       "https://arbitrum-one-rpc.publicnode.com",
@@ -143,6 +162,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "Modescan",
     secPerBlock: 2,
     rpcEnv: "MODE_RPC_URLS",
+    opStackWeth: true,
     defaultRpcs: ["https://mainnet.mode.network", "https://mode.drpc.org"],
   },
   57073: {
@@ -154,6 +174,8 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "Blockscout",
     secPerBlock: 1,
     rpcEnv: "INK_RPC_URLS",
+    dexSlug: "ink",
+    opStackWeth: true,
     defaultRpcs: ["https://rpc-gel.inkonchain.com", "https://rpc-qnd.inkonchain.com", "https://ink.drpc.org"],
   },
   130: {
@@ -165,6 +187,8 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "Uniscan",
     secPerBlock: 1,
     rpcEnv: "UNICHAIN_RPC_URLS",
+    dexSlug: "unichain",
+    opStackWeth: true,
     defaultRpcs: [
       "https://mainnet.unichain.org",
       "https://unichain-rpc.publicnode.com",
@@ -180,6 +204,8 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "Blockscout",
     secPerBlock: 2,
     rpcEnv: "SONEIUM_RPC_URLS",
+    dexSlug: "soneium",
+    opStackWeth: true,
     defaultRpcs: ["https://rpc.soneium.org", "https://soneium.drpc.org"],
   },
   252: {
@@ -191,6 +217,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "Fraxscan",
     secPerBlock: 2,
     rpcEnv: "FRAXTAL_RPC_URLS",
+    opStackWeth: true,
     defaultRpcs: ["https://rpc.frax.com", "https://fraxtal-rpc.publicnode.com", "https://fraxtal.drpc.org"],
   },
   /* A cauda da Superchain (27/09/2026, poc/probe-superchain.ts 5/5 verde).
@@ -210,6 +237,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "Blockscout",
     secPerBlock: 2,
     rpcEnv: "LISK_RPC_URLS",
+    opStackWeth: true,
     defaultRpcs: ["https://rpc.api.lisk.com", "https://lisk.drpc.org"],
   },
   1923: {
@@ -221,6 +249,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "Swell Explorer",
     secPerBlock: 2,
     rpcEnv: "SWELL_RPC_URLS",
+    opStackWeth: true,
     // o RPC que a viem sugere (swell-mainnet.alt.technology) não resolve mais — 27/09/2026
     defaultRpcs: ["https://swell.drpc.org"],
   },
@@ -233,6 +262,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "Metal Explorer",
     secPerBlock: 2,
     rpcEnv: "METAL_RPC_URLS",
+    opStackWeth: true,
     defaultRpcs: ["https://rpc.metall2.com", "https://metall2.drpc.org"],
   },
   5330: {
@@ -244,6 +274,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "Superseed Explorer",
     secPerBlock: 2,
     rpcEnv: "SUPERSEED_RPC_URLS",
+    opStackWeth: true,
     defaultRpcs: ["https://mainnet.superseed.xyz", "https://superseed.drpc.org"],
   },
   42220: {
@@ -255,6 +286,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     explorerLabel: "Celoscan",
     secPerBlock: 1,
     rpcEnv: "CELO_RPC_URLS",
+    opStackWeth: true,
     defaultRpcs: ["https://forno.celo.org", "https://celo.drpc.org"],
   },
 };

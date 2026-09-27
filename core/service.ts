@@ -13,6 +13,11 @@ import type { AdapterNotice, LockPosition, LpPosition, PositionKind, ProtocolAda
 import { buildAdapters } from "./adapters/registry";
 import { chainInfo } from "./chains";
 import { defillamaPrices } from "./prices/defillama";
+import { dexscreenerPrices } from "./prices/dexscreener";
+
+/** WETH-padrão do OP Stack (predeploy) e o WETH da Ethereum, que dá o preço do ETH */
+const OP_WETH = "0x4200000000000000000000000000000000000006";
+const MAINNET_WETH: Address = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
 import type { PriceProvider } from "./prices/types";
 import { getYieldsIndex, type YieldsIndex } from "./yields/defillama";
 import { computeEarning } from "./yields/positionApr";
@@ -284,38 +289,72 @@ export function buildResponse(params: {
     nowSec = Math.floor(Date.now() / 1000),
   } = params;
 
+  /* Preço pelo pool — da REDE (27/09/2026). Cada posição cujo par tem um lado
+     precificado e o outro não dá o preço do lado que falta; guardamos por
+     rede, para reaproveitar onde o próprio pool não resolve (a emissão de
+     XVELO de uma posição WETH/USDC, a stablecoin de um pool estável). Dois
+     pools com preços diferentes: vale o da posição com mais dinheiro no lado
+     precificado — o sinal de pool mais fundo que temos sem ler a rede. */
+  const daRede = new Map<string, { usd: number; peso: number }>();
+  for (const p of normalized) {
+    const q0 = priceOf(prices, p.chainId, p.token0.address);
+    const q1 = priceOf(prices, p.chainId, p.token1.address);
+    if ((q0 === null) === (q1 === null)) continue;
+    const x = poolPrice0In1(p);
+    if (x === null) continue;
+    const [falta, usd, peso] =
+      q0 === null
+        ? [p.token0.address, q1! * x, human(p.amount1Raw, p.token1.decimals) * q1!]
+        : [p.token1.address, q0 / x, human(p.amount0Raw, p.token0.decimals) * q0];
+    const k = priceKey(p.chainId, falta);
+    const atual = daRede.get(k);
+    if (!atual || peso > atual.peso) daRede.set(k, { usd, peso });
+  }
+  const precoDaRede = (chainId: number, a: string) => daRede.get(priceKey(chainId, a))?.usd ?? null;
+
   const positions: PositionDTO[] = normalized.map((p) => {
     let p0 = priceOf(prices, p.chainId, p.token0.address);
     let p1 = priceOf(prices, p.chainId, p.token1.address);
-    /* Preço pelo PRÓPRIO pool (27/09/2026): quando a fonte de preços cobre um
-       lado do par e não o outro, o lado que falta sai do preço do pool. Regra
-       do Alan: pool distorcido mostra o preço COMO ESTÁ NO POOL — esconder ou
-       "corrigir" seria desinformação; a tela só diz de onde ele veio. */
-    let doPool: Address | null = null;
-    if ((p0 === null) !== (p1 === null)) {
+    /* Preço pelo pool (27/09/2026), nesta ordem: 1) o PRÓPRIO pool da posição,
+       quando a fonte cobre um lado do par e não o outro; 2) o preço que outro
+       pool da mesma rede deu ao token; 3) de novo o próprio pool, agora com o
+       parceiro precificado no passo 2. Regra do Alan: pool distorcido mostra o
+       preço COMO ESTÁ NO POOL — esconder ou "corrigir" seria desinformação; a
+       tela só diz de onde ele veio. */
+    const doPool = new Set<string>();
+    const peloProprioPool = () => {
+      if ((p0 === null) === (p1 === null)) return;
       const x = poolPrice0In1(p);
-      if (x !== null) {
-        if (p0 === null) {
-          p0 = p1! * x;
-          doPool = p.token0.address;
-        } else {
-          p1 = p0 / x;
-          doPool = p.token1.address;
-        }
+      if (x === null) return;
+      if (p0 === null) {
+        p0 = p1! * x;
+        doPool.add(p.token0.address.toLowerCase());
+      } else {
+        p1 = p0 / x;
+        doPool.add(p.token1.address.toLowerCase());
       }
-    }
+    };
+    peloProprioPool();
+    if (p0 === null && (p0 = precoDaRede(p.chainId, p.token0.address)) !== null) doPool.add(p.token0.address.toLowerCase());
+    if (p1 === null && (p1 = precoDaRede(p.chainId, p.token1.address)) !== null) doPool.add(p.token1.address.toLowerCase());
+    peloProprioPool();
     const a0 = human(p.amount0Raw, p.token0.decimals);
     const a1 = human(p.amount1Raw, p.token1.decimals);
     const v0 = p0 !== null ? a0 * p0 : null;
     const v1 = p1 !== null ? a1 * p1 : null;
     const valueUsd = v0 !== null && v1 !== null ? v0 + v1 : null;
-    const precoDoPool = doPool === p.token0.address ? p0 : p1;
+    const precoDoPar = (a: string) =>
+      a.toLowerCase() === p.token0.address.toLowerCase() ? p0 : a.toLowerCase() === p.token1.address.toLowerCase() ? p1 : null;
 
     const rewards: RewardDTO[] = p.rewards.map((r) => {
       let pr = priceOf(prices, p.chainId, r.token.address);
-      // taxa paga no token cujo preço saiu do pool: mesmo preço, mesma origem
-      const peloPool = pr === null && doPool !== null && r.token.address.toLowerCase() === doPool.toLowerCase();
-      if (peloPool) pr = precoDoPool;
+      let peloPool = false;
+      if (pr === null) {
+        // o preço que o par desta posição já tem (fonte OU pool), senão o da rede
+        const doPar = precoDoPar(r.token.address);
+        pr = doPar ?? precoDaRede(p.chainId, r.token.address);
+        peloPool = pr !== null && (doPar === null || doPool.has(r.token.address.toLowerCase()));
+      }
       const amt = human(r.raw, r.token.decimals);
       return {
         symbol: r.token.symbol,
@@ -434,7 +473,7 @@ export function buildResponse(params: {
         amount: a0,
         priceUsd: p0,
         valueUsd: v0,
-        ...(doPool === p.token0.address ? { priceSource: "pool" as const } : {}),
+        ...(doPool.has(p.token0.address.toLowerCase()) ? { priceSource: "pool" as const } : {}),
       },
       token1: {
         symbol: p.token1.symbol,
@@ -443,7 +482,7 @@ export function buildResponse(params: {
         amountRaw: p.amount1Raw.toString(),
         amount: a1,
         priceUsd: p1,
-        ...(doPool === p.token1.address ? { priceSource: "pool" as const } : {}),
+        ...(doPool.has(p.token1.address.toLowerCase()) ? { priceSource: "pool" as const } : {}),
         valueUsd: v1,
       },
       rewards,
@@ -546,6 +585,8 @@ export async function getWalletPositions(
   priceProvider: PriceProvider = defillamaPrices,
   /** índice de APR dos pools; injetável para os testes rodarem sem internet */
   loadYields: typeof getYieldsIndex = getYieldsIndex,
+  /** segunda fonte de preço, para o que a primeira não cobriu; null = nenhuma */
+  fallbackPrices: PriceProvider | null = dexscreenerPrices,
 ): Promise<PositionsResponseDTO> {
   const warnings: string[] = [];
   const notices: ScanNotice[] = [];
@@ -617,17 +658,36 @@ export async function getWalletPositions(
     for (const r of l.rewards) set.add(r.token.address);
     byChain.set(l.chainId, set);
   }
+  /* Cadeia de preço (27/09/2026, "mostre o melhor preço que conseguir"):
+     1. a fonte principal (DefiLlama);
+     2. a DexScreener, só para o que faltou e só nas redes que ela indexa;
+     3. WETH = ETH no predeploy do OP Stack, se ainda faltar;
+     4. o preço pelo PRÓPRIO pool — esse entra depois, no buildResponse. */
   const prices = new Map<string, number>();
+  const avisoPreco = (m: string) => {
+    warnings.push(m);
+    notices.push({ kind: "prices" });
+  };
   await Promise.all(
     [...byChain.entries()].map(async ([chainId, addrs]) => {
-      const slug = chainInfo(chainId).priceSlug;
-      const chainPrices = await priceProvider.fetchUsdPrices(slug, [...addrs] as Address[], (m) => {
-        warnings.push(m);
-        notices.push({ kind: "prices" });
-      });
+      const info = chainInfo(chainId);
+      const chainPrices = await priceProvider.fetchUsdPrices(info.priceSlug, [...addrs] as Address[], avisoPreco);
       for (const [addr, price] of chainPrices) prices.set(priceKey(chainId, addr), price);
+      const faltam = [...addrs].filter((a) => !chainPrices.has(a.toLowerCase()));
+      if (fallbackPrices && info.dexSlug && faltam.length > 0) {
+        const dex = await fallbackPrices.fetchUsdPrices(info.dexSlug, faltam as Address[], avisoPreco);
+        for (const [addr, price] of dex) prices.set(priceKey(chainId, addr), price);
+      }
     }),
   );
+  const semWeth = [...byChain.entries()]
+    .filter(([id, addrs]) => chainInfo(id).opStackWeth && [...addrs].some((a) => a.toLowerCase() === OP_WETH))
+    .map(([id]) => id)
+    .filter((id) => !prices.has(priceKey(id, OP_WETH)));
+  if (semWeth.length > 0) {
+    const eth = (await priceProvider.fetchUsdPrices("ethereum", [MAINNET_WETH], avisoPreco)).get(MAINNET_WETH.toLowerCase());
+    if (eth !== undefined) for (const id of semWeth) prices.set(priceKey(id, OP_WETH), eth);
+  }
 
   const feeWindows = await readFeeWindows(normalized, (m) => warnings.push(m));
   if (feeWindows.unmeasured > 0) notices.push({ kind: "fees", positions: feeWindows.unmeasured });

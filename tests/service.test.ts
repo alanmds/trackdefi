@@ -162,7 +162,9 @@ describe("buildResponse", () => {
     // sem o preço do AERO: vAMM-WETH/DEGEN tem taxas em WETH (com preço) E
     // emissão AERO (sem — e o par dele não tem AERO para o pool resolver).
     // Antes, o card inteiro virava null e o WETH sumia do total do topo.
-    const d = buildResponse({ address: DEMO_ACCOUNT, normalized: todas(), prices: SEM_AERO, scanMs: 1, warnings: [] });
+    // e sem NENHUM pool de AERO na rede (senão o preço sairia dele — ver o teste seguinte)
+    const semPoolDeAero = todas().filter((p) => p.poolSymbol !== "CL200-WETH/AERO");
+    const d = buildResponse({ address: DEMO_ACCOUNT, normalized: semPoolDeAero, prices: SEM_AERO, scanMs: 1, warnings: [] });
     const misto = d.positions.find((p) => p.poolSymbol === "vAMM-WETH/DEGEN")!;
     expect(misto.rewardsUsd).toBeNull();
     expect(misto.rewards.find((r) => r.symbol === "WETH")!.valueUsd).toBeGreaterThan(0);
@@ -171,12 +173,20 @@ describe("buildResponse", () => {
     const comPreco = todasRec.reduce((s, r) => s + (r.valueUsd ?? 0), 0);
     expect(d.totals.rewardsUsd).toBeCloseTo(comPreco, 9);
     expect(d.totals.rewardsWithoutPrice).toBe(todasRec.filter((r) => r.valueUsd === null).length);
-    // emissão AERO nas 3 clássicas em stake (DOG, DEGEN, TYBG); no CL200-WETH/AERO
-    // o AERO sai do próprio pool
+    // emissão AERO nas 3 clássicas em stake (DOG, DEGEN, TYBG)
     expect(d.totals.rewardsWithoutPrice).toBe(3);
+  });
+
+  it("token sem preço na fonte ganha o preço que OUTRO pool da mesma rede deu a ele", () => {
+    // sem AERO na fonte, mas com o pool CL200-WETH/AERO na carteira: a emissão
+    // AERO das clássicas (cujo par não tem AERO) sai do preço desse pool
+    const d = buildResponse({ address: DEMO_ACCOUNT, normalized: todas(), prices: SEM_AERO, scanMs: 1, warnings: [] });
     const clAero = d.positions.find((p) => p.poolSymbol === "CL200-WETH/AERO")!;
     expect(clAero.token1.priceSource).toBe("pool");
-    expect(clAero.rewardsUsd).not.toBeNull();
+    const emissao = d.positions.find((p) => p.poolSymbol === "vAMM-WETH/DEGEN")!.rewards.find((r) => r.kind === "emission")!;
+    expect(emissao.priceUsd).toBe(clAero.token1.priceUsd);
+    expect(emissao.priceSource).toBe("pool");
+    expect(d.totals.rewardsWithoutPrice).toBe(0);
   });
 
   it("avisos para o visitante: repetidos viram um, e 'faltou um pedaço' some se o adapter caiu inteiro", () => {

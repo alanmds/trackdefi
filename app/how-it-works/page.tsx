@@ -55,8 +55,9 @@ export default function HowItWorks() {
           range.
         </li>
         <li>
-          US-dollar values come from public price data (DefiLlama). When a token has no reliable price, we show “—”
-          instead of guessing.
+          US-dollar values come from public price data (DefiLlama, then DexScreener). When neither covers a token, we
+          read its price from a pool on the same network and mark it with a dotted underline. When nothing can price a
+          token, we show “—” instead of guessing.
         </li>
       </ol>
 
