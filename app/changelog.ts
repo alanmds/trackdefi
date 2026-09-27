@@ -50,6 +50,13 @@ export const CHANGELOG: ChangeEntry[] = [
       "Found a position we don't show, want a network added, or spotted a number that looks off? There's now a Feedback link at the bottom of every page. Every message is read by a person — leave an email if you'd like a reply.",
   },
   {
+    date: "2026-09-27",
+    kind: "improvement",
+    title: "A tighter wallet summary on phones",
+    body:
+      "On a phone, the totals at the top of a wallet now sit two by two instead of stacking, so your first position shows up without scrolling. And a \"What do these numbers mean?\" link right below them opens the glossary.",
+  },
+  {
     date: "2026-09-26",
     kind: "improvement",
     title: "A new demo wallet",

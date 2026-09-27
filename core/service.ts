@@ -493,6 +493,8 @@ export async function getWalletPositions(
   adaptersOverride?: ProtocolAdapter[],
   /** fonte de preços; trocar de provedor não toca em mais nada (Receita H) */
   priceProvider: PriceProvider = defillamaPrices,
+  /** índice de APR dos pools; injetável para os testes rodarem sem internet */
+  loadYields: typeof getYieldsIndex = getYieldsIndex,
 ): Promise<PositionsResponseDTO> {
   const warnings: string[] = [];
   const notices: ScanNotice[] = [];
@@ -509,7 +511,7 @@ export async function getWalletPositions(
 
   const t0 = Date.now();
   // APR (DefiLlama) baixa em paralelo com a varredura on-chain; falha vira "—"
-  const yieldsPromise = getYieldsIndex((m) => {
+  const yieldsPromise = loadYields((m) => {
     warnings.push(m);
     notices.push({ kind: "apr" });
   });

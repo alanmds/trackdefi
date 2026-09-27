@@ -190,6 +190,12 @@ export default function PositionsView({ address }: { address: string }) {
             </div>
           </div>
 
+          {/* o glossário no lugar onde a dúvida nasce — no rodapé ele fica a
+              44 posições de distância */}
+          <p className="kpis-help">
+            <Link href="/glossary">What do these numbers mean? →</Link>
+          </p>
+
           {state.data.totalPositions > state.data.positions.length && (
             <p className="scan-warnings">
               Showing the top {state.data.positions.length} positions by value (of {state.data.totalPositions}).

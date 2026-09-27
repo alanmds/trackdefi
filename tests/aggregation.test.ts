@@ -7,6 +7,13 @@ import { describe, expect, it } from "vitest";
 import type { Address } from "viem";
 import { getWalletPositions } from "../core/service";
 import type { LpPosition, ProtocolAdapter } from "../core/types";
+import type { PriceProvider } from "../core/prices/types";
+
+/* Sem internet: preço e APR de mentira. Até 27/09/2026 estes testes buscavam
+   a DefiLlama de verdade e, com a rede lenta, estouravam os 5 s do vitest —
+   falhavam sem nada estar quebrado. */
+const precosFalsos: PriceProvider = { name: "teste", fetchUsdPrices: async () => new Map() };
+const semApr = async () => null;
 
 const ADDR = "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac" as Address; // carteira demo, de terceiro
 
@@ -46,7 +53,7 @@ function brokenAdapter(protocol: string): ProtocolAdapter {
 
 describe("getWalletPositions (agregação)", () => {
   it("agrega posições de vários protocolos", async () => {
-    const dto = await getWalletPositions(ADDR, [okAdapter("aerodrome"), okAdapter("uniswap-v3")]);
+    const dto = await getWalletPositions(ADDR, [okAdapter("aerodrome"), okAdapter("uniswap-v3")], precosFalsos, semApr);
     expect(dto.totalPositions).toBe(2);
     expect(dto.protocols).toEqual(["aerodrome", "uniswap-v3"]);
     expect(dto.chains).toEqual(["base"]); // adapters fake são todos chainId 8453
@@ -54,7 +61,7 @@ describe("getWalletPositions (agregação)", () => {
   });
 
   it("um protocolo caído → resposta parcial + warning (não derruba tudo)", async () => {
-    const dto = await getWalletPositions(ADDR, [okAdapter("aerodrome"), brokenAdapter("uniswap-v3")]);
+    const dto = await getWalletPositions(ADDR, [okAdapter("aerodrome"), brokenAdapter("uniswap-v3")], precosFalsos, semApr);
     expect(dto.totalPositions).toBe(1);
     expect(dto.positions[0].protocol).toBe("aerodrome");
     expect(dto.warnings.some((w) => w.includes("uniswap-v3") && w.includes("RPC morreu"))).toBe(true);
@@ -64,7 +71,7 @@ describe("getWalletPositions (agregação)", () => {
 
   it("todos os protocolos caídos → erro (vira 502 na API)", async () => {
     await expect(
-      getWalletPositions(ADDR, [brokenAdapter("aerodrome"), brokenAdapter("uniswap-v3")]),
+      getWalletPositions(ADDR, [brokenAdapter("aerodrome"), brokenAdapter("uniswap-v3")], precosFalsos, semApr),
     ).rejects.toThrow(/todos os protocolos/);
   });
 });

@@ -604,6 +604,45 @@ button {
   margin-top: 3px;
 }
 
+.kpis-help {
+  margin: -12px 0 16px;
+  font-size: 13px;
+  text-align: right;
+}
+
+/* Celular: 2×2 em vez de 4 caixas empilhadas (26/09/2026 — o visitante rolava
+   ~1,5 tela antes da primeira posição). Caixa sobrando numa linha ímpar ocupa
+   a linha inteira. Números menores para caber em meia tela, inclusive milhões. */
+@media (max-width: 560px) {
+  .kpis {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .kpi {
+    padding: 13px 14px 12px;
+    min-width: 0;
+    /* o número acompanha a largura da PRÓPRIA caixa (cqi): em 320 px, meia
+       tela não comporta "$98,765.43" a 21 px — medido em 27/09/2026 */
+    container-type: inline-size;
+  }
+  .kpi:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  .kpi .label {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+  .kpi .value {
+    font-size: min(21px, 16.5cqi);
+  }
+  .kpi .value.value-long {
+    font-size: min(17px, 13.2cqi);
+  }
+  .kpi .hint {
+    font-size: 11.5px;
+  }
+}
+
 /* posições */
 
 .positions-grid {
