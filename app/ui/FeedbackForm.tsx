@@ -41,12 +41,14 @@ export default function FeedbackForm() {
           page: document.referrer ? new URL(document.referrer).pathname : null,
         }),
       });
-      const body = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      const body = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; detail?: string };
       if (res.ok && body.ok) {
         setStatus({ s: "sent", withEmail: email.trim() !== "" });
         return;
       }
-      setStatus({ s: "error", msg: ERRORS[body.error ?? ""] ?? GENERICO });
+      // `detail` só vem fora da produção (link de teste): mostra o motivo técnico
+      const msg = ERRORS[body.error ?? ""] ?? GENERICO;
+      setStatus({ s: "error", msg: body.detail ? `${msg} [${body.error}: ${body.detail}]` : msg });
     } catch {
       setStatus({ s: "error", msg: GENERICO });
     }

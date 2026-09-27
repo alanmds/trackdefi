@@ -23,6 +23,11 @@
  *   429 { error: "rate_limited" }
  *   502 { error: "upstream" }        — o script não confirmou o envio
  *   503 { error: "not_configured" }  — falta a URL em produção
+ *
+ * Nos erros de entrega, `detail` diz o motivo técnico (status HTTP, título da
+ * página que o Google devolveu, timeout). Vai sempre para o log da Vercel e
+ * aparece na resposta SÓ fora da produção: no link de teste o Alan vê o
+ * motivo na tela; o visitante do site oficial vê a frase genérica.
  */
 
 import { buildFeedbackEmail, validateFeedback, type FeedbackInput } from "../../../core/feedback";
@@ -35,6 +40,20 @@ export const dynamic = "force-dynamic";
 const MAX_BODY_BYTES = 16 * 1024;
 // generoso para pessoa (5 mensagens em 10 min), apertado para robô
 const limiter = new FixedWindowLimiter(10 * 60_000, 5);
+
+/** Erro de entrega: sempre no log; o motivo só vai na resposta fora da produção. */
+function falha(error: string, status: number, detail: string): Response {
+  console.error(`[feedback] ${error}: ${detail}`);
+  const mostrar = process.env.VERCEL_ENV !== "production";
+  return json(mostrar ? { error, detail } : { error }, status);
+}
+
+/** O Google devolve erro de script como página HTML com status 200: o título diz o que foi. */
+function resumoResposta(texto: string): string {
+  const titulo = /<title>([^<]*)<\/title>/i.exec(texto)?.[1]?.trim();
+  if (titulo) return `html: ${titulo.slice(0, 120)}`;
+  return `texto: ${texto.replace(/\s+/g, " ").slice(0, 120) || "(vazio)"}`;
+}
 
 function json(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), {
@@ -72,7 +91,7 @@ export async function POST(request: Request): Promise<Response> {
       console.log(`\n[feedback — modo local, NÃO enviado]\n${subject}\n${text}\n`);
       return json({ ok: true }, 200);
     }
-    return json({ error: "not_configured" }, 503);
+    return falha("not_configured", 503, "FEEDBACK_WEBHOOK_URL ausente neste ambiente");
   }
 
   try {
@@ -86,9 +105,10 @@ export async function POST(request: Request): Promise<Response> {
       signal: AbortSignal.timeout(15_000),
     });
     const resposta = (await res.text()).trim();
-    if (!res.ok || resposta !== "ok") return json({ error: "upstream" }, 502);
+    if (!res.ok) return falha("upstream", 502, `http ${res.status} · ${resumoResposta(resposta)}`);
+    if (resposta !== "ok") return falha("upstream", 502, resumoResposta(resposta));
     return json({ ok: true }, 200);
-  } catch {
-    return json({ error: "upstream" }, 502);
+  } catch (err) {
+    return falha("upstream", 502, err instanceof Error ? `${err.name}: ${err.message}` : "falha de rede");
   }
 }
