@@ -76,6 +76,15 @@ export function noPriceTip(symbols: string[], pricesFailed: boolean): string {
     : `No reliable USD price for ${quem} — our price source doesn't cover ${it}, so ${it === "it" ? "it gets" : "they get"} no dollar value instead of a guess. This isn't an error; refreshing won't change it.`;
 }
 
+/**
+ * tooltip de um valor cujo preço veio do PRÓPRIO pool. Regra do Alan
+ * (27/09/2026): o número é o do pool, mesmo distorcido — a tela só diz de
+ * onde ele veio, sem esconder nem "corrigir".
+ */
+export function poolPriceTip(symbol: string): string {
+  return `Priced from this pool: our price source doesn't cover ${symbol}, so this is ${symbol}'s price inside this pool right now. A small or thin pool can price it differently from other markets.`;
+}
+
 /** tooltip dos avisos de "sem preço" no topo da página */
 export function noPriceSummaryTip(what: "positions" | "rewards", pricesFailed: boolean): string {
   const base =

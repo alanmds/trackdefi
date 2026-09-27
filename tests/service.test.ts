@@ -27,7 +27,13 @@ const PRICES = new Map<string, number>([
   [priceKey(10, token("optimism", "oUSDT").address), 1],
 ]);
 
+/* Estes três não têm preço na fonte (member, CREATOR, KAITO), mas o outro lado
+   do par (WETH) tem: desde 27/09/2026 o preço que falta sai do PRÓPRIO pool. */
 const SEM_PRECO = ["vAMM-WETH/member", "vAMM-CREATOR/WETH", "CL100-WETH/KAITO"];
+
+/** mesmos preços, sem o AERO — cria recompensa sem preço que o pool NÃO cobre
+ *  (emissão AERO numa posição cujo par não tem AERO) */
+const SEM_AERO = new Map([...PRICES].filter(([k]) => k !== priceKey(8453, token("base", "AERO").address)));
 
 /** preço do token0 em token1 num tick — fórmula própria, independente do código */
 const precoNoTick = (tick: number, d0: number, d1: number) => 1.0001 ** tick * 10 ** (d0 - d1);
@@ -59,9 +65,59 @@ describe("buildResponse", () => {
     expect(valores.slice(comPreco.length).every((v) => v === null)).toBe(true);
   });
 
-  it("token sem preço → valor null e contado em positionsWithoutPrice", () => {
-    for (const s of SEM_PRECO) expect(bySymbol(s).valueUsd, s).toBeNull();
-    expect(dto.totals.positionsWithoutPrice).toBe(SEM_PRECO.length);
+  it("token sem preço na fonte, com o par precificado → preço do PRÓPRIO pool, marcado como tal", () => {
+    for (const s of SEM_PRECO) {
+      const p = bySymbol(s);
+      expect(p.valueUsd, s).not.toBeNull();
+      const derivado = p.token0.priceSource === "pool" ? p.token0 : p.token1;
+      expect(derivado.priceSource, s).toBe("pool");
+      expect(derivado.priceUsd, s).toBeGreaterThan(0);
+    }
+    expect(dto.totals.positionsWithoutPrice).toBe(0);
+  });
+
+  it("clássica volátil: preço das reservas → os dois lados valem o mesmo (x·y=k)", () => {
+    const p = bySymbol("vAMM-WETH/member"); // WETH (3000) é o token0
+    expect(p.token1.priceUsd).toBeCloseTo((3000 * p.token0.amount) / p.token1.amount, 12);
+    expect(p.token1.valueUsd).toBeCloseTo(p.token0.valueUsd!, 6);
+  });
+
+  it("concentrada: preço do tick atual do pool (KAITO = WETH ÷ KAITO-por-WETH)", () => {
+    const p = bySymbol("CL100-WETH/KAITO");
+    // faixa não invertida: `current` já é KAITO por 1 WETH, lido no tick do pool
+    expect(p.range!.inverted).toBe(false);
+    expect(p.token1.priceUsd).toBeCloseTo(3000 / p.range!.current, 9);
+    expect(p.token1.priceSource).toBe("pool");
+  });
+
+  it("taxa paga no token precificado pelo pool usa o mesmo preço, marcada como pool", () => {
+    const p = bySymbol("vAMM-WETH/member");
+    const taxa = p.rewards.find((r) => r.symbol === "member")!;
+    expect(taxa.priceSource).toBe("pool");
+    expect(taxa.priceUsd).toBe(p.token1.priceUsd);
+    expect(p.rewardsUsd).not.toBeNull();
+  });
+
+  it("sem preço em NENHUM lado do par, não há de onde tirar: continua '—'", () => {
+    const nada = buildResponse({ address: DEMO_ACCOUNT, normalized: todas(), prices: new Map(), scanMs: 1, warnings: [] });
+    expect(nada.totals.positionsWithoutPrice).toBe(12);
+    expect(nada.positions.every((p) => p.token0.priceUsd === null && p.token1.priceUsd === null)).toBe(true);
+  });
+
+  it("clássica ESTÁVEL não usa a proporção das reservas: a curva não é x·y=k", () => {
+    const estavel = todas().map((p) => (p.poolSymbol === "vAMM-WETH/member" ? { ...p, kind: "v2-stable" as const } : p));
+    const d = buildResponse({ address: DEMO_ACCOUNT, normalized: estavel, prices: PRICES, scanMs: 1, warnings: [] });
+    const p = d.positions.find((x) => x.poolSymbol === "vAMM-WETH/member")!;
+    expect(p.token1.priceUsd).toBeNull();
+    expect(p.valueUsd).toBeNull();
+  });
+
+  it("tick do pool desconhecido (leitura falhou) não vira preço", () => {
+    const semTick = todas().map((p) =>
+      p.poolSymbol === "CL100-WETH/KAITO" ? { ...p, range: { ...p.range!, currentKnown: false } } : p,
+    );
+    const d = buildResponse({ address: DEMO_ACCOUNT, normalized: semTick, prices: PRICES, scanMs: 1, warnings: [] });
+    expect(d.positions.find((x) => x.poolSymbol === "CL100-WETH/KAITO")!.valueUsd).toBeNull();
   });
 
   it("posição precificada = quantidade × preço de cada token", () => {
@@ -103,17 +159,24 @@ describe("buildResponse", () => {
   });
 
   it("recompensas somam item a item: token sem preço não apaga o resto do card (26/09/2026)", () => {
-    // vAMM-WETH/member tem taxas em WETH (com preço) E em member (sem) — antes,
-    // o card inteiro virava null e o WETH sumia do total do topo
-    const misto = bySymbol("vAMM-WETH/member");
+    // sem o preço do AERO: vAMM-WETH/DEGEN tem taxas em WETH (com preço) E
+    // emissão AERO (sem — e o par dele não tem AERO para o pool resolver).
+    // Antes, o card inteiro virava null e o WETH sumia do total do topo.
+    const d = buildResponse({ address: DEMO_ACCOUNT, normalized: todas(), prices: SEM_AERO, scanMs: 1, warnings: [] });
+    const misto = d.positions.find((p) => p.poolSymbol === "vAMM-WETH/DEGEN")!;
     expect(misto.rewardsUsd).toBeNull();
     expect(misto.rewards.find((r) => r.symbol === "WETH")!.valueUsd).toBeGreaterThan(0);
 
-    const todasRec = dto.positions.flatMap((p) => p.rewards);
+    const todasRec = d.positions.flatMap((p) => p.rewards);
     const comPreco = todasRec.reduce((s, r) => s + (r.valueUsd ?? 0), 0);
-    expect(dto.totals.rewardsUsd).toBeCloseTo(comPreco, 9);
-    expect(dto.totals.rewardsWithoutPrice).toBe(todasRec.filter((r) => r.valueUsd === null).length);
-    expect(dto.totals.rewardsWithoutPrice).toBe(3); // member, CREATOR e KAITO
+    expect(d.totals.rewardsUsd).toBeCloseTo(comPreco, 9);
+    expect(d.totals.rewardsWithoutPrice).toBe(todasRec.filter((r) => r.valueUsd === null).length);
+    // emissão AERO nas 3 clássicas em stake (DOG, DEGEN, TYBG); no CL200-WETH/AERO
+    // o AERO sai do próprio pool
+    expect(d.totals.rewardsWithoutPrice).toBe(3);
+    const clAero = d.positions.find((p) => p.poolSymbol === "CL200-WETH/AERO")!;
+    expect(clAero.token1.priceSource).toBe("pool");
+    expect(clAero.rewardsUsd).not.toBeNull();
   });
 
   it("avisos para o visitante: repetidos viram um, e 'faltou um pedaço' some se o adapter caiu inteiro", () => {
@@ -160,6 +223,6 @@ describe("buildResponse", () => {
     expect(cut.positions).toHaveLength(2);
     expect(cut.positions[0].poolSymbol).toBe(dto.positions[0].poolSymbol);
     expect(cut.totals.valueUsd).toBeCloseTo(dto.totals.valueUsd, 6); // totais NÃO mudam
-    expect(cut.totals.positionsWithoutPrice).toBe(SEM_PRECO.length); // conta até as cortadas
+    expect(cut.totals.positionsWithoutPrice).toBe(dto.totals.positionsWithoutPrice); // conta até as cortadas
   });
 });

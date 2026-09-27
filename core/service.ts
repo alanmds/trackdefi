@@ -36,6 +36,9 @@ export interface TokenAmountDTO {
   amount: number;
   priceUsd: number | null;
   valueUsd: number | null;
+  /** "pool" = a fonte de preços não cobre o token e o preço veio do PRÓPRIO
+   *  pool da posição (ver `poolPrice0In1`). Ausente = fonte de preços. */
+  priceSource?: "pool";
 }
 
 export interface RewardDTO {
@@ -46,6 +49,7 @@ export interface RewardDTO {
   amount: number;
   priceUsd: number | null;
   valueUsd: number | null;
+  priceSource?: "pool";
 }
 
 export interface RangeDTO {
@@ -216,6 +220,29 @@ export function priceKey(chainId: number, address: string): string {
   return `${chainId}:${address.toLowerCase()}`;
 }
 
+/**
+ * Preço do token0 em token1 lido no PRÓPRIO pool da posição, sem leitura
+ * extra na blockchain. null = não dá para afirmar.
+ *  - concentrada: o preço no tick atual (`range.priceCurrent`) — se o adapter
+ *    não conseguiu ler o tick, é placeholder e não vale;
+ *  - clássica VOLÁTIL: a proporção das quantidades da posição É a das
+ *    reservas do pool (x·y=k), logo o preço é qtd1/qtd0;
+ *  - clássica ESTÁVEL: a curva não é x·y=k e a proporção NÃO é o preço — usar
+ *    seria inventar número. Fica "—".
+ * PoC e contraprova (bate com a DexScreener a 0,2%): poc/probe-preco-pelo-pool.ts
+ */
+export function poolPrice0In1(p: LpPosition): number | null {
+  let x: number | null = null;
+  if (p.kind === "concentrated") {
+    if (p.range && p.range.currentKnown !== false) x = p.range.priceCurrent;
+  } else if (p.kind === "v2-volatile") {
+    const a0 = human(p.amount0Raw, p.token0.decimals);
+    const a1 = human(p.amount1Raw, p.token1.decimals);
+    if (a0 > 0 && a1 > 0) x = a1 / a0;
+  }
+  return x !== null && Number.isFinite(x) && x > 0 ? x : null;
+}
+
 function priceOf(prices: Map<string, number>, chainId: number, address: string): number | null {
   const p = prices.get(priceKey(chainId, address));
   return p === undefined ? null : p;
@@ -258,16 +285,37 @@ export function buildResponse(params: {
   } = params;
 
   const positions: PositionDTO[] = normalized.map((p) => {
-    const p0 = priceOf(prices, p.chainId, p.token0.address);
-    const p1 = priceOf(prices, p.chainId, p.token1.address);
+    let p0 = priceOf(prices, p.chainId, p.token0.address);
+    let p1 = priceOf(prices, p.chainId, p.token1.address);
+    /* Preço pelo PRÓPRIO pool (27/09/2026): quando a fonte de preços cobre um
+       lado do par e não o outro, o lado que falta sai do preço do pool. Regra
+       do Alan: pool distorcido mostra o preço COMO ESTÁ NO POOL — esconder ou
+       "corrigir" seria desinformação; a tela só diz de onde ele veio. */
+    let doPool: Address | null = null;
+    if ((p0 === null) !== (p1 === null)) {
+      const x = poolPrice0In1(p);
+      if (x !== null) {
+        if (p0 === null) {
+          p0 = p1! * x;
+          doPool = p.token0.address;
+        } else {
+          p1 = p0 / x;
+          doPool = p.token1.address;
+        }
+      }
+    }
     const a0 = human(p.amount0Raw, p.token0.decimals);
     const a1 = human(p.amount1Raw, p.token1.decimals);
     const v0 = p0 !== null ? a0 * p0 : null;
     const v1 = p1 !== null ? a1 * p1 : null;
     const valueUsd = v0 !== null && v1 !== null ? v0 + v1 : null;
+    const precoDoPool = doPool === p.token0.address ? p0 : p1;
 
     const rewards: RewardDTO[] = p.rewards.map((r) => {
-      const pr = priceOf(prices, p.chainId, r.token.address);
+      let pr = priceOf(prices, p.chainId, r.token.address);
+      // taxa paga no token cujo preço saiu do pool: mesmo preço, mesma origem
+      const peloPool = pr === null && doPool !== null && r.token.address.toLowerCase() === doPool.toLowerCase();
+      if (peloPool) pr = precoDoPool;
       const amt = human(r.raw, r.token.decimals);
       return {
         symbol: r.token.symbol,
@@ -277,6 +325,7 @@ export function buildResponse(params: {
         amount: amt,
         priceUsd: pr,
         valueUsd: pr !== null ? amt * pr : null,
+        ...(peloPool ? { priceSource: "pool" as const } : {}),
       };
     });
     const rewardsComplete = rewards.every((r) => r.valueUsd !== null);
@@ -385,6 +434,7 @@ export function buildResponse(params: {
         amount: a0,
         priceUsd: p0,
         valueUsd: v0,
+        ...(doPool === p.token0.address ? { priceSource: "pool" as const } : {}),
       },
       token1: {
         symbol: p.token1.symbol,
@@ -393,6 +443,7 @@ export function buildResponse(params: {
         amountRaw: p.amount1Raw.toString(),
         amount: a1,
         priceUsd: p1,
+        ...(doPool === p.token1.address ? { priceSource: "pool" as const } : {}),
         valueUsd: v1,
       },
       rewards,

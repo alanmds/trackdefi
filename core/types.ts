@@ -33,6 +33,12 @@ export interface RangeInfo {
   priceLower: number;
   priceUpper: number;
   priceCurrent: number;
+  /**
+   * false = o adapter NÃO conseguiu ler o tick atual do pool, e `priceCurrent`
+   * é só o preço no tick 0 (placeholder). Quem deriva preço do pool precisa
+   * disto para não transformar um placeholder em preço. Ausente = conhecido.
+   */
+  currentKnown?: boolean;
 }
 
 export interface LpPosition {

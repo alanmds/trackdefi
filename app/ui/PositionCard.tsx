@@ -2,7 +2,7 @@ import type { PositionDTO } from "../../core/service";
 import { CHAINS } from "../../core/chains";
 import { fmtAmount, fmtPct, fmtUsd, fmtUsdFine, fmtWindow, protocolLabel } from "./format";
 import RangeBar from "./RangeBar";
-import { noPriceTip } from "./notices";
+import { noPriceTip, poolPriceTip } from "./notices";
 
 function kindLabel(p: PositionDTO): string {
   if (p.kind === "concentrated") return "Concentrated";
@@ -154,7 +154,13 @@ export default function PositionCard({ p, pricesFailed = false }: { p: PositionD
             <span className="amt">
               {fmtAmount(t.amount)}{" "}
               {t.valueUsd !== null ? (
-                <span className="usd">{fmtUsd(t.valueUsd)}</span>
+                t.priceSource === "pool" ? (
+                  <span className="usd has-tip" title={poolPriceTip(t.symbol)}>
+                    {fmtUsd(t.valueUsd)}
+                  </span>
+                ) : (
+                  <span className="usd">{fmtUsd(t.valueUsd)}</span>
+                )
               ) : (
                 <span className="usd has-tip" title={tip([t.symbol])}>
                   —
@@ -179,7 +185,13 @@ export default function PositionCard({ p, pricesFailed = false }: { p: PositionD
                 <span className="amt">
                   {fmtAmount(r.amount)}{" "}
                   {r.valueUsd !== null ? (
-                    <span className="usd">{fmtUsd(r.valueUsd)}</span>
+                    r.priceSource === "pool" ? (
+                      <span className="usd has-tip" title={poolPriceTip(r.symbol)}>
+                        {fmtUsd(r.valueUsd)}
+                      </span>
+                    ) : (
+                      <span className="usd">{fmtUsd(r.valueUsd)}</span>
+                    )
                   ) : (
                     <span className="usd has-tip" title={tip([r.symbol])}>
                       —

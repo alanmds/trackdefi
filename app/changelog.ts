@@ -44,6 +44,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 export const CHANGELOG: ChangeEntry[] = [
   {
     date: "2026-09-27",
+    kind: "improvement",
+    title: "Fewer \"—\": prices from the pool itself",
+    body:
+      "When our price source doesn't cover a token but the other token in the pair has a price, the missing one now comes from the position's own pool — so more positions show a dollar value instead of \"—\". These values have a dotted underline: tap or hover to see where the price came from. It's the pool's real price, shown as it is, even when a small pool prices a token differently from other markets.",
+  },
+  {
+    date: "2026-09-27",
     kind: "feature",
     title: "Send us feedback",
     body:

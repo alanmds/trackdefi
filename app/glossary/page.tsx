@@ -274,6 +274,11 @@ const SECTIONS: Section[] = [
         term: "Price unit (e.g. USDC/WETH)",
         def: "The unit of the range numbers: how many of the first token one of the second token is worth. USDC/WETH at 3,000 means 1 WETH = 3,000 USDC.",
       },
+      {
+        id: "pool-price",
+        term: "Dollar value with a dotted underline",
+        def: "Our price source doesn't cover that token, so its price comes from the position's own pool: the other token's market price times the exchange rate inside the pool. It is the pool's real price — shown as it is, even when a small or thin pool prices the token differently from other markets.",
+      },
     ],
   },
   {
@@ -356,7 +361,7 @@ const SECTIONS: Section[] = [
       {
         id: "dash",
         term: "—",
-        def: "No reliable number to show, so we show nothing rather than guess. For a price, it almost always means our price source doesn't cover that token; hover over it (or tap it) to see which one.",
+        def: "No reliable number to show, so we show nothing rather than guess. For a price, it means neither our price source nor the position's own pool can price that token — for example, when neither token in the pair has a market price. Hover over it (or tap it) to see which one.",
       },
       {
         id: "dotted",

@@ -447,6 +447,7 @@ export function toLpPosition(
       priceLower: tickToPrice0In1(p.tick_lower, token0.decimals, token1.decimals),
       priceUpper: tickToPrice0In1(p.tick_upper, token0.decimals, token1.decimals),
       priceCurrent: tickToPrice0In1(tickCurrent, token0.decimals, token1.decimals),
+      ...(pool.tick === null ? { currentKnown: false } : {}),
     };
   }
 

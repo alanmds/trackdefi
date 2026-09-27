@@ -14,7 +14,7 @@ const EDITADA_EM = {
   home: "2026-09-26",
   howItWorks: "2026-09-25",
   roadmap: "2026-09-26",
-  glossary: "2026-09-26",
+  glossary: "2026-09-27",
 } as const;
 
 const dia = (d: string) => new Date(`${d}T12:00:00Z`);
