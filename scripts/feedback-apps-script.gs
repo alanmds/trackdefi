@@ -17,7 +17,12 @@
  *  3. Implantar → Nova implantação → tipo "App da Web"
  *       Executar como: Eu
  *       Quem pode acessar: Qualquer pessoa
- *  4. autorizar (o Google pede permissão para "enviar e-mail como você")
+ *  4. autorizar: no editor, escolher a função `autorizar` na lista ao lado de
+ *     "Executar" e clicar em Executar → Revisar permissões → Avançado →
+ *     Acessar (não seguro) → Permitir. Chega um e-mail de teste no Gmail.
+ *     SEM ESTE PASSO o site recebe "You do not have permission to call
+ *     MailApp.sendEmail" (aconteceu em 27/09/2026: a autorização da tela de
+ *     implantação não bastou).
  *  5. copiar a "URL do app da Web" (termina em /exec) e colar na Vercel como
  *     FEEDBACK_WEBHOOK_URL, marcada como Sensitive
  */
@@ -46,4 +51,17 @@ function doPost(e) {
 
   MailApp.sendEmail(msg);
   return ContentService.createTextOutput("ok");
+}
+
+/**
+ * Rodar UMA VEZ pelo editor (Executar): faz o Google pedir a permissão de
+ * enviar e-mail e manda um teste para o próprio dono. Se o teste chegou, o
+ * formulário do site também consegue enviar.
+ */
+function autorizar() {
+  MailApp.sendEmail(
+    Session.getEffectiveUser().getEmail(),
+    "[trackdefi feedback] teste de autorização",
+    "Se este e-mail chegou, o script está autorizado e o formulário do site já consegue entregar aqui."
+  );
 }
