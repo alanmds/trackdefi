@@ -2,15 +2,23 @@ import type { PositionDTO } from "../../core/service";
 import { CHAINS } from "../../core/chains";
 import { fmtAmount, fmtPct, fmtUsd, fmtUsdFine, fmtWindow, protocolLabel } from "./format";
 import RangeBar from "./RangeBar";
+import { noPriceTip } from "./notices";
 
 function kindLabel(p: PositionDTO): string {
   if (p.kind === "concentrated") return "Concentrated";
   return p.kind === "v2-stable" ? "Classic · stable" : "Classic · volatile";
 }
 
-export default function PositionCard({ p }: { p: PositionDTO }) {
+export default function PositionCard({ p, pricesFailed = false }: { p: PositionDTO; pricesFailed?: boolean }) {
   const chain = CHAINS[p.chainId];
   const explorerUrl = chain?.explorerUrl ?? "https://basescan.org";
+
+  /* Todo "—" de preço ausente explica a si mesmo no tooltip: sem isso, quem o
+     via ao lado do aviso de varredura achava que era falha e recarregava. */
+  const semPreco = [p.token0, p.token1].filter((t) => t.valueUsd === null).map((t) => t.symbol);
+  const recSemPreco = p.rewards.filter((r) => r.valueUsd === null).map((r) => r.symbol);
+  const recComPrecoUsd = p.rewards.reduce((s, r) => s + (r.valueUsd ?? 0), 0);
+  const tip = (symbols: string[]) => noPriceTip(symbols, pricesFailed);
 
   /* "Rendendo agora" (Receitas C2 + G v2). Desde 15/09/2026 são VÁRIAS linhas:
      uma por janela medida (24 h e 15 min), cada uma com o valor em dólar ao
@@ -58,7 +66,13 @@ export default function PositionCard({ p }: { p: PositionDTO }) {
             {p.poolSymbol}
           </a>
         </h3>
-        <span className="pos-value">{fmtUsd(p.valueUsd)}</span>
+        {p.valueUsd !== null ? (
+          <span className="pos-value">{fmtUsd(p.valueUsd)}</span>
+        ) : (
+          <span className="pos-value has-tip" title={tip(semPreco)}>
+            —
+          </span>
+        )}
       </div>
 
       <div className="badges">
@@ -138,7 +152,14 @@ export default function PositionCard({ p }: { p: PositionDTO }) {
           <div className="token-row" key={t.address}>
             <span className="sym">{t.symbol}</span>
             <span className="amt">
-              {fmtAmount(t.amount)} <span className="usd">{t.valueUsd !== null ? fmtUsd(t.valueUsd) : "—"}</span>
+              {fmtAmount(t.amount)}{" "}
+              {t.valueUsd !== null ? (
+                <span className="usd">{fmtUsd(t.valueUsd)}</span>
+              ) : (
+                <span className="usd has-tip" title={tip([t.symbol])}>
+                  —
+                </span>
+              )}
             </span>
           </div>
         ))}
@@ -156,14 +177,33 @@ export default function PositionCard({ p }: { p: PositionDTO }) {
                   {r.symbol} <span className="usd">{r.kind === "emission" ? "emissions" : "fees"}</span>
                 </span>
                 <span className="amt">
-                  {fmtAmount(r.amount)} <span className="usd">{r.valueUsd !== null ? fmtUsd(r.valueUsd) : "—"}</span>
+                  {fmtAmount(r.amount)}{" "}
+                  {r.valueUsd !== null ? (
+                    <span className="usd">{fmtUsd(r.valueUsd)}</span>
+                  ) : (
+                    <span className="usd has-tip" title={tip([r.symbol])}>
+                      —
+                    </span>
+                  )}
                 </span>
               </div>
             ))}
           </div>
           <div className="rewards-total">
             <span>Total claimable</span>
-            <span>{fmtUsd(p.rewardsUsd)}</span>
+            {/* parte com preço soma; a sem preço aparece pelo nome, igual ao
+                total do topo — antes um só token sem preço virava "—" no card todo */}
+            {recSemPreco.length === 0 ? (
+              <span>{fmtUsd(p.rewardsUsd)}</span>
+            ) : recSemPreco.length === p.rewards.length ? (
+              <span className="has-tip" title={tip(recSemPreco)}>
+                —
+              </span>
+            ) : (
+              <span className="has-tip" title={tip(recSemPreco)}>
+                {fmtUsd(recComPrecoUsd)} <span className="usd">+ {[...new Set(recSemPreco)].join(", ")}</span>
+              </span>
+            )}
           </div>
         </div>
       )}

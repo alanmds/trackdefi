@@ -30,6 +30,12 @@ export default function SearchForm({ autoFocus = false }: { autoFocus?: boolean 
           inputMode="text"
           autoComplete="off"
           spellCheck={false}
+          /* teclado do iPhone: sem maiúscula nem correção automática — um
+             endereço digitado com uma letra trocada de caixa falha no checksum
+             e o site diria "isso não parece um endereço" */
+          autoCapitalize="none"
+          autoCorrect="off"
+          enterKeyHint="go"
           autoFocus={autoFocus}
           placeholder="Paste a wallet address (0x…)"
           aria-label="Wallet address"

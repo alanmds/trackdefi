@@ -8,7 +8,7 @@ import type { Address } from "viem";
 import { getWalletPositions } from "../core/service";
 import type { LpPosition, ProtocolAdapter } from "../core/types";
 
-const ADDR = "0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC" as Address;
+const ADDR = "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac" as Address; // carteira demo, de terceiro
 
 function fakePosition(protocol: string): LpPosition {
   const t = (s: string, a: Address) => ({ address: a, symbol: s, decimals: 18 });
@@ -58,6 +58,8 @@ describe("getWalletPositions (agregação)", () => {
     expect(dto.totalPositions).toBe(1);
     expect(dto.positions[0].protocol).toBe("aerodrome");
     expect(dto.warnings.some((w) => w.includes("uniswap-v3") && w.includes("RPC morreu"))).toBe(true);
+    // e o visitante fica sabendo QUAL caiu, em forma de dado (texto na tela)
+    expect(dto.notices).toContainEqual({ kind: "source", protocol: "uniswap-v3", chainId: 8453 });
   });
 
   it("todos os protocolos caídos → erro (vira 502 na API)", async () => {

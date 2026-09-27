@@ -7,11 +7,19 @@ import { networksDotted, networksSentence } from "../site";
 import { fmtUsd, shortAddress } from "./format";
 import LockCard from "./LockCard";
 import PositionCard from "./PositionCard";
+import { noPriceSummaryTip, noticeText } from "./notices";
 
 type ViewState =
   | { phase: "loading" }
   | { phase: "error"; code: string; message: string }
   | { phase: "done"; data: PositionsResponseDTO };
+
+/* Valor de 7 dígitos ("$1,234,987.65") não cabe na caixa com a fonte cheia
+   quando há 4 caixas lado a lado — medido em 26/09/2026 no iPhone deitado e
+   no computador. A partir de 12 caracteres a fonte encolhe; o resto não muda. */
+function KpiValue({ text }: { text: string }) {
+  return <div className={text.length > 11 ? "value value-long" : "value"}>{text}</div>;
+}
 
 const ERROR_COPY: Record<string, { title: string; body: string }> = {
   invalid_address: { title: "Invalid address", body: "That doesn't look like a valid wallet address." },
@@ -69,6 +77,12 @@ export default function PositionsView({ address }: { address: string }) {
       /* clipboard indisponível — sem drama */
     }
   }
+
+  // `?? []`: fixture e respostas em cache anteriores a 26/09/2026 não têm o campo
+  const notices = state.phase === "done" ? (state.data.notices ?? []) : [];
+  // a fonte de preços falhou NESTA varredura → "—" pode sumir ao recarregar
+  const pricesFailed = notices.some((n) => n.kind === "prices");
+  const rewardsWithoutPrice = state.phase === "done" ? (state.data.totals.rewardsWithoutPrice ?? 0) : 0;
 
   return (
     <main className="container">
@@ -138,9 +152,9 @@ export default function PositionsView({ address }: { address: string }) {
           <div className="kpis">
             <div className="kpi">
               <div className="label">Total in pools</div>
-              <div className="value">{fmtUsd(state.data.totals.valueUsd)}</div>
+              <KpiValue text={fmtUsd(state.data.totals.valueUsd)} />
               {state.data.totals.positionsWithoutPrice > 0 && (
-                <div className="hint">
+                <div className="hint has-tip" title={noPriceSummaryTip("positions", pricesFailed)}>
                   + {state.data.totals.positionsWithoutPrice} position
                   {state.data.totals.positionsWithoutPrice > 1 ? "s" : ""} without a reliable price
                 </div>
@@ -149,7 +163,7 @@ export default function PositionsView({ address }: { address: string }) {
             {(state.data.locks ?? []).length > 0 && (
               <div className="kpi">
                 <div className="label">Locked</div>
-                <div className="value">{fmtUsd(state.data.totals.lockedUsd ?? 0)}</div>
+                <KpiValue text={fmtUsd(state.data.totals.lockedUsd ?? 0)} />
                 <div className="hint">
                   {[...new Set((state.data.locks ?? []).map((l) => `ve${l.token.symbol}`))].join(" + ")} governance locks
                 </div>
@@ -157,12 +171,17 @@ export default function PositionsView({ address }: { address: string }) {
             )}
             <div className="kpi">
               <div className="label">Claimable rewards</div>
-              <div className="value">{fmtUsd(state.data.totals.rewardsUsd)}</div>
+              <KpiValue text={fmtUsd(state.data.totals.rewardsUsd)} />
               <div className="hint">
                 {(state.data.locks ?? []).some((l) => l.rewards.length > 0)
                   ? "fees, emissions & lock rewards"
                   : "fees + emissions"}
               </div>
+              {rewardsWithoutPrice > 0 && (
+                <div className="hint has-tip" title={noPriceSummaryTip("rewards", pricesFailed)}>
+                  + {rewardsWithoutPrice} reward{rewardsWithoutPrice > 1 ? "s" : ""} without a reliable price
+                </div>
+              )}
             </div>
             <div className="kpi">
               <div className="label">Positions</div>
@@ -178,11 +197,21 @@ export default function PositionsView({ address }: { address: string }) {
             </p>
           )}
 
-          {state.data.warnings.length > 0 && (
-            <p className="scan-warnings" title={state.data.warnings.join("\n")}>
-              ⚠ {state.data.warnings.length} warning{state.data.warnings.length > 1 ? "s" : ""} during the scan — some
-              data may be incomplete. Refresh to retry.
-            </p>
+          {/* Um aviso por linha, dizendo o que aconteceu. O log interno
+              (`warnings`, em português) não aparece mais na tela — nem no
+              tooltip, onde vazava texto de depuração para o visitante. */}
+          {notices.length > 0 && (
+            <ul className="scan-warnings scan-notices">
+              {notices.map((n, i) => {
+                const { text, retry } = noticeText(n);
+                return (
+                  <li key={i}>
+                    ⚠ {text}
+                    {retry && " Refresh to retry."}
+                  </li>
+                );
+              })}
+            </ul>
           )}
 
           {/* Locks vêm ANTES das posições: são poucos (1 a 3, em geral) e
@@ -207,7 +236,11 @@ export default function PositionsView({ address }: { address: string }) {
                 e o id do NFT recomeça em cada uma — o pool 0xc2026f… com o NFT
                 #2 aparecia em Ink, Unichain e Soneium com a mesma chave */}
             {state.data.positions.map((p) => (
-              <PositionCard key={`${p.chainId}-${p.poolAddress}-${p.positionId ?? "v2"}`} p={p} />
+              <PositionCard
+                key={`${p.chainId}-${p.poolAddress}-${p.positionId ?? "v2"}`}
+                p={p}
+                pricesFailed={pricesFailed}
+              />
             ))}
           </div>
         </>

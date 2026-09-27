@@ -25,7 +25,6 @@ import { base, robinhood } from "viem/chains";
 import { chainInfo } from "../core/chains";
 
 /** carteira do Alan — tem posições v4 nas duas redes (conferido em 10/08) */
-const DEFAULT_WALLET: Address = "0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC";
 
 interface V4Chain {
   name: string;
@@ -187,7 +186,9 @@ async function probe(c: V4Chain, wallet: Address) {
 }
 
 async function main() {
-  const wallet = (process.argv[2] as Address) ?? DEFAULT_WALLET;
+  // carteira por argumento, sem padrão: repo público (limpeza de 26/09/2026)
+  if (!process.argv[2]) throw new Error("uso: npx tsx <este-arquivo> <carteira>");
+  const wallet = process.argv[2] as Address;
   console.log("PoC Receita D — Uniswap v4, passo 0: enumerar posições");
   console.log(`Carteira: ${wallet}`);
   for (const c of V4_CHAINS) {

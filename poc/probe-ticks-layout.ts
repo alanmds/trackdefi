@@ -87,7 +87,7 @@ async function pergunta2() {
     const alvo = bloco - BigInt(Math.round((horas * 3600) / sp));
     try {
       const p = (await reader.readContract({
-        address: UNISWAP_V3_ROBINHOOD.nfpm, abi: nfpmAbi, functionName: "positions", args: [1181755n],
+        address: UNISWAP_V3_ROBINHOOD.nfpm, abi: nfpmAbi, functionName: "positions", args: [BigInt(process.argv[2] ?? 0)], // NFT por argumento (sem padrão: repo público)
         ...(horas === 0 ? {} : { blockNumber: alvo }),
       })) as any[];
       console.log(`  ${String(horas).padStart(3)}h atrás (bloco ${alvo}): L = ${p[7]}`);

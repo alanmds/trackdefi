@@ -121,6 +121,13 @@ export default function Roadmap() {
         <li>
           <Status kind="planned" />
           <span>
+            <strong>Solana · Orca</strong>
+            {" — our first network outside the Ethereum family. A proof of concept already reads Orca positions from public data — amounts, price range, in-range status, pending fees and rewards — so the work left is plumbing, not research. Raydium and Meteora would follow."}
+          </span>
+        </li>
+        <li>
+          <Status kind="planned" />
+          <span>
             <strong>More Superchain networks</strong>
             {" (Lisk, Swell, Metal L2, Superseed, Celo) — the tail of the same deployment, added the same way."}
           </span>

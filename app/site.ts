@@ -8,6 +8,23 @@
 export const SITE_NAME = "trackdefi";
 
 /**
+ * Carteira do botão "Try a demo wallet" da home — a VITRINE do site.
+ *
+ * Trocada em 26/09/2026. A anterior (a de teste do repo `sugar`) mostrava
+ * posições fora da faixa, tokens sem preço e valores de centavos: boa para
+ * validar, fraca como propaganda. Esta foi escolhida pelo Alan entre
+ * candidatas achadas em dado público (depositantes do gauge CL100-WETH/USDC
+ * da Aerodrome): posições em 4 redes, Uniswap v3 e Aerodrome, em stake e com
+ * as janelas de 24 h / 15 min. É de terceiro, nunca de alguém daqui.
+ *
+ * ⚠️ As faixas dela são MANUAIS — posições podem sair da faixa se o preço
+ * andar muito. O `poc/validate-live.ts` mostra a saúde dela depois de cada
+ * deploy, para saber quando trocar. Candidatas reservas em
+ * `privado/DEMO_CANDIDATAS.md`.
+ */
+export const DEMO_WALLET = "0xad93e07a25e815ebb69bc3272b36ff563197d33b";
+
+/**
  * Redes suportadas, na ordem em que aparecem nos textos.
  *
  * Vive aqui, e não em `core/chains.ts`, porque componentes client importam

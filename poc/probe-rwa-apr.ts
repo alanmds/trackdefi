@@ -1,11 +1,11 @@
 /**
- * PoC — por que a posição USDG/HIMS (RWA, Robinhood Chain) não mostra APR?
+ * PoC — por que uma posição RWA da Robinhood Chain não mostra APR?
  *
  * Testa os DOIS caminhos de APR do projeto, separadamente:
  *   1) DefiLlama (yields.llama.fi) — cobertura da Robinhood Chain
  *   2) fee APR on-chain (Receita G) — o RPC serve estado histórico? até onde?
  *
- * Uso: npx tsx poc/probe-rwa-apr.ts
+ * Uso: npx tsx poc/probe-rwa-apr.ts <nft-id> [símbolo-para-procurar-no-dataset]
  */
 
 import { parseAbi, type Address } from "viem";
@@ -14,7 +14,9 @@ import { UNISWAP_V3_ROBINHOOD } from "../core/adapters/uniswap-v3/config";
 import { CHAINS } from "../core/chains";
 
 const CHAIN_ID = 4663;
-const NFT_ID = 1181755n;
+// sem padrão: um NFT fixo num repo público liga o projeto à carteira dona dele
+if (!process.argv[2]) throw new Error("uso: npx tsx poc/probe-rwa-apr.ts <nft-id> [símbolo]");
+const NFT_ID = BigInt(process.argv[2]);
 
 const nfpmAbi = parseAbi([
   "function positions(uint256 tokenId) view returns (uint96 nonce, address operator, address token0, address token1, uint24 fee, int24 tickLower, int24 tickUpper, uint128 liquidity, uint256 feeGrowthInside0LastX128, uint256 feeGrowthInside1LastX128, uint128 tokensOwed0, uint128 tokensOwed1)",
@@ -60,8 +62,9 @@ async function parte1_defillama() {
   }
 
   // o par existe em QUALQUER rede do dataset?
-  const hims = rows.filter((r) => /HIMS/i.test(String(r.symbol)));
-  console.log(`\nlinhas com "HIMS" no símbolo (qualquer rede): ${hims.length}`);
+  const alvo = (process.argv[3] ?? "").toUpperCase();
+  const hims = alvo ? rows.filter((r) => String(r.symbol).toUpperCase().includes(alvo)) : [];
+  console.log(`\nlinhas com "${alvo}" no símbolo (qualquer rede): ${hims.length}`);
   for (const r of hims.slice(0, 10)) console.log(`  ${r.chain} | ${r.project} | ${r.symbol} | tvl=$${Math.round(r.tvlUsd)} | apy=${r.apy}`);
 }
 

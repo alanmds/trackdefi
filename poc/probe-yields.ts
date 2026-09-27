@@ -7,7 +7,7 @@
 
 
 export {}; // arquivo-script: evita colisao de escopo global no tsc
-// pools reais conhecidos (carteira 0x05963CdC + demo), para testar o casamento
+// pools reais conhecidos (carteira demo), para testar o casamento
 const KNOWN: Record<string, string> = {
   "0x9D14ff91AE2c6e3D1A760542248B6c7F206894b0": "CL1-USDC/cbBTC (Aerodrome/Base)",
   "0x4e392fBfE4D0557C82D2F97F02ec39daA31516dd": "CL1-WETH/USDC (Aerodrome/Base)",

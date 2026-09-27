@@ -36,7 +36,7 @@ import { CHAINS } from "../core/chains";
 import { UNISWAP_V3_CHAINS } from "../core/adapters/uniswap-v3/config";
 
 const WALLET = "0x8cadb20A4811f363Dadb863A190708bEd26245F8" as Address;
-const ALAN = "0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC" as Address;
+const DEMO = "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac" as Address; // carteira demo, de terceiro
 const YEAR = 365;
 
 const nfpmAbi = parseAbi([
@@ -130,13 +130,13 @@ async function main() {
   console.log("── Sonda: posição CL EM STAKE (Aerodrome) acumula fees p/ o LP?");
   const reader = createReader(8453);
   const adapter = new AerodromeAdapter(reader);
-  const raw = await adapter.fetchRawPositions(ALAN);
+  const raw = await adapter.fetchRawPositions(DEMO);
   const staked = raw.find((p) => p.staked > 0n);
   if (staked) {
     console.log(`   NFT #${staked.id}: unstaked_earned0=${staked.unstaked_earned0} unstaked_earned1=${staked.unstaked_earned1} (t0)`);
     console.log("   aguardando 60s…");
     await new Promise((r) => setTimeout(r, 60_000));
-    const raw2 = await adapter.fetchRawPositions(ALAN);
+    const raw2 = await adapter.fetchRawPositions(DEMO);
     const s2 = raw2.find((p) => p.id === staked.id);
     if (s2) {
       const d0 = s2.unstaked_earned0 - staked.unstaked_earned0;

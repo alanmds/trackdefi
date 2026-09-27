@@ -23,7 +23,7 @@
  */
 
 import { erc20Abi, type Address, type Hex } from "viem";
-import type { ChainReader, LpPosition, ProtocolAdapter, RewardAmount, TokenInfo } from "../../types";
+import type { ChainReader, LpPosition, ProtocolAdapter, RewardAmount, TokenInfo, WarnSink } from "../../types";
 import { amountsForLiquidity } from "../../math/liquidity";
 import { getSqrtRatioAtTick } from "../../math/tickmath";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
@@ -48,7 +48,7 @@ import { MAX_V4_NFTS, UNISWAP_V4_ROBINHOOD, type UniV4ChainConfig } from "./conf
 export interface UniswapV4Options {
   config?: UniV4ChainConfig;
   maxNfts?: number;
-  onWarn?: (msg: string) => void;
+  onWarn?: WarnSink;
 }
 
 export class UniswapV4Adapter implements ProtocolAdapter {
@@ -59,7 +59,7 @@ export class UniswapV4Adapter implements ProtocolAdapter {
   private readonly stateView: Address;
   private readonly poolManager: Address;
   private readonly maxNfts: number;
-  private readonly warn: (msg: string) => void;
+  private readonly warn: WarnSink;
 
   constructor(
     private readonly reader: ChainReader,
@@ -181,7 +181,10 @@ export class UniswapV4Adapter implements ProtocolAdapter {
 
     if (candidatos.length === 0) return [];
     if (candidatos.length > this.maxNfts) {
-      this.warn(`uniswap-v4: carteira já recebeu ${candidatos.length} NFTs; conferindo só os ${this.maxNfts} mais recentes`);
+      this.warn(`uniswap-v4: carteira já recebeu ${candidatos.length} NFTs; conferindo só os ${this.maxNfts} mais recentes`, {
+        kind: "capped",
+        checked: this.maxNfts,
+      });
       candidatos = candidatos.slice(-this.maxNfts);
     }
 
@@ -278,6 +281,7 @@ export class UniswapV4Adapter implements ProtocolAdapter {
     if (comHook.length > 0) {
       this.warn(
         `uniswap-v4: ${comHook.length} posição(ões) em pool com hook — taxas do núcleo estão certas, mas recompensa própria do hook não é contabilizada`,
+        { kind: "hooks", positions: comHook.length },
       );
     }
 

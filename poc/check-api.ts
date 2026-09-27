@@ -18,7 +18,7 @@ async function hit(query: string) {
 }
 
 async function main() {
-  const wallet = "0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC";
+  const wallet = "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac"; // carteira demo, de terceiro
 
   console.log("1) endereço válido (MISS, lê a chain)...");
   const a = await hit(`?address=${wallet}`);

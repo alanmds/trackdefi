@@ -43,6 +43,34 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    date: "2026-09-26",
+    kind: "improvement",
+    title: "A new demo wallet",
+    body:
+      "The \"Try a demo wallet\" link now opens a wallet that shows what trackdefi does best: positions across four networks on Uniswap and Aerodrome, gauge-staked ones included, with live fee measurements and claimable rewards.",
+  },
+  {
+    date: "2026-09-26",
+    kind: "improvement",
+    title: "Explanations open with a tap on phones",
+    body:
+      "The details behind the numbers — what adds up to Earning now, why a price shows \"—\", what a lock's status means — used to appear only when a mouse hovered over them, which a phone can't do. Now a tap opens them at the bottom of the screen. Cards also fit iPhones set to a larger display zoom, and long numbers no longer turn into phone-number links in Safari.",
+  },
+  {
+    date: "2026-09-26",
+    kind: "feature",
+    title: "A glossary for every number on the page",
+    body:
+      "Not sure what \"Earning now\", \"Staked in gauge\" or a price range like USDC/WETH means? The new glossary explains every label and figure on a wallet page in plain English, in the order they appear on screen. It's linked at the bottom of every page.",
+  },
+  {
+    date: "2026-09-26",
+    kind: "improvement",
+    title: "Warnings that say what happened",
+    body:
+      "The yellow scan notice used to say only that something went wrong. Now each line tells you what: a network that didn't answer, or fees that were estimated because they couldn't be measured. It only suggests a refresh when a refresh can actually help. A \"—\" where a price should be now explains itself when you hover over it: some tokens have no reliable price, and that isn't an error. Claimable rewards also stopped hiding the priced part of a position just because one of its tokens has no price.",
+  },
+  {
     date: "2026-09-25",
     kind: "feature",
     title: "Send us feedback",

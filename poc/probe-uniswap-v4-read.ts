@@ -40,7 +40,6 @@ import { isInRange, tickToPrice0In1 } from "../core/math/ticks";
 const CHAIN_ID = 4663;
 const POSITION_MANAGER: Address = "0x58daec3116aae6d93017baaea7749052e8a04fa7";
 const STATE_VIEW: Address = "0xf3334192d15450cdd385c8b70e03f9a6bd9e673b";
-const DEFAULT_WALLET: Address = "0x05963CdCc69CD5B1A06353b2d1098C447E1D75aC";
 
 /** endereço zero = moeda nativa da rede (o v4 trata ETH nativo como currency) */
 const NATIVE: Address = "0x0000000000000000000000000000000000000000";
@@ -114,7 +113,9 @@ const ok = (m: string) => console.log(`   ✅ ${m}`);
 const bad = (m: string) => console.log(`   ❌ ${m}`);
 
 async function main() {
-  const wallet = (process.argv[2] as Address) ?? DEFAULT_WALLET;
+  // carteira por argumento, sem padrão: repo público (limpeza de 26/09/2026)
+  if (!process.argv[2]) throw new Error("uso: npx tsx <este-arquivo> <carteira>");
+  const wallet = process.argv[2] as Address;
   const client = createPublicClient({
     chain: robinhood,
     transport: fallback(chainInfo(CHAIN_ID).defaultRpcs.map((u) => http(u, { timeout: 30_000 }))),

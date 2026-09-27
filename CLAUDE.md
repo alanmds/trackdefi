@@ -12,22 +12,23 @@ Vercel e não chega aqui por git nem pelo Drive. Na dúvida sobre o que está
 valendo, ler o site (`/robots.txt`, `/sitemap.xml`) ou rodar
 `npx tsx poc/validate-live.ts <URL>`. Pendências em `privado/PENDENCIAS.md`.
 
-Idioma de trabalho: **português**. Site: **inglês**. Dono: Alan (Rio de
-Janeiro, não-programador). Windows.
+Idioma de trabalho: **português**. Site: **inglês**. Windows.
 
-## Ambiente (regra desde 17/07/2026)
-- **O Alan trabalha em 2 computadores. Nomes fixos (usar SEMPRE estes):**
-  - **Computador 1** → `C:\Users\Pc\Documents\Claude aplicacoes\trackdefi`
-  - **Computador 2** → `D:\Documents\Claude aplicacoes\trackdefi`
+## Ambiente
+**Perfil do dono, nomes dos computadores e caminhos das pastas ficam em
+`privado/AMBIENTE.md`** (fora do GitHub — este arquivo é público), importado
+aqui:
 
-  Este arquivo é lido nos dois — nunca escrever "aqui" ou "neste PC" ao falar
-  de pasta; dizer o número. Para saber em qual você está, olhe o caminho da
-  pasta de trabalho da sessão. É na pasta LOCAL que se edita, roda
-  testes/build e faz commits.
-- **Backup: `G:\Meu Drive\Claude aplicacoes\trackdefi`** (Google Drive). Após
-  CADA modificação, espelhar a pasta local no backup — usar `npm run salvar`
-  (scripts/salvar.cmd). O backup guarda também `ebook/`, `backups/`,
-  `gemini/` (que ficam fora do GitHub).
+@privado/AMBIENTE.md
+
+Se o import não carregou (clone novo, antes do `npm run retomar`), ler
+`privado/AMBIENTE.md` à mão antes de falar de pastas.
+
+- **2 computadores, nomes fixos: "Computador 1" e "Computador 2"** — nunca
+  "aqui" ou "neste PC".
+- **Backup no Google Drive.** Após CADA modificação, espelhar a pasta local
+  no backup — usar `npm run salvar` (scripts/salvar.cmd). O backup guarda
+  também `ebook/`, `backups/`, `gemini/` (que ficam fora do GitHub).
 - **Troca de computador:** `npm run retomar` ao chegar (git pull + npm
   install + pastas privadas do Drive); `npm run salvar` ao sair. O código
   viaja pelo **GitHub** (não pelo Drive). Ver `privado/COMO_RETOMAR.md`.

@@ -39,8 +39,12 @@ async function main() {
   const info = CHAINS[chainId];
   const reader = createReader(chainId);
   const r = reader as any;
-  const pool = "0xC8C90d3a1c1a24967E773ac2aD0d456BA3E31F64" as Address;
-  const nft = 1181755n;
+  /* NFT e pool vêm por argumento, sem padrão: o repo é público, e um NFT
+     fixo aqui ligava o projeto à carteira dona dele (limpeza de 26/09/2026). */
+  const [nftArg, poolArg] = process.argv.slice(2);
+  if (!nftArg || !poolArg) throw new Error("uso: npx tsx <este-arquivo> <nft-id> <endereço-do-pool>");
+  const pool = poolArg as Address;
+  const nft = BigInt(nftArg);
 
   const pos = (await r.readContract({ address: UNISWAP_V3_ROBINHOOD.nfpm, abi: nfpmAbi, functionName: "positions", args: [nft] })) as any[];
   const lower = Number(pos[5]), upper = Number(pos[6]);
@@ -67,9 +71,8 @@ async function main() {
   const dev0 = (wrapSub(in0, inside0Last) * L) / Q128;
   const dev1 = (wrapSub(in1, inside1Last) * L) / Q128;
   console.log("=== contraprova: taxas acumuladas desde o mint ===");
-  console.log(`  pela fórmula feeGrowthInside : ${Number(dev0) / 1e6} USDG + ${Number(dev1) / 1e18} HIMS`);
-  console.log(`  tokensOwed gravado na posição: ${Number(pos[10]) / 1e6} USDG + ${Number(pos[11]) / 1e18} HIMS`);
-  console.log(`  (o site mostra ~0,0412 USDG + 0,000355 HIMS via collect() simulado)`);
+  console.log(`  pela fórmula feeGrowthInside : ${dev0} (token0, cru) + ${dev1} (token1, cru)`);
+  console.log(`  tokensOwed gravado na posição: ${pos[10]} (token0, cru) + ${pos[11]} (token1, cru)`);
 
   // ---- CONTRAPROVA 2: o caminho de produção, janela por janela
   console.log("\n=== readPositionFeeWindows (código de produção) ===");
@@ -78,10 +81,14 @@ async function main() {
   const comIdade = await readPositionFeeWindows(reader, [alvo], bloco, info.secPerBlock, (m) => console.log("   aviso:", m));
   const semIdade = await readPositionFeeWindows(reader, [{ ...alvo, inside0Last: null }], bloco, info.secPerBlock, () => {});
 
-  const precos = { u: 1.0, h: 28.21 };
+  // preços e valor da posição por argumento — nada da posição de origem fixo aqui
+  const [p0Arg, p1Arg, valorArg] = process.argv.slice(4);
+  if (!p0Arg || !p1Arg || !valorArg)
+    throw new Error("uso: npx tsx poc/probe-fee-inside-check.ts <nft-id> <pool> <preço0-usd> <preço1-usd> <valor-da-posição-usd>");
+  const precos = { u: Number(p0Arg), h: Number(p1Arg) };
   const apr = (w: any) => w && computeOnchainFeeApr({
     delta0: w.delta0, delta1: w.delta1, posLiquidity: L, windowSec: w.windowSec,
-    decimals0: 6, decimals1: 18, price0Usd: precos.u, price1Usd: precos.h, positionValueUsd: 193.04,
+    decimals0: 6, decimals1: 18, price0Usd: precos.u, price1Usd: precos.h, positionValueUsd: Number(valorArg),
   });
   const a = comIdade.byTarget.get("rwa")?.[0], b = semIdade.byTarget.get("rwa")?.[0];
   console.log(`  COM guarda de idade : janela ${a ? a.windowSec / 60 + " min" : "—"} → ${apr(a)?.toFixed(2) ?? "—"}% a.a.`);

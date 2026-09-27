@@ -125,6 +125,20 @@ export interface LockPosition {
   rewards: LockReward[];
 }
 
+/**
+ * O que um aviso de adapter significa PARA O VISITANTE, em forma de dado (o
+ * texto em inglês sai da tela, em `app/ui/notices.ts`). Até 26/09/2026 a tela
+ * mostrava um "N warnings… Refresh to retry" genérico para tudo, e quem via
+ * um token sem preço achava que era aquilo e que recarregar resolveria.
+ *
+ * - omitido (undefined): falha de leitura — algo pode faltar, recarregar ajuda;
+ * - `capped` / `hooks`: limite conhecido — recarregar NÃO muda nada;
+ * - `null`: só log interno, o visitante não tem o que fazer com isso.
+ */
+export type AdapterNotice = { kind: "capped"; checked: number } | { kind: "hooks"; positions: number };
+
+export type WarnSink = (msg: string, notice?: AdapterNotice | null) => void;
+
 export interface ProtocolAdapter {
   readonly protocol: string;
   readonly chainId: number;
