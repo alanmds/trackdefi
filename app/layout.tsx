@@ -118,6 +118,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <Link href="/roadmap">see the roadmap</Link> · <Link href="/changelog">what&apos;s new</Link> ·{" "}
               <Link href="/glossary">what each number means</Link>.
             </span>
+            <span>
+              <Link href="/feedback">Feedback</Link>
+            </span>
           </div>
         </footer>
         {/* tooltips no toque: o iPhone não mostra `title` (app/ui/TapTips.tsx) */}

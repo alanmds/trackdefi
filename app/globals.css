@@ -337,6 +337,73 @@ button {
   min-height: 1.4em;
 }
 
+/* ------------------------------------------------ formulário de sugestões
+   Mesma família do campo de busca (borda, raio, sombra), em coluna. */
+.feedback-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.feedback-field {
+  display: grid;
+  gap: 6px;
+}
+
+.feedback-field > span {
+  font-weight: 600;
+}
+
+.feedback-field em {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--ink-3);
+  font-size: 14px;
+}
+
+.feedback-field input,
+.feedback-field textarea {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.feedback-field textarea {
+  resize: vertical;
+  min-height: 140px;
+  line-height: 1.5;
+}
+
+.feedback-field input::placeholder,
+.feedback-field textarea::placeholder {
+  color: var(--ink-3);
+}
+
+/* campo-isca: fora da tela e do leitor de tela; robô preenche, pessoa não vê */
+.hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.feedback-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.feedback-sent {
+  margin-top: 22px;
+}
+
 .try-demo {
   margin-top: 14px;
   font-size: 14px;
