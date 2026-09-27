@@ -26,6 +26,7 @@ import {
 import { createReader } from "./chain";
 import { mapLimit } from "./util";
 import { orientRange } from "./math/ticks";
+import { redactUrls } from "./redact";
 
 export interface TokenAmountDTO {
   symbol: string;
@@ -433,7 +434,8 @@ export function buildResponse(params: {
     totalPositions: positions.length,
     positions: positions.length > maxPositions ? positions.slice(0, maxPositions) : positions,
     locks,
-    warnings,
+    // públicos (CORS *): erro do viem traz a URL do RPC, e a chave mora nela
+    warnings: warnings.map(redactUrls),
     notices: dedupeNotices(notices),
   };
 }
