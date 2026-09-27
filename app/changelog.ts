@@ -43,6 +43,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    date: "2026-09-27",
+    kind: "feature",
+    title: "Send us feedback",
+    body:
+      "Found a position we don't show, want a network added, or spotted a number that looks off? There's now a Feedback link at the bottom of every page. Every message is read by a person — leave an email if you'd like a reply.",
+  },
+  {
     date: "2026-09-26",
     kind: "improvement",
     title: "A new demo wallet",
@@ -69,13 +76,6 @@ export const CHANGELOG: ChangeEntry[] = [
     title: "Warnings that say what happened",
     body:
       "The yellow scan notice used to say only that something went wrong. Now each line tells you what: a network that didn't answer, or fees that were estimated because they couldn't be measured. It only suggests a refresh when a refresh can actually help. A \"—\" where a price should be now explains itself when you hover over it: some tokens have no reliable price, and that isn't an error. Claimable rewards also stopped hiding the priced part of a position just because one of its tokens has no price.",
-  },
-  {
-    date: "2026-09-25",
-    kind: "feature",
-    title: "Send us feedback",
-    body:
-      "Found a position we don't show, want a network added, or spotted a number that looks off? There's now a Feedback link at the bottom of every page. Every message is read by a person — leave an email if you'd like a reply.",
   },
   {
     date: "2026-09-25",
