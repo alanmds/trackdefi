@@ -18,7 +18,7 @@
 export {}; // arquivo-script
 
 import { createPublicClient, erc20Abi, fallback, http, parseAbi, type Address, type Chain } from "viem";
-import { fraxtal, ink, mode, soneium, unichain } from "viem/chains";
+import { celo, fraxtal, ink, lisk, metalL2, mode, soneium, superseed, swellchain, unichain } from "viem/chains";
 import { sugarAbi } from "../core/adapters/aerodrome/abi";
 
 /** Levantado dos `deployments/<chain>.env` do repo velodrome-finance/sugar
@@ -40,6 +40,8 @@ interface Candidate {
   chain: Chain;
   sugar: Address;
   rpcs: string[];
+  /** carteira de teste do .env da rede, quando difere da padrão (Celo) */
+  testWallet?: Address;
 }
 
 const CANDIDATES: Candidate[] = [
@@ -72,6 +74,19 @@ const CANDIDATES: Candidate[] = [
     chain: fraxtal,
     sugar: "0xCAaf4556fF489521d4c722CB275510B602d6276d",
     rpcs: ["https://rpc.frax.com", "https://fraxtal.drpc.org"],
+  },
+  /* A cauda (27/09/2026) — endereços dos `deployments/<chain>.env` do repo
+     velodrome-finance/sugar, lidos no mesmo dia. Mesmas factories "leaf". */
+  { name: "Lisk", chain: lisk, sugar: "0xD39E277B327705026dB4fb4E2b63E09ACBCD1754", rpcs: ["https://rpc.api.lisk.com", "https://lisk.drpc.org"] },
+  { name: "Swell", chain: swellchain, sugar: "0x6C0c56920D8B4273E489A5f2b5E39C1C610a7c38", rpcs: ["https://swell-mainnet.alt.technology", "https://swell.drpc.org"] },
+  { name: "Metal", chain: metalL2, sugar: "0x4ea3301ab7FBEdb21e70a01e242212B5ad0AF6fE", rpcs: ["https://rpc.metall2.com", "https://metall2.drpc.org"] },
+  { name: "Superseed", chain: superseed, sugar: "0x215cEad02e0b9E0E494DD179585C18a772048a43", rpcs: ["https://mainnet.superseed.xyz", "https://superseed.drpc.org"] },
+  {
+    name: "Celo",
+    chain: celo,
+    sugar: "0xa3a6F881A1Db3d5DA0F7c10659239F9FAdF74C5e",
+    rpcs: ["https://forno.celo.org", "https://celo.drpc.org"],
+    testWallet: "0x667EddE578BA64B5d9DeeaF3DB6d46506460a7A7", // o .env da Celo usa outra
   },
 ];
 
@@ -150,8 +165,10 @@ async function probe(c: Candidate): Promise<boolean> {
     return false;
   }
 
-  // 2. multicall3
-  const mc = await client.getCode({ address: MULTICALL3 });
+  // 2. multicall3 — no endereço que a PRÓPRIA rede declara (na Lisk não é o canônico)
+  const mcAddr = (c.chain.contracts?.multicall3?.address as Address | undefined) ?? MULTICALL3;
+  if (mcAddr.toLowerCase() !== MULTICALL3) info(`multicall3 fora do endereço canônico: ${mcAddr}`);
+  const mc = await client.getCode({ address: mcAddr });
   if (mc && mc !== "0x") ok(`multicall3 presente (${(mc.length - 2) / 2} bytes)`);
   else {
     bad("multicall3 NÃO encontrado — o ChainReader não funciona nesta rede");
@@ -182,7 +199,7 @@ async function probe(c: Candidate): Promise<boolean> {
       address: c.sugar,
       abi: sugarAbi,
       functionName: "positions",
-      args: [200n, 0n, TEST_WALLET],
+      args: [200n, 0n, c.testWallet ?? TEST_WALLET],
     })) as unknown[];
     ok(`struct Position decodifica · ${raw.length} posição(ões) da carteira de teste do repo`);
   } catch (e) {

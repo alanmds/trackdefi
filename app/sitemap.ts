@@ -11,9 +11,9 @@ import { SITE_URL } from "./site";
  * Não dá para tirar do git: a Vercel constrói sem o histórico completo.
  */
 const EDITADA_EM = {
-  home: "2026-09-26",
-  howItWorks: "2026-09-25",
-  roadmap: "2026-09-26",
+  home: "2026-09-27",
+  howItWorks: "2026-09-27",
+  roadmap: "2026-09-27",
   glossary: "2026-09-27",
 } as const;
 

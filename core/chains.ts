@@ -3,7 +3,23 @@
  * rótulo e RPCs. Adicionar rede = uma entrada aqui (Receita A do playbook).
  */
 
-import { arbitrum, base, fraxtal, ink, mainnet, mode, optimism, robinhood, soneium, unichain } from "viem/chains";
+import {
+  arbitrum,
+  base,
+  celo,
+  fraxtal,
+  ink,
+  lisk,
+  mainnet,
+  metalL2,
+  mode,
+  optimism,
+  robinhood,
+  soneium,
+  superseed,
+  swellchain,
+  unichain,
+} from "viem/chains";
 import type { Chain } from "viem";
 
 export interface ChainInfo {
@@ -176,6 +192,70 @@ export const CHAINS: Record<number, ChainInfo> = {
     secPerBlock: 2,
     rpcEnv: "FRAXTAL_RPC_URLS",
     defaultRpcs: ["https://rpc.frax.com", "https://fraxtal-rpc.publicnode.com", "https://fraxtal.drpc.org"],
+  },
+  /* A cauda da Superchain (27/09/2026, poc/probe-superchain.ts 5/5 verde).
+     secPerBlock MEDIDO sobre 10 mil blocos. priceSlug confirmado pedindo um
+     preço real só na Lisk e na Celo — Swell, Metal L2 e Superseed NÃO têm
+     cobertura de preço na DefiLlama (conferido pela lista oficial de redes
+     dela): lá as posições saem com quantidade exata e valor "—". Os slugs
+     delas seguem o padrão da DefiLlama para funcionarem sozinhos no dia em
+     que a cobertura chegar. Nenhuma das cinco tem pools da Velodrome no
+     dataset de APR. */
+  1135: {
+    chain: lisk,
+    label: "Lisk",
+    priceSlug: "lisk",
+    yieldsLabel: "Lisk",
+    explorerUrl: "https://blockscout.lisk.com",
+    explorerLabel: "Blockscout",
+    secPerBlock: 2,
+    rpcEnv: "LISK_RPC_URLS",
+    defaultRpcs: ["https://rpc.api.lisk.com", "https://lisk.drpc.org"],
+  },
+  1923: {
+    chain: swellchain,
+    label: "Swell",
+    priceSlug: "swellchain",
+    yieldsLabel: "Swellchain",
+    explorerUrl: "https://explorer.swellnetwork.io",
+    explorerLabel: "Swell Explorer",
+    secPerBlock: 2,
+    rpcEnv: "SWELL_RPC_URLS",
+    // o RPC que a viem sugere (swell-mainnet.alt.technology) não resolve mais — 27/09/2026
+    defaultRpcs: ["https://swell.drpc.org"],
+  },
+  1750: {
+    chain: metalL2,
+    label: "Metal L2",
+    priceSlug: "metal",
+    yieldsLabel: "Metal L2",
+    explorerUrl: "https://explorer.metall2.com",
+    explorerLabel: "Metal Explorer",
+    secPerBlock: 2,
+    rpcEnv: "METAL_RPC_URLS",
+    defaultRpcs: ["https://rpc.metall2.com", "https://metall2.drpc.org"],
+  },
+  5330: {
+    chain: superseed,
+    label: "Superseed",
+    priceSlug: "superseed",
+    yieldsLabel: "Superseed",
+    explorerUrl: "https://explorer.superseed.xyz",
+    explorerLabel: "Superseed Explorer",
+    secPerBlock: 2,
+    rpcEnv: "SUPERSEED_RPC_URLS",
+    defaultRpcs: ["https://mainnet.superseed.xyz", "https://superseed.drpc.org"],
+  },
+  42220: {
+    chain: celo,
+    label: "Celo",
+    priceSlug: "celo",
+    yieldsLabel: "Celo",
+    explorerUrl: "https://celoscan.io",
+    explorerLabel: "Celoscan",
+    secPerBlock: 1,
+    rpcEnv: "CELO_RPC_URLS",
+    defaultRpcs: ["https://forno.celo.org", "https://celo.drpc.org"],
   },
 };
 

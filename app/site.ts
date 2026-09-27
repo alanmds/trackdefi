@@ -57,6 +57,11 @@ export const NETWORKS = [
   { label: "Mode", name: "Mode" },
   { label: "Soneium", name: "Soneium" },
   { label: "Fraxtal", name: "Fraxtal" },
+  { label: "Lisk", name: "Lisk" },
+  { label: "Swell", name: "Swell" },
+  { label: "Metal L2", name: "Metal L2" },
+  { label: "Superseed", name: "Superseed" },
+  { label: "Celo", name: "Celo" },
 ] as const;
 
 /** nomes por extenso, na ordem de exibição */
@@ -97,7 +102,19 @@ export const COVERAGE = [
   { protocol: "Aerodrome", networks: ["Base"] as readonly string[] },
   {
     protocol: "Velodrome",
-    networks: ["Optimism", "Unichain", "Ink", "Mode", "Soneium", "Fraxtal"] as readonly string[],
+    networks: [
+      "Optimism",
+      "Unichain",
+      "Ink",
+      "Mode",
+      "Soneium",
+      "Fraxtal",
+      "Lisk",
+      "Swell",
+      "Metal L2",
+      "Superseed",
+      "Celo",
+    ] as readonly string[],
   },
   {
     protocol: "Uniswap v3",

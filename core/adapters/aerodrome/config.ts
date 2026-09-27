@@ -97,8 +97,8 @@ const XVELO: Address = "0x7f9AdFbd38b669F03d1d11000Bc76b9AaEA28A81";
 const LEAF_TEST_WALLET: Address = "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac";
 
 /** monta a config de uma leaf chain — só o LP_SUGAR difere entre elas */
-function leafChain(chainId: number, sugar: Address): SugarChainConfig {
-  return { protocol: "velodrome", chainId, sugar, factories: LEAF_FACTORIES, emissionsToken: XVELO, testWallet: LEAF_TEST_WALLET };
+function leafChain(chainId: number, sugar: Address, testWallet: Address = LEAF_TEST_WALLET): SugarChainConfig {
+  return { protocol: "velodrome", chainId, sugar, factories: LEAF_FACTORIES, emissionsToken: XVELO, testWallet };
 }
 
 export const VELODROME_MODE = leafChain(34443, "0x1A3C63c8D442948085E47f88CB377183E23EA01f");
@@ -107,6 +107,22 @@ export const VELODROME_UNICHAIN = leafChain(130, "0xE002AF2176f604C250c6C368baB5
 export const VELODROME_SONEIUM = leafChain(1868, "0x7A0225110765d2A14652323733f616215c5509cf");
 export const VELODROME_FRAXTAL = leafChain(252, "0xCAaf4556fF489521d4c722CB275510B602d6276d");
 
+/* A cauda (27/09/2026) — LP_SUGAR dos `deployments/<chain>.env` do repo
+   velodrome-finance/sugar; poc/probe-superchain.ts 5/5 verde (mesmo bytecode
+   de 22.335 bytes, XVELO no mesmo endereço, struct decodifica). O LP_SUGAR da
+   Superseed tem o MESMO endereço do da Ink — deploy determinístico em redes
+   diferentes, conferido com bytecode vivo nas duas. */
+export const VELODROME_LISK = leafChain(1135, "0xD39E277B327705026dB4fb4E2b63E09ACBCD1754");
+export const VELODROME_SWELL = leafChain(1923, "0x6C0c56920D8B4273E489A5f2b5E39C1C610a7c38");
+export const VELODROME_METAL = leafChain(1750, "0x4ea3301ab7FBEdb21e70a01e242212B5ad0AF6fE");
+export const VELODROME_SUPERSEED = leafChain(5330, "0x215cEad02e0b9E0E494DD179585C18a772048a43");
+/** a Celo é a única com outra carteira de teste no .env do repo */
+export const VELODROME_CELO = leafChain(
+  42220,
+  "0xa3a6F881A1Db3d5DA0F7c10659239F9FAdF74C5e",
+  "0x667EddE578BA64B5d9DeeaF3DB6d46506460a7A7",
+);
+
 /** as leaf chains, na ordem em que entram no registry */
 export const VELODROME_LEAF_CHAINS: SugarChainConfig[] = [
   VELODROME_MODE,
@@ -114,6 +130,11 @@ export const VELODROME_LEAF_CHAINS: SugarChainConfig[] = [
   VELODROME_UNICHAIN,
   VELODROME_SONEIUM,
   VELODROME_FRAXTAL,
+  VELODROME_LISK,
+  VELODROME_SWELL,
+  VELODROME_METAL,
+  VELODROME_SUPERSEED,
+  VELODROME_CELO,
 ];
 
 // compatibilidade com código/testes existentes (Base)

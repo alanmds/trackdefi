@@ -44,6 +44,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 export const CHANGELOG: ChangeEntry[] = [
   {
     date: "2026-09-27",
+    kind: "network",
+    title: "Five more networks: Lisk, Swell, Metal L2, Superseed and Celo",
+    body:
+      "Velodrome positions on Lisk, Swell, Metal L2, Superseed and Celo now show up too — staked ones included, with pending XVELO emissions. That completes Velodrome's Superchain deployment. Public price data barely covers Swell, Metal L2 and Superseed yet, so many positions there show exact amounts with \"—\" in place of a dollar value.",
+  },
+  {
+    date: "2026-09-27",
     kind: "improvement",
     title: "Fewer \"—\": prices from the pool itself",
     body:

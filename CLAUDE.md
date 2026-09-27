@@ -63,10 +63,11 @@ Se o import não carregou (clone novo, antes do `npm run retomar`), ler
   **distribuição é a frente da vez**.
 - `ebook/` (gitignored, local) — plano de monetização (material interno).
 
-## Estado atual (ago/2026)
-**10 redes** (Base, Optimism, Ethereum, Arbitrum, Robinhood Chain +
-Unichain, Ink, Mode, Soneium e Fraxtal, as leaf chains da Superchain que
-entraram em 10/08) · 3 protocolos (Aerodrome, Velodrome, Uniswap v3).
+## Estado atual (set/2026)
+**15 redes** (Base, Optimism, Ethereum, Arbitrum, Robinhood Chain + as leaf
+chains da Superchain da Velodrome: Unichain, Ink, Mode, Soneium e Fraxtal
+desde 10/08; Lisk, Swell, Metal L2, Superseed e Celo desde 27/09) ·
+protocolos Aerodrome, Velodrome, Uniswap v3 e Uniswap v4 (Robinhood).
 Roadmap público em `/roadmap`.
 **Nenhum texto do site escreve nome de rede à mão** — tudo sai de `NETWORKS`
 em `app/site.ts`, com teste que impede envelhecer.
