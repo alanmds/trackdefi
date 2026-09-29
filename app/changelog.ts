@@ -43,6 +43,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    date: "2026-09-29",
+    kind: "project",
+    title: "What it costs to build trackdefi, in the open",
+    body:
+      "A note at the top of every page now shows how many hours of work and how many dollars the site has taken so far, with the tip address next to it. Tips are optional — the tracker stays free and read-only either way.",
+  },
+  {
     date: "2026-09-27",
     kind: "network",
     title: "Five more networks: Lisk, Swell, Metal L2, Superseed and Celo",

@@ -1314,3 +1314,31 @@ a.chip:hover {
     animation: none;
   }
 }
+
+/* faixa de custo do projeto, no topo de toda página (app/ui/CostBar.tsx) */
+.costbar {
+  border-bottom: 1px dashed var(--border);
+  padding: 8px 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.costbar .container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.costbar-short {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .costbar-full {
+    display: none;
+  }
+  .costbar-short {
+    display: inline;
+  }
+}

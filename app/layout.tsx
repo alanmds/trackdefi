@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Fraunces, Inter } from "next/font/google";
 import { COVERAGE, humanList, NETWORK_NAMES, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "./site";
+import CostBar from "./ui/CostBar";
 import DonateLine from "./ui/DonateLine";
 import SiteAnalytics from "./ui/SiteAnalytics";
 import TapTips from "./ui/TapTips";
@@ -91,6 +92,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
+        <CostBar />
         <header className="site-header">
           <div className="container">
             <Link href="/" className="brand">

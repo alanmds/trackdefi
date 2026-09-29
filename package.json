@@ -11,7 +11,8 @@
     "check-api": "tsx poc/check-api.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "retomar": "scripts\\retomar.cmd",
+    "horas": "node scripts/horas.mjs",
+    "retomar":"scripts\\retomar.cmd",
     "salvar": "scripts\\salvar.cmd"
   },
   "dependencies": {
