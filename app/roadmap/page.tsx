@@ -128,6 +128,13 @@ export default function Roadmap() {
         <li>
           <Status kind="planned" />
           <span>
+            <strong>BNB Chain · PancakeSwap v3</strong>
+            {" — the largest exchange on BNB Chain, read the same way as Uniswap v3: concentrated positions, amounts, price ranges and pending fees."}
+          </span>
+        </li>
+        <li>
+          <Status kind="planned" />
+          <span>
             <strong>Solana · Orca</strong>
             {" — our first network outside the Ethereum family. A proof of concept already reads Orca positions from public data — amounts, price range, in-range status, pending fees and rewards — so the work left is plumbing, not research. Raydium and Meteora would follow."}
           </span>

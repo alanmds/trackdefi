@@ -46,3 +46,10 @@ export const UNISWAP_V4_CHAINS: UniV4ChainConfig[] = [UNISWAP_V4_ROBINHOOD];
 
 /** teto de NFTs de posição por carteira (evita carteira-robô derrubar a varredura) */
 export const MAX_V4_NFTS = 400;
+
+/** varredura de `Transfer`: faixa (em blocos) abaixo da qual não se parte mais, só se repete */
+export const MIN_LOG_SPAN = 200_000n;
+/** repetições de uma faixa curta que o RPC recusou */
+export const LOG_RETRIES = 2;
+/** teto de chamadas `getLogs` por varredura (não martelar o RPC) */
+export const MAX_LOG_CALLS = 200;

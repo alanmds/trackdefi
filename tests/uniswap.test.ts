@@ -144,14 +144,20 @@ describe("UniswapV3Adapter", () => {
     reader.readContract = async () => 5000n;
     const warnings: string[] = [];
     const seen: number[] = [];
+    const indices: bigint[] = [];
     const original = reader.multicall.bind(reader);
     reader.multicall = async (args) => {
-      if (args.contracts[0]?.functionName === "tokenOfOwnerByIndex") seen.push(args.contracts.length);
+      if (args.contracts[0]?.functionName === "tokenOfOwnerByIndex") {
+        seen.push(args.contracts.length);
+        for (const c of args.contracts) indices.push(c.args![1] as bigint);
+      }
       return original(args);
     };
     const adapter = new UniswapV3Adapter(reader, { maxNfts: 3, onWarn: (m) => warnings.push(m) });
     await adapter.getPositions(OWNER);
     expect(seen[0]).toBe(3);
     expect(warnings.some((w) => w.includes("5000"))).toBe(true);
+    // lê os MAIS RECENTES (índices do fim), não os 3 primeiros
+    expect(indices).toEqual([4999n, 4998n, 4997n]);
   });
 });

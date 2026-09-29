@@ -44,6 +44,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 export const CHANGELOG: ChangeEntry[] = [
   {
     date: "2026-09-29",
+    kind: "improvement",
+    title: "Uniswap v3: wallets with thousands of NFTs no longer show empty",
+    body:
+      "Bots and heavy traders can hold thousands of position NFTs. We used to read only the oldest 1,000, which are mostly closed, so a wallet with open positions could show none at all. We now read the newest 1,000 first.",
+  },
+  {
+    date: "2026-09-29",
     kind: "project",
     title: "What it costs to build trackdefi, in the open",
     body:

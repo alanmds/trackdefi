@@ -131,18 +131,21 @@ export class UniswapV3Adapter implements ProtocolAdapter {
 
     const count = Number(balance > BigInt(this.maxNfts) ? BigInt(this.maxNfts) : balance);
     if (balance > BigInt(this.maxNfts)) {
-      this.warn(`uniswap: carteira tem ${balance} NFTs de posição; enumerando só os primeiros ${this.maxNfts}`, {
+      this.warn(`uniswap: carteira tem ${balance} NFTs de posição; enumerando só os ${this.maxNfts} mais recentes`, {
         kind: "capped",
         checked: this.maxNfts,
       });
     }
 
+    // Do índice mais alto para o mais baixo: `tokenOfOwnerByIndex` devolve os
+    // NFTs na ordem em que chegaram à carteira, e em carteira-robô as posições
+    // abertas são as mais novas — as antigas já foram encerradas.
     const idResults = await this.reader.multicall({
       contracts: Array.from({ length: count }, (_, i) => ({
         address: this.nfpm,
         abi: nfpmAbi,
         functionName: "tokenOfOwnerByIndex",
-        args: [account, BigInt(i)],
+        args: [account, balance - 1n - BigInt(i)],
       })),
       allowFailure: true,
     });

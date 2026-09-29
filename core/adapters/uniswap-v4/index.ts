@@ -43,11 +43,20 @@ import {
   type PoolKey,
   type V4RawPosition,
 } from "./abi";
-import { MAX_V4_NFTS, UNISWAP_V4_ROBINHOOD, type UniV4ChainConfig } from "./config";
+import {
+  LOG_RETRIES,
+  MAX_LOG_CALLS,
+  MAX_V4_NFTS,
+  MIN_LOG_SPAN,
+  UNISWAP_V4_ROBINHOOD,
+  type UniV4ChainConfig,
+} from "./config";
 
 export interface UniswapV4Options {
   config?: UniV4ChainConfig;
   maxNfts?: number;
+  /** espera-base entre repetições de uma faixa de logs recusada (testes usam 0) */
+  retryDelayMs?: number;
   onWarn?: WarnSink;
 }
 
@@ -59,6 +68,7 @@ export class UniswapV4Adapter implements ProtocolAdapter {
   private readonly stateView: Address;
   private readonly poolManager: Address;
   private readonly maxNfts: number;
+  private readonly retryDelayMs: number;
   private readonly warn: WarnSink;
 
   constructor(
@@ -71,6 +81,7 @@ export class UniswapV4Adapter implements ProtocolAdapter {
     this.stateView = config.stateView;
     this.poolManager = config.poolManager;
     this.maxNfts = opts.maxNfts ?? MAX_V4_NFTS;
+    this.retryDelayMs = opts.retryDelayMs ?? 400;
     this.warn = opts.onWarn ?? (() => {});
   }
 
@@ -149,6 +160,43 @@ export class UniswapV4Adapter implements ProtocolAdapter {
   }
 
   /**
+   * `Transfer(to = carteira)` na faixa inteira; se o RPC recusar (faixa larga
+   * demais, resposta grande, falha passageira), parte a faixa ao meio e tenta
+   * cada metade, e uma faixa já pequena é repetida com espera crescente. Um
+   * pedaço que nunca responde derruba a varredura toda: lista parcial lida
+   * como "é tudo que tenho" é pior que aviso.
+   */
+  private async getLogsAdaptive(account: Address, from: bigint, to: bigint) {
+    const budget = { calls: 0 };
+    const scan = async (a: bigint, b: bigint): Promise<{ args: Record<string, unknown> }[]> => {
+      let lastError: unknown;
+      // faixa curta: só vale repetir; faixa longa: parte ao meio já na 1ª recusa
+      const attempts = b - a < MIN_LOG_SPAN ? LOG_RETRIES + 1 : 1;
+      for (let attempt = 0; attempt < attempts; attempt++) {
+        if (++budget.calls > MAX_LOG_CALLS) throw new Error("varredura de histórico excedeu o limite de chamadas");
+        try {
+          return await this.reader.getLogs!({
+            address: this.positionManager,
+            event: transferEvent,
+            args: { to: account },
+            fromBlock: a,
+            toBlock: b,
+          });
+        } catch (e) {
+          lastError = e;
+          if (attempt + 1 < attempts) await new Promise((r) => setTimeout(r, this.retryDelayMs * (attempt + 1)));
+        }
+      }
+      if (b - a < MIN_LOG_SPAN) throw lastError;
+      const mid = a + (b - a) / 2n;
+      const left = await scan(a, mid);
+      const right = await scan(mid + 1n, b);
+      return [...left, ...right];
+    };
+    return scan(from, to);
+  }
+
+  /**
    * NFTs da carteira. Duas etapas, porque o histórico só diz o que ENTROU:
    * `Transfer(to = carteira)` dá os candidatos, e `ownerOf` descarta os que
    * já saíram.
@@ -162,13 +210,7 @@ export class UniswapV4Adapter implements ProtocolAdapter {
     let candidatos: bigint[];
     try {
       const head = await this.reader.getBlockNumber();
-      const logs = await this.reader.getLogs({
-        address: this.positionManager,
-        event: transferEvent,
-        args: { to: account },
-        fromBlock: 0n,
-        toBlock: head,
-      });
+      const logs = await this.getLogsAdaptive(account, 0n, head);
       candidatos = [...new Set(logs.map((l) => l.args.tokenId as bigint).filter((id) => id != null))];
     } catch (e) {
       // RPC que limita a faixa de blocos cai aqui. Melhor avisar alto do que
