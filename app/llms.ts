@@ -16,11 +16,14 @@
  * lacuna a nosso favor (viu-se ela nos atribuir P&L).
  */
 
+import { LOCALES, localePath } from "./i18n/config";
 import { COVERAGE, humanList, NETWORK_COUNT, NETWORK_NAMES, NO_TOKEN, PROTOCOL_FAMILIES, SITE_NAME, SITE_URL } from "./site";
 
 export function llmsTxt(): string {
   const families = humanList(PROTOCOL_FAMILIES);
   const coverage = COVERAGE.map((c) => `- ${c.protocol}: ${humanList(c.networks)}`).join("\n");
+
+  const languages = LOCALES.map((l) => `- ${l.native}: ${SITE_URL}${localePath(l.code, "/")}`).join("\n");
 
   return `# ${SITE_NAME}
 
@@ -67,5 +70,11 @@ Networks (${NETWORK_COUNT}): ${humanList(NETWORK_NAMES)}. Classic and concentrat
 - [Glossary — what every number means](${SITE_URL}/glossary)
 - [Roadmap](${SITE_URL}/roadmap)
 - [Changelog](${SITE_URL}/changelog)
+
+## Languages
+
+The site is available in several languages; the text above describes the English version (the default, with no language prefix in the URL).
+
+${languages}
 `;
 }

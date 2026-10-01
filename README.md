@@ -56,6 +56,9 @@ comes from.
 - **DefiLlama**, then **DexScreener** — USD prices (free, no key); when neither
   covers a token, its price is read from a pool on the same network. DefiLlama
   also provides pool yield data
+- **Languages** — English (default, no URL prefix) and Brazilian Portuguese
+  (`/pt-br`); adding one is a dictionary folder plus a line in
+  `app/i18n/config.ts`
 - **Vercel** — hosting; **Vercel Analytics** — cookieless usage stats
 
 ## Architecture
@@ -79,9 +82,11 @@ core/            pure engine, testable without a UI
   yields/        position-level APR ("what is this position earning now")
   adapters/      aerodrome/ (Sugar family) · uniswap-v3/ · registry.ts
 app/             Next.js site + /api/positions
-  w/[address]/   wallet results page
-  how-it-works/  trust / safety page
-  roadmap/       what's live and what's next
+  [lang]/        every page, once per language (w/[address] wallet results,
+                 how-it-works, glossary, roadmap, changelog, feedback)
+  i18n/          languages, dictionaries (messages/<lang>/) and SEO helpers
+  ui/            components, number/date formatting
+proxy.ts         language routing: English has no URL prefix, others do (/pt-br)
 tests/           unit tests with frozen real-wallet fixtures
 poc/             CLI + validation scripts (see below)
 ```

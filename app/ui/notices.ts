@@ -12,68 +12,72 @@
  * 2. Preço ausente não é erro do site: a fonte não cobre o token. A tela diz
  *    isso — a não ser que a fonte de preços tenha falhado nesta varredura,
  *    caso em que recarregar PODE resolver.
+ *
+ * As frases vêm do dicionário (`ui.notices`); toda função recebe o `I18n` da
+ * página (`useI18n()`), e os testes passam o do inglês.
  */
 
 import type { ScanNotice } from "../../core/service";
 import { CHAINS } from "../../core/chains";
-import { protocolLabel } from "./format";
+import { GRAMMAR } from "../i18n/config";
+import { fill, pl } from "../i18n/rich";
+import type { I18n } from "../i18n/provider";
+import { fmtInt, protocolLabel } from "./format";
 
-function where(protocol: string, chainId: number): string {
-  return `${protocolLabel(protocol)} on ${CHAINS[chainId]?.label ?? `chain ${chainId}`}`;
+function where(i18n: I18n, protocol: string, chainId: number): string {
+  return fill(i18n.ui.notices.where, {
+    protocol: protocolLabel(protocol),
+    network: CHAINS[chainId]?.label ?? fill(i18n.ui.common.chainFallback, { id: chainId }),
+  });
 }
 
-function plural(n: number, one: string, many: string): string {
-  return n === 1 ? one : many;
-}
-
-export function noticeText(n: ScanNotice): { text: string; retry: boolean } {
+export function noticeText(n: ScanNotice, i18n: I18n): { text: string; retry: boolean } {
+  const { locale, ui } = i18n;
+  const t = ui.notices;
   switch (n.kind) {
     case "source":
-      return { text: `Couldn't read ${where(n.protocol, n.chainId)} — positions there are missing from this list.`, retry: true };
+      return { text: fill(t.source, { where: where(i18n, n.protocol, n.chainId) }), retry: true };
     case "partial":
-      return { text: `Some data from ${where(n.protocol, n.chainId)} didn't load, so a position or reward may be missing.`, retry: true };
+      return { text: fill(t.partial, { where: where(i18n, n.protocol, n.chainId) }), retry: true };
     case "locks":
-      return { text: `Couldn't read governance locks on ${where(n.protocol, n.chainId)}.`, retry: true };
+      return { text: fill(t.locks, { where: where(i18n, n.protocol, n.chainId) }), retry: true };
     case "prices":
-      return { text: `The price service didn't answer for some tokens, so their dollar values show "—".`, retry: true };
+      return { text: t.prices, retry: true };
     case "apr":
-      return { text: `Pool APR data didn't load, so pool averages show "—".`, retry: true };
+      return { text: t.apr, retry: true };
     case "fees":
-      return {
-        text:
-          `Live fee measurement wasn't available for ${n.positions} ${plural(n.positions, "position", "positions")} — ` +
-          `${plural(n.positions, "its", "their")} fee rate is estimated from pool-wide data where possible.`,
-        retry: false,
-      };
+      return { text: pl(locale, t.fees, n.positions), retry: false };
     case "capped":
       return {
-        text: `This wallet holds a very large number of position NFTs on ${where(n.protocol, n.chainId)}; only ${n.checked.toLocaleString("en-US")} were checked.`,
+        text: fill(t.capped, { where: where(i18n, n.protocol, n.chainId), checked: fmtInt(n.checked, locale) }),
         retry: false,
       };
     case "hooks":
       return {
-        text:
-          `${n.positions} ${where(n.protocol, n.chainId)} ${plural(n.positions, "position sits", "positions sit")} in a pool with a custom hook — ` +
-          `any extra rewards the hook pays aren't counted.`,
+        text: pl(locale, t.hooks, n.positions, { where: where(i18n, n.protocol, n.chainId) }),
         retry: false,
       };
   }
 }
 
 /** "XYZ", "XYZ and ABC", "XYZ, ABC and FOO" */
-function listSymbols(symbols: string[]): string {
+function listSymbols(symbols: string[], i18n: I18n): string {
   const u = [...new Set(symbols)];
-  if (u.length <= 1) return u[0] ?? "this token";
-  return `${u.slice(0, -1).join(", ")} and ${u[u.length - 1]}`;
+  if (u.length <= 1) return u[0] ?? i18n.ui.notices.thisToken;
+  // mesmo conector do resto do site (`GRAMMAR` em i18n/config): "A, B e C"
+  return `${u.slice(0, -1).join(", ")} ${GRAMMAR[i18n.locale].and} ${u[u.length - 1]}`;
 }
 
 /** tooltip de qualquer "—" que venha de token sem preço */
-export function noPriceTip(symbols: string[], pricesFailed: boolean): string {
-  const quem = listSymbols(symbols);
-  const it = new Set(symbols).size > 1 ? "them" : "it";
-  return pricesFailed
-    ? `No USD price for ${quem} right now — either our price source doesn't cover ${it}, or it didn't answer this time (see the warning above).`
-    : `No reliable USD price for ${quem} — our price source doesn't cover ${it}, so ${it === "it" ? "it gets" : "they get"} no dollar value instead of a guess. This isn't an error; refreshing won't change it.`;
+export function noPriceTip(symbols: string[], pricesFailed: boolean, i18n: I18n): string {
+  const t = i18n.ui.notices;
+  const many = new Set(symbols).size > 1;
+  const vars = {
+    who: listSymbols(symbols, i18n),
+    them: many ? t.itMany : t.itOne,
+    they: many ? t.getsMany : t.getsOne,
+  };
+  return fill(pricesFailed ? t.noPriceFailed : t.noPrice, vars);
 }
 
 /**
@@ -81,17 +85,13 @@ export function noPriceTip(symbols: string[], pricesFailed: boolean): string {
  * (27/09/2026): o número é o do pool, mesmo distorcido — a tela só diz de
  * onde ele veio, sem esconder nem "corrigir".
  */
-export function poolPriceTip(symbol: string): string {
-  return `Priced from a pool: our price sources don't cover ${symbol}, so this is ${symbol}'s price inside a pool on this network right now — this position's own pool whenever it can be. A small or thin pool can price it differently from other markets.`;
+export function poolPriceTip(symbol: string, i18n: I18n): string {
+  return fill(i18n.ui.notices.poolPrice, { symbol });
 }
 
 /** tooltip dos avisos de "sem preço" no topo da página */
-export function noPriceSummaryTip(what: "positions" | "rewards", pricesFailed: boolean): string {
-  const base =
-    what === "positions"
-      ? `These positions hold a token our price source doesn't cover, so they're left out of the total instead of guessed.`
-      : `Some claimable tokens have no price in our price source, so they're left out of this total instead of guessed. The amounts are listed on each card.`;
-  return pricesFailed
-    ? `${base} The price service also failed to answer for some tokens this time — refreshing may bring those back.`
-    : `${base} This isn't an error; refreshing won't change it.`;
+export function noPriceSummaryTip(what: "positions" | "rewards", pricesFailed: boolean, i18n: I18n): string {
+  const t = i18n.ui.notices;
+  const base = what === "positions" ? t.summaryPositions : t.summaryRewards;
+  return `${base} ${pricesFailed ? t.summaryFailed : t.summaryNotError}`;
 }

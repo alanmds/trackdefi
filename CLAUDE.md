@@ -12,7 +12,8 @@ Vercel e não chega aqui por git nem pelo Drive. Na dúvida sobre o que está
 valendo, ler o site (`/robots.txt`, `/sitemap.xml`) ou rodar
 `npx tsx poc/validate-live.ts <URL>`. Pendências em `privado/PENDENCIAS.md`.
 
-Idioma de trabalho: **português**. Site: **inglês**. Windows.
+Idioma de trabalho: **português**. Site: **inglês** (padrão, sem prefixo na URL)
+e **português do Brasil** (`/pt-br`) — ver "Idiomas" abaixo. Windows.
 
 ## Ambiente
 **Perfil do dono, nomes dos computadores e caminhos das pastas ficam em
@@ -72,6 +73,30 @@ Roadmap público em `/roadmap`.
 **Nenhum texto do site escreve nome de rede à mão** — tudo sai de `NETWORKS`
 em `app/site.ts`, com teste que impede envelhecer.
 
+## Idiomas (i18n) — desde 30/09/2026
+O site fala **inglês** (padrão, URL sem prefixo: `/roadmap`) e **pt-BR**
+(`/pt-br/roadmap`). A meta é muitos idiomas, então a estrutura já é de N:
+- Páginas vivem em `app/[lang]/…`; `proxy.ts` reescreve `/x` → `/en/x` e
+  redireciona `/en/x` → `/x` (as URLs já indexadas não mudam).
+- **Texto nenhum fica em componente ou página.** Tudo mora em
+  `app/i18n/messages/<idioma>/`: `ui.ts` (o que o navegador lê), `pages.ts`
+  (páginas e metadados, só servidor) e `changelog.ts` (traduções por `id`).
+  O inglês é o idioma-mãe: o TypeScript obriga os outros a ter as mesmas chaves.
+- Marcadores nos textos: `{valor}`, `<b>…</b>`/`<link>…</link>` (função `rich`),
+  plural `{ one, other }` (função `pl`). Link interno sempre por
+  `localePath(lang, "/x")`; número/data sempre por `ui/format.ts` com o idioma.
+- **Mudança que o usuário percebe = texto novo em TODOS os idiomas, no mesmo
+  commit.** Entrada nova em `app/changelog.ts` (em inglês, com `id`) exige a
+  tradução em cada `messages/<idioma>/changelog.ts`; `tests/i18n.test.ts`
+  quebra se faltar, se perder um `{valor}` ou se o glossário citar um rótulo
+  diferente do que a tela mostra.
+- Idioma novo: linha em `LOCALES` e `GRAMMAR` (`app/i18n/config.ts`), pasta
+  `messages/<código>/`, registro em `app/i18n/get.ts`, lista de palavras de
+  golpe em `tests/i18n.test.ts` (frases de doação). Sitemap, hreflang, robots e
+  seletor de idioma saem da lista. Fonte nova só para alfabeto não latino.
+- Tradução é feita pelo Claude e **vai ao Alan antes do push** quando toca
+  privacidade, dinheiro ou promessa pública (sem token, somente leitura, gorjetas).
+
 ## Stack e arquitetura
 - Next.js (App Router) + TypeScript + viem. Preços: DefiLlama. Deploy: Vercel.
 - **Regra anti-retrabalho:** todo código de protocolo vive atrás de
@@ -85,7 +110,7 @@ em `app/site.ts`, com teste que impede envelhecer.
    produção. Antes de publicar: `npm run typecheck && npm test && npm run build`.
 2. Depois de cada deploy: `npx tsx poc/validate-live.ts https://trackdefi.app`.
 2b. **Mudança que o usuário percebe = entrada nova em `app/changelog.ts`**, no
-   MESMO commit. É de lá que saem a página `/changelog`, a linha "Updated …"
+   MESMO commit (e a tradução dela em cada idioma — ver "Idiomas"). É de lá que saem a página `/changelog`, a linha "Updated …"
    da home e o rodapé do `/roadmap` — um log que para de crescer diz ao
    visitante que o site parou. Data = o dia em que foi AO AR; texto para o
    usuário, não para quem programa (tem teste barrando texto de commit).

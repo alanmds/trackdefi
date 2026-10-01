@@ -22,10 +22,10 @@ import {
   NETWORK_COUNT,
   NETWORK_NAMES,
   NETWORKS,
-  SITE_DESCRIPTION,
   coverageSentence,
   networksSentence,
 } from "../app/site";
+import { siteDescription } from "../app/i18n/seo";
 
 describe("rótulos de rede da UI", () => {
   it("NETWORKS cobre exatamente as redes registradas em CHAINS", () => {
@@ -114,10 +114,10 @@ describe("meta description", () => {
   it("cabe no limite do Google (~160 caracteres)", () => {
     // se quebrar: encurtar o texto, não aumentar o limite. Descrição truncada
     // vira "…" no resultado de busca.
-    expect(SITE_DESCRIPTION.length).toBeLessThanOrEqual(160);
+    expect(siteDescription("en").length).toBeLessThanOrEqual(160);
   });
 
   it("não fixa o número de redes à mão", () => {
-    expect(SITE_DESCRIPTION).toContain(`${NETWORK_COUNT} networks`);
+    expect(siteDescription("en")).toContain(`${NETWORK_COUNT} networks`);
   });
 });

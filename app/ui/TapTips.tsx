@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useI18n } from "../i18n/provider";
 
 /**
  * Tooltips para quem usa o dedo.
@@ -18,6 +19,7 @@ import { useEffect, useState } from "react";
  * de fazer o que sempre fizeram.
  */
 export default function TapTips() {
+  const { ui } = useI18n();
   const [tip, setTip] = useState<string | null>(null);
 
   useEffect(() => {
@@ -107,7 +109,7 @@ export default function TapTips() {
   return (
     <div className="tap-tip" role="status">
       <p>{tip}</p>
-      <button type="button" className="tap-tip-close" aria-label="Close" onClick={() => setTip(null)}>
+      <button type="button" className="tap-tip-close" aria-label={ui.tapTips.close} onClick={() => setTip(null)}>
         ×
       </button>
     </div>

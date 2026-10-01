@@ -15,7 +15,15 @@
  */
 
 import { ImageResponse } from "next/og";
-import { NETWORK_COUNT, SITE_NAME } from "./site";
+import { DEFAULT_LOCALE, isLocale, LOCALE_CODES } from "../i18n/config";
+import { getMessages } from "../i18n/get";
+import { fill } from "../i18n/rich";
+import { NETWORK_COUNT, SITE_NAME } from "../site";
+
+/** um cartão por idioma; no inglês a URL pública segue sendo /opengraph-image (o proxy reescreve) */
+export function generateStaticParams() {
+  return LOCALE_CODES.map((lang) => ({ lang }));
+}
 
 export const alt = `${SITE_NAME} — liquidity pool tracker`;
 export const size = { width: 1200, height: 630 };
@@ -28,7 +36,9 @@ const ACCENT = "#7a4a10";
 const GOOD = "#1e7a46";
 const RING = "#7a9e7e";
 
-export default function OpengraphImage() {
+export default async function OpengraphImage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  const m = getMessages(isLocale(lang) ? lang : DEFAULT_LOCALE).pages.meta;
   return new ImageResponse(
     (
       <div
@@ -58,23 +68,23 @@ export default function OpengraphImage() {
 
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 78, fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.03em" }}>
-            Liquidity Pool Tracker
+            {m.ogCard.title}
           </div>
           <div style={{ marginTop: 24, fontSize: 36, lineHeight: 1.35, color: INK_SOFT }}>
-            Paste a wallet address — see every LP position, staked ones included.
+            {m.ogCard.subtitle}
           </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div style={{ display: "flex", fontSize: 30, fontWeight: 600, color: INK }}>
-            Aerodrome · Velodrome · Uniswap v3
+            {m.ogProtocols}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 27, color: INK_SOFT }}>
             <div style={{ width: 16, height: 16, borderRadius: 8, background: GOOD }} />
             {/* o número, não a lista: os nomes das cinco redes não cabem numa
                 linha aqui (o Satori não quebra linha dentro de um flex), e a
                 lista escrita à mão ficou sem a Robinhood Chain por dias. */}
-            <div style={{ display: "flex" }}>{NETWORK_COUNT} networks — read-only, no keys, no login</div>
+            <div style={{ display: "flex" }}>{fill(m.ogCard.networks, { count: NETWORK_COUNT })}</div>
           </div>
         </div>
       </div>

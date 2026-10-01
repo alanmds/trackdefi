@@ -1,5 +1,9 @@
+"use client";
+
 import type { LockDTO } from "../../core/service";
 import { CHAINS } from "../../core/chains";
+import { fill } from "../i18n/rich";
+import { useI18n } from "../i18n/provider";
 import { fmtAmount, fmtUnixDate, fmtUsd, protocolLabel } from "./format";
 
 /**
@@ -11,34 +15,23 @@ import { fmtAmount, fmtUnixDate, fmtUsd, protocolLabel } from "./format";
  * mas já pode ser sacado, e nenhum agregador que comparamos avisa isso.
  */
 export default function LockCard({ l }: { l: LockDTO }) {
+  const { locale, ui } = useI18n();
+  const t = ui.lock;
   const chain = CHAINS[l.chainId];
   const veSymbol = `ve${l.token.symbol}`;
+  const usd = (n: number | null) => fmtUsd(n, locale);
+  const amount = (n: number) => fmtAmount(n, locale);
+  const date = fmtUnixDate(l.expiresAt, ui.dates);
 
   let status: { label: string; cls: string; tip: string };
   if (l.managedId) {
-    status = {
-      label: `In managed lock #${l.managedId}`,
-      cls: "badge",
-      tip: "This lock was deposited into a managed lock (a relay). The tokens now live in that managed lock, so this one shows zero locked.",
-    };
+    status = { label: fill(t.managed, { id: l.managedId }), cls: "badge", tip: t.managedTip };
   } else if (l.permanent) {
-    status = {
-      label: "Permanent lock",
-      cls: "badge",
-      tip: "Permanently locked: voting power does not decay and there is no unlock date.",
-    };
+    status = { label: t.permanent, cls: "badge", tip: t.permanentTip };
   } else if (l.expired) {
-    status = {
-      label: "⚠ Expired — withdrawable",
-      cls: "badge badge-warn",
-      tip: `This lock expired on ${fmtUnixDate(l.expiresAt)}. The tokens are still in it, but they can be withdrawn — and it no longer has voting power.`,
-    };
+    status = { label: t.expired, cls: "badge badge-warn", tip: fill(t.expiredTip, { date }) };
   } else {
-    status = {
-      label: `Unlocks ${fmtUnixDate(l.expiresAt)}`,
-      cls: "badge",
-      tip: "Voting power decays linearly until this date, when the tokens can be withdrawn.",
-    };
+    status = { label: fill(t.unlocks, { date }), cls: "badge", tip: t.unlocksTip };
   }
 
   return (
@@ -47,13 +40,13 @@ export default function LockCard({ l }: { l: LockDTO }) {
         <h3 className="pos-title">
           {veSymbol} #{l.lockId}
         </h3>
-        <span className="pos-value">{fmtUsd(l.valueUsd)}</span>
+        <span className="pos-value">{usd(l.valueUsd)}</span>
       </div>
 
       <div className="badges">
-        <span className="badge">{chain?.label ?? `chain ${l.chainId}`}</span>
+        <span className="badge">{chain?.label ?? fill(ui.common.chainFallback, { id: l.chainId })}</span>
         <span className="badge">{protocolLabel(l.protocol)}</span>
-        <span className="badge">Governance lock</span>
+        <span className="badge">{t.badge}</span>
         <span className={status.cls} title={status.tip}>
           {status.label}
         </span>
@@ -61,45 +54,41 @@ export default function LockCard({ l }: { l: LockDTO }) {
 
       <div className="token-rows">
         <div className="token-row">
-          <span className="sym">{l.token.symbol} locked</span>
+          <span className="sym">{fill(t.locked, { symbol: l.token.symbol })}</span>
           <span className="amt">
-            {fmtAmount(l.token.amount)} <span className="usd">{fmtUsd(l.valueUsd)}</span>
+            {amount(l.token.amount)} <span className="usd">{usd(l.valueUsd)}</span>
           </span>
         </div>
-        <div className="token-row" title="Current voting power. It decays toward zero as the unlock date approaches.">
-          <span className="sym">Voting power</span>
+        <div className="token-row" title={t.votingPowerTip}>
+          <span className="sym">{t.votingPower}</span>
           <span className="amt">
-            {fmtAmount(l.votingPower)} <span className="usd">{veSymbol}</span>
+            {amount(l.votingPower)} <span className="usd">{veSymbol}</span>
           </span>
         </div>
       </div>
 
       {l.rewards.length > 0 && (
         <div>
-          <div className="subhead">Claimable</div>
+          <div className="subhead">{t.claimable}</div>
           <div className="token-rows">
             {l.rewards.map((r, i) => (
               <div
                 className="token-row"
                 key={`${r.address}-${r.kind}-${i}`}
-                title={
-                  r.kind === "rebase"
-                    ? "Rebase: new tokens paid to lockers every week to offset emission dilution."
-                    : "Voting rewards: swap fees and incentives from the pools this lock voted for."
-                }
+                title={r.kind === "rebase" ? t.rebaseTip : t.votesTip}
               >
                 <span className="sym">
-                  {r.symbol} <span className="usd">{r.kind === "rebase" ? "rebase" : "votes"}</span>
+                  {r.symbol} <span className="usd">{r.kind === "rebase" ? t.rebase : t.votes}</span>
                 </span>
                 <span className="amt">
-                  {fmtAmount(r.amount)} <span className="usd">{r.valueUsd !== null ? fmtUsd(r.valueUsd) : "—"}</span>
+                  {amount(r.amount)} <span className="usd">{r.valueUsd !== null ? usd(r.valueUsd) : "—"}</span>
                 </span>
               </div>
             ))}
           </div>
           <div className="rewards-total">
-            <span>Total claimable</span>
-            <span>{fmtUsd(l.rewardsUsd)}</span>
+            <span>{t.totalClaimable}</span>
+            <span>{usd(l.rewardsUsd)}</span>
           </div>
         </div>
       )}

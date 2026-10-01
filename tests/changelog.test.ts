@@ -47,6 +47,12 @@ describe("log de atualizações", () => {
     }
   });
 
+  it("todo id é único e estável em formato (kebab-case) — é a chave das traduções", () => {
+    const ids = CHANGELOG.map((e) => e.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const id of ids) expect(id).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
+  });
+
   it("todo tipo usado tem rótulo para o selo", () => {
     for (const e of CHANGELOG) expect(KIND_LABEL[e.kind], e.title).toBeTruthy();
   });

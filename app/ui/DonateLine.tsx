@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { DONATION_ADDRESS, DONATION_PHRASES, nextPhrase } from "../donate";
+import { DONATION_ADDRESS, nextPhrase } from "../donate";
+import { useI18n } from "../i18n/provider";
 
 /** onde a rotação fica guardada; o sufixo muda se o formato mudar */
 const STORAGE_KEY = "trackdefi.donate.v1";
@@ -21,22 +22,26 @@ function readBag(): unknown {
  * todo mundo até o próximo deploy.
  *
  * Troca de frase a cada página visitada — o layout não remonta quando se
- * navega dentro do site, por isso o efeito depende do caminho da URL.
+ * navega dentro do site, por isso o efeito depende do caminho da URL. As
+ * frases são as do idioma da página; o mesmo `localStorage` serve a todos os
+ * idiomas (`parseBag` descarta o que não couber no banco do idioma atual).
  */
 export default function DonateLine() {
+  const { ui } = useI18n();
   const pathname = usePathname();
   const [phrase, setPhrase] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const phrases = ui.donate.phrases;
 
   useEffect(() => {
-    const { index, bag } = nextPhrase(readBag(), DONATION_PHRASES.length);
-    setPhrase(DONATION_PHRASES[index]);
+    const { index, bag } = nextPhrase(readBag(), phrases.length);
+    setPhrase(phrases[index]);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(bag));
     } catch {
       /* sem armazenamento: a frase continua aleatória, só não evita repetir */
     }
-  }, [pathname]);
+  }, [pathname, phrases]);
 
   async function copy() {
     try {
@@ -49,7 +54,7 @@ export default function DonateLine() {
   }
 
   return (
-    <section className="donate" aria-label="Support trackdefi">
+    <section className="donate" aria-label={ui.donate.aria}>
       {/* antes do sorteio o espaço fica reservado e vazio, para o rodapé não
           pular nem trocar de texto diante do visitante */}
       {phrase ? (
@@ -58,18 +63,18 @@ export default function DonateLine() {
         </p>
       ) : (
         <p className="donate-phrase" aria-hidden>
-          {" "}
+          {" "}
         </p>
       )}
       <p className="donate-how">
-        <span>Tip jar</span>
+        <span>{ui.donate.tipJar}</span>
         <code className="donate-addr" translate="no">
           {DONATION_ADDRESS}
         </code>
-        <button type="button" className="donate-copy" onClick={copy} aria-label="Copy tip address">
-          {copied ? "Copied ✓" : "Copy"}
+        <button type="button" className="donate-copy" onClick={copy} aria-label={ui.donate.copyAria}>
+          {copied ? ui.donate.copied : ui.donate.copy}
         </button>
-        <span className="donate-note">Same address on any EVM network · always optional</span>
+        <span className="donate-note">{ui.donate.note}</span>
       </p>
     </section>
   );

@@ -3,8 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { isAddress } from "viem";
+import { localePath } from "../i18n/config";
+import { useI18n } from "../i18n/provider";
 
 export default function SearchForm({ autoFocus = false }: { autoFocus?: boolean }) {
+  const { locale, ui } = useI18n();
   const router = useRouter();
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
@@ -14,12 +17,12 @@ export default function SearchForm({ autoFocus = false }: { autoFocus?: boolean 
     e.preventDefault();
     const addr = value.trim();
     if (!isAddress(addr)) {
-      setError("That doesn't look like a wallet address. Paste the full 0x… address (42 characters).");
+      setError(ui.search.invalid);
       return;
     }
     setError("");
     setNavigating(true);
-    router.push(`/w/${addr}`);
+    router.push(localePath(locale, `/w/${addr}`));
   }
 
   return (
@@ -37,8 +40,8 @@ export default function SearchForm({ autoFocus = false }: { autoFocus?: boolean 
           autoCorrect="off"
           enterKeyHint="go"
           autoFocus={autoFocus}
-          placeholder="Paste a wallet address (0x…)"
-          aria-label="Wallet address"
+          placeholder={ui.search.placeholder}
+          aria-label={ui.search.aria}
           value={value}
           onChange={(e) => {
             setValue(e.target.value);
@@ -46,7 +49,7 @@ export default function SearchForm({ autoFocus = false }: { autoFocus?: boolean 
           }}
         />
         <button type="submit" className="btn" disabled={navigating}>
-          {navigating ? "Opening…" : "Track positions"}
+          {navigating ? ui.search.opening : ui.search.submit}
         </button>
       </form>
       <p className="form-error" role="alert">

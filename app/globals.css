@@ -123,6 +123,38 @@ button {
   white-space: nowrap;
 }
 
+/* seletor de idioma (app/ui/LanguageSwitcher.tsx) */
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  flex: none;
+}
+
+.lang-switch a,
+.lang-switch .lang-current {
+  padding: 4px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.lang-switch a {
+  color: var(--ink-2);
+}
+
+.lang-switch a:hover {
+  background: var(--card-2);
+  text-decoration: none;
+}
+
+.lang-switch .lang-current {
+  background: var(--card);
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+
 .dot-live {
   width: 8px;
   height: 8px;

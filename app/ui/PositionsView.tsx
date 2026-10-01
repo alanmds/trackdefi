@@ -3,8 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { PositionsResponseDTO } from "../../core/service";
+import { localePath } from "../i18n/config";
+import { fill, pl } from "../i18n/rich";
+import { useI18n } from "../i18n/provider";
 import { networksDotted, networksSentence } from "../site";
-import { fmtUsd, shortAddress } from "./format";
+import { fmtDecimal, fmtInt, fmtUsd, shortAddress } from "./format";
 import LockCard from "./LockCard";
 import PositionCard from "./PositionCard";
 import { noPriceSummaryTip, noticeText } from "./notices";
@@ -21,25 +24,20 @@ function KpiValue({ text }: { text: string }) {
   return <div className={text.length > 11 ? "value value-long" : "value"}>{text}</div>;
 }
 
-const ERROR_COPY: Record<string, { title: string; body: string }> = {
-  invalid_address: { title: "Invalid address", body: "That doesn't look like a valid wallet address." },
-  rate_limited: { title: "Too many requests", body: "Please wait a few seconds and try again." },
-  timeout: { title: "The blockchain took too long", body: "The network is slow right now. Try again in a moment." },
-  upstream: { title: "Couldn't reach the blockchain", body: "A network hiccup on our side. Try again in a moment." },
-  busy: { title: "Server is busy", body: "We're scanning other wallets right now. Try again in a few seconds." },
-  network: { title: "Connection problem", body: "Check your internet connection and try again." },
-};
-
 function Elapsed() {
+  const { ui } = useI18n();
   const [secs, setSecs] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setSecs((s) => s + 1), 1000);
     return () => clearInterval(t);
   }, []);
-  return <span className="scan-elapsed">{secs}s — a full scan takes ~15 s on the first visit</span>;
+  return <span className="scan-elapsed">{fill(ui.wallet.elapsed, { secs })}</span>;
 }
 
 export default function PositionsView({ address }: { address: string }) {
+  const i18n = useI18n();
+  const { locale, ui } = i18n;
+  const w = ui.wallet;
   const [state, setState] = useState<ViewState>({ phase: "loading" });
   const [copied, setCopied] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -83,6 +81,12 @@ export default function PositionsView({ address }: { address: string }) {
   // a fonte de preços falhou NESTA varredura → "—" pode sumir ao recarregar
   const pricesFailed = notices.some((n) => n.kind === "prices");
   const rewardsWithoutPrice = state.phase === "done" ? (state.data.totals.rewardsWithoutPrice ?? 0) : 0;
+  const networks = networksSentence("and", locale);
+
+  /* Os avisos de erro vêm do dicionário, por CÓDIGO. A `message` que a API
+     devolve está em inglês e só serve de reserva para um código desconhecido —
+     usá-la sempre faria o erro aparecer no idioma errado. */
+  const errorCopy = state.phase === "error" ? (w.errors[state.code] ?? null) : null;
 
   return (
     <main className="container">
@@ -97,10 +101,10 @@ export default function PositionsView({ address }: { address: string }) {
         </div>
         <div className="wallet-actions">
           <button type="button" className="btn btn-ghost btn-sm" onClick={copy}>
-            {copied ? "Copied ✓" : "Copy address"}
+            {copied ? w.copied : w.copyAddress}
           </button>
           <button type="button" className="btn btn-sm" onClick={load} disabled={state.phase === "loading"}>
-            Refresh
+            {w.refresh}
           </button>
         </div>
       </div>
@@ -109,11 +113,8 @@ export default function PositionsView({ address }: { address: string }) {
         <>
           <div className="state-box" aria-live="polite">
             <div className="spinner" aria-hidden />
-            <h2>Scanning the blockchains…</h2>
-            <p>
-              Reading Aerodrome, Velodrome and Uniswap v3 across {networksSentence()} — classic, concentrated and
-              gauge-staked positions.
-            </p>
+            <h2>{w.scanning}</h2>
+            <p>{fill(w.scanningBody, { networks })}</p>
             <Elapsed />
           </div>
           <div className="skeleton-grid" aria-hidden>
@@ -126,23 +127,20 @@ export default function PositionsView({ address }: { address: string }) {
 
       {state.phase === "error" && (
         <div className="state-box error" role="alert">
-          <h2>{(ERROR_COPY[state.code] ?? ERROR_COPY.upstream).title}</h2>
-          <p>{state.message || (ERROR_COPY[state.code] ?? ERROR_COPY.upstream).body}</p>
+          <h2>{(errorCopy ?? w.errors.upstream).title}</h2>
+          <p>{errorCopy ? errorCopy.body : state.message || w.errors.upstream.body}</p>
           <button type="button" className="btn" onClick={load}>
-            Try again
+            {w.tryAgain}
           </button>
         </div>
       )}
 
       {state.phase === "done" && state.data.positions.length === 0 && (state.data.locks ?? []).length === 0 && (
         <div className="state-box">
-          <h2>No liquidity positions found</h2>
-          <p>
-            This wallet has no active positions on Aerodrome, Velodrome or Uniswap v3 across {networksSentence()}{" "}
-            right now.
-          </p>
-          <Link href="/" className="btn">
-            Track another wallet
+          <h2>{w.empty.title}</h2>
+          <p>{fill(w.empty.body, { networks })}</p>
+          <Link href={localePath(locale, "/")} className="btn">
+            {w.empty.another}
           </Link>
         </div>
       )}
@@ -151,55 +149,62 @@ export default function PositionsView({ address }: { address: string }) {
         <>
           <div className="kpis">
             <div className="kpi">
-              <div className="label">Total in pools</div>
-              <KpiValue text={fmtUsd(state.data.totals.valueUsd)} />
+              <div className="label">{w.kpi.totalInPools}</div>
+              <KpiValue text={fmtUsd(state.data.totals.valueUsd, locale)} />
               {state.data.totals.positionsWithoutPrice > 0 && (
-                <div className="hint has-tip" title={noPriceSummaryTip("positions", pricesFailed)}>
-                  + {state.data.totals.positionsWithoutPrice} position
-                  {state.data.totals.positionsWithoutPrice > 1 ? "s" : ""} without a reliable price
+                <div className="hint has-tip" title={noPriceSummaryTip("positions", pricesFailed, i18n)}>
+                  {pl(locale, w.kpi.positionsWithoutPrice, state.data.totals.positionsWithoutPrice)}
                 </div>
               )}
             </div>
             {(state.data.locks ?? []).length > 0 && (
               <div className="kpi">
-                <div className="label">Locked</div>
-                <KpiValue text={fmtUsd(state.data.totals.lockedUsd ?? 0)} />
+                <div className="label">{w.kpi.locked}</div>
+                <KpiValue text={fmtUsd(state.data.totals.lockedUsd ?? 0, locale)} />
                 <div className="hint">
-                  {[...new Set((state.data.locks ?? []).map((l) => `ve${l.token.symbol}`))].join(" + ")} governance locks
+                  {fill(w.kpi.lockedHint, {
+                    tokens: [...new Set((state.data.locks ?? []).map((l) => `ve${l.token.symbol}`))].join(" + "),
+                  })}
                 </div>
               </div>
             )}
             <div className="kpi">
-              <div className="label">Claimable rewards</div>
-              <KpiValue text={fmtUsd(state.data.totals.rewardsUsd)} />
+              <div className="label">{w.kpi.claimable}</div>
+              <KpiValue text={fmtUsd(state.data.totals.rewardsUsd, locale)} />
               <div className="hint">
                 {(state.data.locks ?? []).some((l) => l.rewards.length > 0)
-                  ? "fees, emissions & lock rewards"
-                  : "fees + emissions"}
+                  ? w.kpi.claimableHintLocks
+                  : w.kpi.claimableHint}
               </div>
               {rewardsWithoutPrice > 0 && (
-                <div className="hint has-tip" title={noPriceSummaryTip("rewards", pricesFailed)}>
-                  + {rewardsWithoutPrice} reward{rewardsWithoutPrice > 1 ? "s" : ""} without a reliable price
+                <div className="hint has-tip" title={noPriceSummaryTip("rewards", pricesFailed, i18n)}>
+                  {pl(locale, w.kpi.rewardsWithoutPrice, rewardsWithoutPrice)}
                 </div>
               )}
             </div>
             <div className="kpi">
-              <div className="label">Positions</div>
+              <div className="label">{w.kpi.positions}</div>
               <div className="value">{state.data.totalPositions}</div>
-              <div className="hint">scanned in {(state.data.scanMs / 1000).toFixed(1)} s</div>
+              <div className="hint">
+                {fill(w.kpi.scannedIn, {
+                  s: fmtDecimal(state.data.scanMs / 1000, 1, locale),
+                })}
+              </div>
             </div>
           </div>
 
           {/* o glossário no lugar onde a dúvida nasce — no rodapé ele fica a
               44 posições de distância */}
           <p className="kpis-help">
-            <Link href="/glossary">What do these numbers mean? →</Link>
+            <Link href={localePath(locale, "/glossary")}>{w.glossaryLink}</Link>
           </p>
 
           {state.data.totalPositions > state.data.positions.length && (
             <p className="scan-warnings">
-              Showing the top {state.data.positions.length} positions by value (of {state.data.totalPositions}).
-              Totals include all of them.
+              {fill(w.showingTop, {
+                shown: fmtInt(state.data.positions.length, locale),
+                total: fmtInt(state.data.totalPositions, locale),
+              })}
             </p>
           )}
 
@@ -209,11 +214,11 @@ export default function PositionsView({ address }: { address: string }) {
           {notices.length > 0 && (
             <ul className="scan-warnings scan-notices">
               {notices.map((n, i) => {
-                const { text, retry } = noticeText(n);
+                const { text, retry } = noticeText(n, i18n);
                 return (
                   <li key={i}>
                     ⚠ {text}
-                    {retry && " Refresh to retry."}
+                    {retry && ` ${w.refreshToRetry}`}
                   </li>
                 );
               })}
@@ -226,13 +231,13 @@ export default function PositionsView({ address }: { address: string }) {
               fica exatamente como antes, sem títulos de seção. */}
           {(state.data.locks ?? []).length > 0 && (
             <>
-              <h2 className="section-title">Governance locks</h2>
+              <h2 className="section-title">{w.sectionLocks}</h2>
               <div className="positions-grid">
                 {(state.data.locks ?? []).map((l) => (
                   <LockCard key={`${l.chainId}-${l.lockId}`} l={l} />
                 ))}
               </div>
-              {state.data.positions.length > 0 && <h2 className="section-title">Liquidity positions</h2>}
+              {state.data.positions.length > 0 && <h2 className="section-title">{w.sectionPositions}</h2>}
             </>
           )}
 
