@@ -265,7 +265,10 @@ const SECTIONS: Section[] = [
           <>
             The left and right numbers are the edges of the range; <strong>now</strong> is the current price, and the
             marker shows where it sits. Green means in range. When the price is past an edge, the bar turns orange and
-            the marker is pinned to that side — the position is then 100% in one of the two tokens.
+            the marker is pinned to that side — the position is then 100% in one of the two tokens. The percentages under
+            each edge show how far the price has to move from now to reach it: −8.00% under the left edge means an 8%
+            drop takes the position out of range on that side. Out of range, both have the same sign — the distance
+            back to each edge.
           </>
         ),
       },

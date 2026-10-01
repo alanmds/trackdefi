@@ -7,7 +7,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { fmtUsdFine, fmtWindow } from "../app/ui/format";
+import { fmtRangeDelta, fmtUsdFine, fmtWindow } from "../app/ui/format";
 
 describe("fmtUsdFine (taxa ganha na janela)", () => {
   it("valor normal sai como dólar normal", () => {
@@ -51,5 +51,36 @@ describe("fmtWindow (duração da janela)", () => {
   it("janela inválida não inventa número", () => {
     expect(fmtWindow(0)).toBe("—");
     expect(fmtWindow(-5)).toBe("—");
+  });
+});
+
+describe("fmtRangeDelta (distância até a borda da faixa)", () => {
+  it("dentro da faixa: mínima negativa, máxima positiva, 2 casas", () => {
+    // mesma forma do exemplo pedido: −8.03% e +32.48%
+    expect(fmtRangeDelta(0.4879, 0.5305)).toBe("−8.03%");
+    expect(fmtRangeDelta(0.7029, 0.5305)).toBe("+32.50%");
+    expect(fmtRangeDelta(110, 100)).toBe("+10.00%");
+  });
+
+  it("fora da faixa: as duas bordas do mesmo lado", () => {
+    expect(fmtRangeDelta(80, 120)).toBe("−33.33%");
+    expect(fmtRangeDelta(100, 120)).toBe("−16.67%");
+  });
+
+  it("número grande sem casas; faixa inteira não vira número absurdo", () => {
+    expect(fmtRangeDelta(2500, 100)).toBe("+2,400%");
+    expect(fmtRangeDelta(1e38, 1)).toBe(">+999,999%");
+    expect(fmtRangeDelta(1e-30, 1)).toBe("−100.00%");
+  });
+
+  it("borda em cima do preço vira 0.00% sem sinal", () => {
+    expect(fmtRangeDelta(100, 100)).toBe("0.00%");
+    expect(fmtRangeDelta(100.000001, 100)).toBe("0.00%");
+  });
+
+  it("sem preço atual válido: não mostra", () => {
+    expect(fmtRangeDelta(1, 0)).toBeNull();
+    expect(fmtRangeDelta(Number.NaN, 1)).toBeNull();
+    expect(fmtRangeDelta(Infinity, 1)).toBeNull();
   });
 });

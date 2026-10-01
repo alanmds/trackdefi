@@ -44,6 +44,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 export const CHANGELOG: ChangeEntry[] = [
   {
     date: "2026-09-30",
+    kind: "improvement",
+    title: "How far the price is from each edge of your range",
+    body:
+      "Under each end of the price range bar you now see how far the price has to move from now to reach it — for example −8.03% on the left and +32.48% on the right. When a position is out of range, the same numbers show how far the price is from coming back in.",
+  },
+  {
+    date: "2026-09-30",
     kind: "project",
     title: "No token, no presale, no airdrop",
     body:

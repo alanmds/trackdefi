@@ -34,6 +34,29 @@ export function fmtRangePrice(n: number): string {
 }
 
 /**
+ * Distância do preço atual até uma borda da faixa, em % do preço atual — o
+ * quanto o preço precisa andar para chegar ali (ex.: "−8.03%", "+32.48%").
+ * Sinal sempre explícito: dentro da faixa a mínima fica abaixo (−) e a máxima
+ * acima (+); fora dela, as duas ficam do mesmo lado, e o sinal mostra isso.
+ * null = não dá para calcular (preço atual zero ou número inválido).
+ * Faixa "inteira" (ticks extremos) dá números astronômicos: acima de
+ * 999.999% vira ">+999,999%" em vez de um número sem sentido.
+ */
+export function fmtRangeDelta(bound: number, current: number): string | null {
+  if (!Number.isFinite(bound) || !Number.isFinite(current) || current <= 0) return null;
+  const pct = (bound / current - 1) * 100;
+  if (!Number.isFinite(pct)) return null;
+  if (pct > 999_999) return ">+999,999%";
+  const abs = Math.abs(pct);
+  const num = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: abs >= 1000 ? 0 : 2,
+    maximumFractionDigits: abs >= 1000 ? 0 : 2,
+  }).format(abs);
+  if (num === "0.00") return "0.00%";
+  return `${pct < 0 ? "−" : "+"}${num}%`;
+}
+
+/**
  * Dólar de taxa ganha numa janela de medição.
  *
  * Numa janela de 15 min o valor costuma ser fração de centavo. `fmtUsd`

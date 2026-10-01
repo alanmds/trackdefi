@@ -924,6 +924,15 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
+.rangebar .deltas {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -3px;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
 .rangebar .quote {
   font-size: 11.5px;
   color: var(--ink-3);
