@@ -9,6 +9,7 @@ import {
   humanList,
   networksOf,
   networksSentence,
+  NO_TOKEN,
   pageMetadata,
   SITE_NAME,
 } from "./site";
@@ -36,7 +37,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: `Is ${SITE_NAME} free?`,
-    a: "Yes — free, no account, no limits for normal use. Values come from on-chain data and public price feeds.",
+    a: `Yes — free, no account, no limits for normal use. ${NO_TOKEN} Values come from on-chain data and public price feeds.`,
   },
 ];
 

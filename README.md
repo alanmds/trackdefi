@@ -2,10 +2,11 @@
 
 **Live at [trackdefi.app](https://trackdefi.app) — free, no login, no wallet connection.**
 
-Paste any wallet address and see all of its liquidity-pool positions across
-ten networks, including the gauge-staked ones that most trackers miss.
-Read-only: trackdefi never asks for private keys or seed phrases, and cannot
-move funds.
+Paste any wallet address and see all of its liquidity-pool positions on
+Aerodrome, Velodrome and Uniswap, across every network in the
+[coverage table](#coverage) — including the gauge-staked ones that most
+trackers miss. Read-only: trackdefi never asks for private keys or seed
+phrases, and cannot move funds. No token, no presale, no airdrop.
 
 [![trackdefi — liquidity pool tracker](https://trackdefi.app/opengraph-image)](https://trackdefi.app)
 
@@ -32,12 +33,17 @@ When a token has no reliable price, trackdefi shows `—` instead of guessing.
 | Exchange | Networks |
 |---|---|
 | Aerodrome | Base |
-| Velodrome | Optimism, Unichain, Ink, Mode, Soneium, Fraxtal |
-| Uniswap v3 | Base, Ethereum, Arbitrum, Optimism, Robinhood Chain |
+| Velodrome | Optimism, Unichain, Ink, Mode, Soneium, Fraxtal, Lisk, Swell, Metal L2, Superseed, Celo |
+| Uniswap v3 | Base, Optimism, Ethereum, Arbitrum, Robinhood Chain |
 | Uniswap v4 | Robinhood Chain |
 
 Classic (v2-style) and concentrated positions, staked or not, with pending fees
-and emissions. The [roadmap](https://trackdefi.app/roadmap) tracks what's next;
+and emissions, plus veAERO / veVELO governance locks. For each position it also
+shows what that position itself is earning now — `0%` in fees when it is out of
+range.
+
+What it doesn't do: no profit and loss or impermanent loss since a position was
+opened, no alerts, and no transactions of any kind. The [roadmap](https://trackdefi.app/roadmap) tracks what's next;
 [how it works](https://trackdefi.app/how-it-works) explains where every number
 comes from.
 
@@ -47,7 +53,9 @@ comes from.
 - **viem** — read-only on-chain access (Sugar contracts for the Aerodrome/
   Velodrome family; the NonfungiblePositionManager for Uniswap v3; the
   PositionManager and StateView for Uniswap v4)
-- **DefiLlama** — USD prices and pool yield data (free, no key)
+- **DefiLlama**, then **DexScreener** — USD prices (free, no key); when neither
+  covers a token, its price is read from a pool on the same network. DefiLlama
+  also provides pool yield data
 - **Vercel** — hosting; **Vercel Analytics** — cookieless usage stats
 
 ## Architecture
@@ -67,7 +75,7 @@ core/            pure engine, testable without a UI
   service.ts     adapters + prices -> JSON DTO (USD computed server-side)
   guards.ts      TTL cache, rate limiter, concurrency semaphore
   math/          Q96 concentrated-liquidity math (BigInt)
-  prices/        DefiLlama price client
+  prices/        price clients (DefiLlama, DexScreener)
   yields/        position-level APR ("what is this position earning now")
   adapters/      aerodrome/ (Sugar family) · uniswap-v3/ · registry.ts
 app/             Next.js site + /api/positions

@@ -154,6 +154,17 @@ export function coverageSentence(): string {
 }
 
 /**
+ * Frase de "sem token", num lugar só (FAQ da home, /roadmap, llms.txt, README).
+ *
+ * Existe por causa dos homônimos (GEO, 30/09/2026): ao perguntar "What is
+ * trackdefi?", IAs responderam com projetos de nome parecido QUE TÊM token —
+ * um deles vivo, na Base. Dizer isto com todas as letras é o que deixa a IA (e
+ * o visitante) responder sozinha. É promessa pública e permanente: decidida
+ * pelo Alan em 30/09/2026 — não suavizar nem remover sem ele.
+ */
+export const NO_TOKEN = "No token, no presale, no airdrop.";
+
+/**
  * Domínio definitivo desde 24/07/2026. A Vercel deve ter
  * NEXT_PUBLIC_SITE_URL=https://trackdefi.app (Production) — este valor é só a
  * rede de segurança para quando a variável não estiver setada.

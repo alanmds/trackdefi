@@ -43,6 +43,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    date: "2026-09-30",
+    kind: "project",
+    title: "No token, no presale, no airdrop",
+    body:
+      "Some crypto projects with names close to ours sell tokens. trackdefi has none, and it's now written on the site: it's a free, read-only tracker with nothing to buy, claim or connect. If anyone offers you a trackdefi token or airdrop, it's a scam.",
+  },
+  {
     date: "2026-09-29",
     kind: "improvement",
     title: "Uniswap v3: wallets with thousands of NFTs no longer show empty",

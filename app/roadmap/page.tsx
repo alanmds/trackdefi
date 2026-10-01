@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { NETWORK_COUNT, pageMetadata } from "../site";
+import { NETWORK_COUNT, NO_TOKEN, pageMetadata } from "../site";
 import { CHANGELOG, fmtDate } from "../changelog";
 
 export const metadata: Metadata = pageMetadata({
@@ -175,6 +175,10 @@ export default function Roadmap() {
       <h2>What will never change</h2>
       <ul>
         <li>No login, no wallet connection, no private keys — trackdefi cannot touch funds.</li>
+        <li>
+          {NO_TOKEN} trackdefi is a free tool, not an investment — anyone offering you a trackdefi token is running a
+          scam.
+        </li>
         <li>Honest numbers: when a token has no reliable price we show “—”, never a guess.</li>
         <li>Read straight from the blockchain, so what you see is the on-chain truth.</li>
       </ul>
