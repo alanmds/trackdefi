@@ -42,7 +42,7 @@ const pages = {
 
   meta: {
     /** `{families}`: "Aerodrome, Velodrome & Uniswap" */
-    siteTitle: "{name} — Liquidity Pool Tracker · {families}",
+    siteTitle: "Liquidity Pool Tracker · {families}",
     siteDescription:
       "Free LP tracker: paste a wallet address to see every {families} position across {count} networks — gauge-staked ones included.",
     ogAlt: "{name} — liquidity pool tracker",
@@ -52,6 +52,7 @@ const pages = {
       "Aerodrome",
       "Uniswap v3",
       "Velodrome",
+      "PancakeSwap v3",
     ],
     /** uma por rede */
     keywordNetwork: "{network} LP tracker",
@@ -63,7 +64,7 @@ const pages = {
       networks: "{count} networks — read-only, no keys, no login",
     },
     /** "Aerodrome, Velodrome & Uniswap v3" no cartão — nomes próprios, não traduzir */
-    ogProtocols: "Aerodrome · Velodrome · Uniswap v3",
+    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap",
   },
 
   /** frase de "sem token" — promessa pública e permanente (ver `NO_TOKEN` em app/site.ts) */
@@ -71,7 +72,7 @@ const pages = {
 
   home: {
     heading: ["Every LP position.", "One wallet address."],
-    lede: "Paste any wallet address and see all of its liquidity pool positions across {networks} — value, pending fees, emissions and price ranges. Including positions staked in gauges, which most trackers miss.",
+    lede: "Paste any wallet address and see all of its liquidity pool positions across {networks} — value, pending fees, emissions and price ranges. Including positions staked in gauges and farms, which most trackers miss.",
     tryDemo: "No wallet handy? <link>Try a demo wallet →</link>",
     whatsNew: "<date>Updated {date}</date> — {title}. <link>What's new →</link>",
     more: "More <soon>— see the roadmap →</soon>",
@@ -83,7 +84,7 @@ const pages = {
       },
       {
         title: "Staked positions included",
-        body: "Positions staked in Aerodrome or Velodrome gauges don't show up as tokens in the wallet. We read them straight from the protocol, with their pending emissions.",
+        body: "Positions staked in Aerodrome or Velodrome gauges, or in PancakeSwap farms, don't show up as tokens in the wallet. We read them straight from the protocol, with their pending emissions.",
       },
       {
         title: "Honest numbers",
@@ -96,11 +97,11 @@ const pages = {
     faq: [
       {
         q: "How do I track my liquidity pool positions across networks?",
-        a: "Paste your wallet address (0x…) in the search box above. {name} reads the blockchains and lists every LP position that address holds on Aerodrome, Velodrome and Uniswap v3 across {networks} — value in USD, pending fees, emissions and price ranges.",
+        a: "Paste your wallet address (0x…) in the search box above. {name} reads the blockchains and lists every LP position that address holds on Aerodrome, Velodrome, Uniswap and PancakeSwap across {networks} — value in USD, pending fees, emissions and price ranges.",
       },
       {
         q: "Why don't my staked Aerodrome LP positions show up in my wallet?",
-        a: "When you stake a position in an Aerodrome gauge to earn AERO, the LP token (or NFT) moves into the gauge contract, so wallets and most portfolio trackers stop showing it. {name} reads the gauges directly, so staked positions appear with their pending emissions. The same applies to Velodrome gauges on {velodromeNetworks}.",
+        a: "When you stake a position in an Aerodrome gauge to earn AERO, the LP token (or NFT) moves into the gauge contract, so wallets and most portfolio trackers stop showing it. {name} reads the gauges directly, so staked positions appear with their pending emissions. The same applies to Velodrome gauges on {velodromeNetworks}, and to PancakeSwap v3 positions staked in its farms (the MasterChef) on BNB Chain, with their pending CAKE.",
       },
       {
         q: "Do I need to connect my wallet or create an account?",
@@ -131,7 +132,7 @@ const pages = {
     ],
     howTitle: "How it works",
     how: [
-      "You paste a wallet address. We read the supported exchanges' on-chain data across our networks to find every position that wallet holds — classic pools, concentrated positions, and positions staked in gauges that don't appear as tokens in the wallet.",
+      "You paste a wallet address. We read the supported exchanges' on-chain data across our networks to find every position that wallet holds — classic pools, concentrated positions, and positions staked in gauges or farms that don't appear as tokens in the wallet.",
       "For each position we compute how much of each token it holds, the pending fees, and the pending emissions where the exchange pays them — and, for concentrated positions, whether the price is inside your chosen range.",
       "US-dollar values come from public price data (DefiLlama, then DexScreener). When neither covers a token, we read its price from a pool on the same network and mark it with a dotted underline. When nothing can price a token, we show “—” instead of guessing.",
     ],
@@ -149,7 +150,7 @@ const pages = {
     title: "Roadmap — networks & exchanges",
     heading: "Roadmap",
     description:
-      "Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome and Uniswap across {count} networks; wider Uniswap v4 coverage, pool age and P&L next.",
+      "Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome, Uniswap and PancakeSwap across {count} networks; wider Uniswap v4 coverage, pool age and P&L next.",
     lede: "Where trackdefi is today and where it's going. No deadlines and no promises — priorities follow what users actually ask for. One thing never changes: <b>read-only, forever</b>.",
     status: { live: "✓ Live", next: "→ Next", planned: "Planned", exploring: "Exploring" } as Record<RoadmapKind, string>,
     liveTitle: "Live today",
@@ -194,6 +195,10 @@ const pages = {
         title: "Lisk, Swell, Metal L2, Superseed & Celo · Velodrome",
         body: "the rest of Velodrome's Superchain deployment, read the same way as the first five. Positions, amounts, staked positions and pending XVELO emissions are all exact. Where public price data doesn't reach yet (Swell, Metal L2, Superseed), dollar values are read from the networks' own pools.",
       },
+      {
+        title: "BNB Chain · PancakeSwap v3",
+        body: "the largest exchange on BNB Chain. Concentrated positions, amounts, price ranges and pending fees — and positions staked in PancakeSwap farms, with their pending CAKE and what they earn in CAKE right now. Our first network outside the Ethereum L2s.",
+      },
     ] as RoadmapItem[],
     nextTitle: "Next",
     next: [
@@ -204,10 +209,6 @@ const pages = {
     ] as RoadmapItem[],
     plannedTitle: "Planned",
     planned: [
-      {
-        title: "BNB Chain · PancakeSwap v3",
-        body: "the largest exchange on BNB Chain, read the same way as Uniswap v3: concentrated positions, amounts, price ranges and pending fees.",
-      },
       {
         title: "Solana · Orca",
         body: "our first network outside the Ethereum family. A proof of concept already reads Orca positions from public data — amounts, price range, in-range status, pending fees and rewards — so the work left is plumbing, not research. Raydium and Meteora would follow.",
@@ -372,6 +373,11 @@ const pages = {
             id: "staked",
             term: "Staked in gauge",
             def: "The position was deposited into the exchange's gauge — a contract that pays emissions (the exchange's own token) to liquidity providers. Staking moves the position out of the wallet, which is why most wallets and many trackers stop showing it. trackdefi reads the gauges directly.",
+          },
+          {
+            id: "staked-farm",
+            term: "Staked in farm",
+            def: "PancakeSwap's version of a gauge: the position was deposited into a PancakeSwap farm (the MasterChef contract), which pays CAKE. Same effect — the position leaves the wallet, and trackdefi reads the farm directly.",
           },
           {
             id: "alm",

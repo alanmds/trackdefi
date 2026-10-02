@@ -155,6 +155,7 @@ describe.each(OUTROS)("dicionário %s bate com o inglês", (code) => {
     expect(termo("classic")).toBe(`${ui.card.kind.v2volatile} / ${ui.card.kind.v2stable}`);
     expect(termo("in-range")).toBe(`${ui.card.inRange} / ${ui.card.outOfRange}`);
     expect(termo("staked")).toBe(ui.card.staked);
+    expect(termo("staked-farm")).toBe(ui.card.stakedFarm);
     expect(termo("alm")).toBe(ui.card.alm);
     expect(termo("earning-now")).toBe(ui.card.earningNow);
     expect(termo("total-claimable")).toBe(ui.card.totalClaimable);

@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "bnb-pancakeswap-v3",
+    date: "2026-10-02",
+    kind: "network",
+    title: "BNB Chain and PancakeSwap v3, staked positions included",
+    body: "trackdefi now reads PancakeSwap v3 on BNB Chain: concentrated positions with their amounts, price range and pending fees. Positions staked in PancakeSwap farms show up too, with their pending CAKE and what they are earning in CAKE right now.",
+  },
+  {
     id: "portuguese",
     date: "2026-09-30",
     kind: "feature",

@@ -64,6 +64,7 @@ export const NETWORKS = [
   { label: "Metal L2", name: "Metal L2" },
   { label: "Superseed", name: "Superseed" },
   { label: "Celo", name: "Celo" },
+  { label: "BNB Chain", name: "BNB Chain" },
 ] as const;
 
 /** nomes por extenso, na ordem de exibição */
@@ -127,6 +128,7 @@ export const COVERAGE = [
     networks: ["Base", "Optimism", "Ethereum", "Arbitrum", "Robinhood Chain"] as readonly string[],
   },
   { protocol: "Uniswap v4", networks: ["Robinhood Chain"] as readonly string[] },
+  { protocol: "PancakeSwap v3", networks: ["BNB Chain"] as readonly string[] },
 ] as const;
 
 /**
@@ -152,6 +154,16 @@ export function networksOf(protocol: string): readonly string[] {
 export const PROTOCOL_FAMILIES: readonly string[] = [
   ...new Set(COVERAGE.map((c) => c.protocol.replace(/ v\d+$/, ""))),
 ];
+
+/**
+ * Famílias por VOLUME negociado, maior primeiro — decide quem sai do título
+ * quando ele não cabe em 70 caracteres (regra do Alan, 02/10/2026: em
+ * conflito, ficam os protocolos de maior volume). Fonte: DefiLlama,
+ * api.llama.fi/overview/dexs, volume de 30 dias em 02/10/2026 — Uniswap
+ * US$ 93 bi, PancakeSwap US$ 30 bi, Aerodrome US$ 14 bi, Velodrome US$ 0,6 bi.
+ * Família nova precisa entrar aqui (teste cobra), conferida na mesma fonte.
+ */
+export const FAMILIES_BY_VOLUME: readonly string[] = ["Uniswap", "PancakeSwap", "Aerodrome", "Velodrome"];
 
 /** "Aerodrome on Base, Velodrome on Optimism, and Uniswap v3 on Base, …" */
 export function coverageSentence(locale: Locale = DEFAULT_LOCALE): string {

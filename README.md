@@ -3,9 +3,9 @@
 **Live at [trackdefi.app](https://trackdefi.app) — free, no login, no wallet connection.**
 
 Paste any wallet address and see all of its liquidity-pool positions on
-Aerodrome, Velodrome and Uniswap, across every network in the
-[coverage table](#coverage) — including the gauge-staked ones that most
-trackers miss. Read-only: trackdefi never asks for private keys or seed
+Aerodrome, Velodrome, Uniswap and PancakeSwap, across every network in the
+[coverage table](#coverage) — including the gauge-staked (and MasterChef-staked)
+ones that most trackers miss. Read-only: trackdefi never asks for private keys or seed
 phrases, and cannot move funds. No token, no presale, no airdrop.
 
 [![trackdefi — liquidity pool tracker](https://trackdefi.app/opengraph-image)](https://trackdefi.app)
@@ -36,6 +36,7 @@ When a token has no reliable price, trackdefi shows `—` instead of guessing.
 | Velodrome | Optimism, Unichain, Ink, Mode, Soneium, Fraxtal, Lisk, Swell, Metal L2, Superseed, Celo |
 | Uniswap v3 | Base, Optimism, Ethereum, Arbitrum, Robinhood Chain |
 | Uniswap v4 | Robinhood Chain |
+| PancakeSwap v3 | BNB Chain |
 
 Classic (v2-style) and concentrated positions, staked or not, with pending fees
 and emissions, plus veAERO / veVELO governance locks. For each position it also
@@ -52,7 +53,8 @@ comes from.
 - **Next.js (App Router) + TypeScript** — site + API
 - **viem** — read-only on-chain access (Sugar contracts for the Aerodrome/
   Velodrome family; the NonfungiblePositionManager for Uniswap v3; the
-  PositionManager and StateView for Uniswap v4)
+  PositionManager and StateView for Uniswap v4; the same NonfungiblePositionManager
+  plus the MasterChef v3 for PancakeSwap v3)
 - **DefiLlama**, then **DexScreener** — USD prices (free, no key); when neither
   covers a token, its price is read from a pool on the same network. DefiLlama
   also provides pool yield data
@@ -125,7 +127,9 @@ Copy `.env.example`. All variables are optional:
   the sitemap. Defaults to `https://trackdefi.app`.
 - `BASE_RPC_URLS` — comma-separated RPC URLs (e.g. an Alchemy key) to speed up
   scans. Server-side only, never exposed to the browser. Falls back to public
-  RPCs.
+  RPCs. Every network has its own (`OPTIMISM_RPC_URLS`, `BSC_RPC_URLS`, …; the
+  full list is `rpcEnv` in `core/chains.ts`). The "earning now" fee window
+  needs an RPC that serves historical state, which most public RPCs don't.
 - `TRACKDEFI_FIXTURE` — **dev only**; serve a frozen DTO instead of reading the
   chain. Ignored on Vercel.
 

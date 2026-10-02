@@ -144,8 +144,18 @@ const SLIPSTREAM_LAYOUT: PoolLayout = {
   fg1: 4,
 };
 
+/** PancakeSwap v3: `ticks()` igual à Uniswap; `slot0()` com feeProtocol uint32.
+ *  Provado no `poc/probe-pancake-v3.ts` (02/10/2026). */
+const PANCAKE_LAYOUT: PoolLayout = {
+  ...UNISWAP_LAYOUT,
+  slot0Abi: parseAbi([
+    "function slot0() view returns (uint160 sqrtPriceX96, int24 tick, uint16 observationIndex, uint16 observationCardinality, uint16 observationCardinalityNext, uint32 feeProtocol, bool unlocked)",
+  ]),
+};
+
 const LAYOUTS: Record<string, PoolLayout> = {
   "uniswap-v3": UNISWAP_LAYOUT,
+  "pancakeswap-v3": PANCAKE_LAYOUT,
   aerodrome: SLIPSTREAM_LAYOUT,
   velodrome: SLIPSTREAM_LAYOUT,
 };

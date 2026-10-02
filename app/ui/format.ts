@@ -157,6 +157,7 @@ const PROTOCOL_LABELS: Record<string, string> = {
   velodrome: "Velodrome",
   "uniswap-v3": "Uniswap v3",
   "uniswap-v4": "Uniswap v4",
+  "pancakeswap-v3": "PancakeSwap v3",
 };
 
 export function protocolLabel(id: string): string {

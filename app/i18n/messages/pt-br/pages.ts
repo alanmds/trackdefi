@@ -12,9 +12,9 @@ const pages: PagesMessages = {
   },
 
   meta: {
-    siteTitle: "{name} — Rastreador de Pools · {families}",
+    siteTitle: "Rastreador de Pools · {families}",
     siteDescription:
-      "Rastreador de LP grátis: cole o endereço de uma carteira e veja todas as posições de {families} em {count} redes, inclusive as em stake.",
+      "Rastreador de LP grátis: cole o endereço de uma carteira e veja cada posição de {families} em {count} redes, inclusive as em stake.",
     ogAlt: "{name} — rastreador de pools de liquidez",
     keywordsBase: [
       "rastreador de pools de liquidez",
@@ -22,6 +22,7 @@ const pages: PagesMessages = {
       "Aerodrome",
       "Uniswap v3",
       "Velodrome",
+      "PancakeSwap v3",
     ],
     keywordNetwork: "rastreador de LP {network}",
     keywordsExtra: ["portfólio DeFi", "liquidez concentrada", "endereço de carteira"],
@@ -31,14 +32,14 @@ const pages: PagesMessages = {
       subtitle: "Cole o endereço de uma carteira — veja todas as posições de LP, inclusive as em stake.",
       networks: "{count} redes — somente leitura, sem chaves, sem login",
     },
-    ogProtocols: "Aerodrome · Velodrome · Uniswap v3",
+    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap",
   },
 
   noToken: "Sem token, sem pré-venda, sem airdrop.",
 
   home: {
     heading: ["Todas as posições de LP.", "Um só endereço de carteira."],
-    lede: "Cole qualquer endereço de carteira e veja todas as posições dela em pools de liquidez em {networks} — valor, taxas pendentes, emissões e faixas de preço. Inclusive as posições em stake nos gauges, que a maioria dos rastreadores não mostra.",
+    lede: "Cole qualquer endereço de carteira e veja todas as posições dela em pools de liquidez em {networks} — valor, taxas pendentes, emissões e faixas de preço. Inclusive as posições em stake nos gauges e nas farms, que a maioria dos rastreadores não mostra.",
     tryDemo: "Sem uma carteira à mão? <link>Experimente uma carteira de demonstração →</link>",
     whatsNew: "<date>Atualizado em {date}</date> — {title}. <link>Novidades →</link>",
     more: "Mais <soon>— veja o roadmap →</soon>",
@@ -50,7 +51,7 @@ const pages: PagesMessages = {
       },
       {
         title: "Posições em stake incluídas",
-        body: "Posições em stake nos gauges da Aerodrome ou da Velodrome não aparecem como tokens na carteira. Nós as lemos direto do protocolo, com as emissões pendentes.",
+        body: "Posições em stake nos gauges da Aerodrome ou da Velodrome, ou nas farms da PancakeSwap, não aparecem como tokens na carteira. Nós as lemos direto do protocolo, com as emissões pendentes.",
       },
       {
         title: "Números honestos",
@@ -62,11 +63,11 @@ const pages: PagesMessages = {
     faq: [
       {
         q: "Como acompanho minhas posições em pools de liquidez em várias redes?",
-        a: "Cole o endereço da sua carteira (0x…) na caixa de busca acima. O {name} lê as blockchains e lista todas as posições de LP que esse endereço tem na Aerodrome, Velodrome e Uniswap v3 em {networks} — valor em dólar, taxas pendentes, emissões e faixas de preço.",
+        a: "Cole o endereço da sua carteira (0x…) na caixa de busca acima. O {name} lê as blockchains e lista todas as posições de LP que esse endereço tem na Aerodrome, Velodrome, Uniswap e PancakeSwap em {networks} — valor em dólar, taxas pendentes, emissões e faixas de preço.",
       },
       {
         q: "Por que minhas posições de LP da Aerodrome em stake não aparecem na minha carteira?",
-        a: "Quando você coloca uma posição em stake num gauge da Aerodrome para ganhar AERO, o token de LP (ou NFT) vai para o contrato do gauge, e por isso as carteiras e a maioria dos rastreadores de portfólio deixam de mostrá-la. O {name} lê os gauges diretamente, então as posições em stake aparecem com as emissões pendentes. O mesmo vale para os gauges da Velodrome em {velodromeNetworks}.",
+        a: "Quando você coloca uma posição em stake num gauge da Aerodrome para ganhar AERO, o token de LP (ou NFT) vai para o contrato do gauge, e por isso as carteiras e a maioria dos rastreadores de portfólio deixam de mostrá-la. O {name} lê os gauges diretamente, então as posições em stake aparecem com as emissões pendentes. O mesmo vale para os gauges da Velodrome em {velodromeNetworks} e para as posições da PancakeSwap v3 em stake nas farms dela (o MasterChef) na BNB Chain, com o CAKE pendente.",
       },
       {
         q: "Preciso conectar minha carteira ou criar uma conta?",
@@ -97,7 +98,7 @@ const pages: PagesMessages = {
     ],
     howTitle: "Como funciona",
     how: [
-      "Você cola o endereço de uma carteira. Lemos os dados on-chain das corretoras suportadas, em todas as nossas redes, para achar cada posição dessa carteira — pools clássicos, posições concentradas e posições em stake nos gauges, que não aparecem como tokens na carteira.",
+      "Você cola o endereço de uma carteira. Lemos os dados on-chain das corretoras suportadas, em todas as nossas redes, para achar cada posição dessa carteira — pools clássicos, posições concentradas e posições em stake nos gauges ou nas farms, que não aparecem como tokens na carteira.",
       "Para cada posição calculamos quanto ela tem de cada token, as taxas pendentes e as emissões pendentes, quando a corretora as paga — e, nas posições concentradas, se o preço está dentro da faixa que você escolheu.",
       "Os valores em dólar vêm de dados públicos de preço (DefiLlama, depois DexScreener). Quando nenhum dos dois cobre um token, lemos o preço dele num pool da mesma rede e o marcamos com um sublinhado pontilhado. Quando nada consegue precificar um token, mostramos “—” em vez de chutar.",
     ],
@@ -115,7 +116,7 @@ const pages: PagesMessages = {
     title: "Roadmap — redes e corretoras",
     heading: "Roadmap",
     description:
-      "Onde o trackdefi está hoje e para onde vai: APR por posição, Aerodrome, Velodrome e Uniswap em {count} redes; em seguida, mais cobertura da Uniswap v4, idade do pool e P&L.",
+      "Onde o trackdefi está hoje e para onde vai: APR por posição, Aerodrome, Velodrome, Uniswap e PancakeSwap em {count} redes; em seguida, mais cobertura da Uniswap v4, idade do pool e P&L.",
     lede: "Onde o trackdefi está hoje e para onde vai. Sem prazos e sem promessas — as prioridades seguem o que os usuários realmente pedem. Uma coisa nunca muda: <b>somente leitura, para sempre</b>.",
     status: { live: "✓ No ar", next: "→ Próximo", planned: "Planejado", exploring: "Explorando" },
     liveTitle: "No ar hoje",
@@ -160,6 +161,10 @@ const pages: PagesMessages = {
         title: "Lisk, Swell, Metal L2, Superseed e Celo · Velodrome",
         body: "o restante da implantação da Velodrome na Superchain, lido do mesmo jeito que as cinco primeiras. Posições, quantidades, posições em stake e emissões pendentes de XVELO são todas exatas. Onde dados públicos de preço ainda não chegam (Swell, Metal L2, Superseed), os valores em dólar são lidos dos próprios pools dessas redes.",
       },
+      {
+        title: "BNB Chain · PancakeSwap v3",
+        body: "a maior corretora da BNB Chain. Posições concentradas, quantidades, faixas de preço e taxas pendentes — e as posições em stake nas farms da PancakeSwap, com o CAKE pendente e o que rendem em CAKE agora. Nossa primeira rede fora das L2 do Ethereum.",
+      },
     ],
     nextTitle: "Próximo",
     next: [
@@ -170,10 +175,6 @@ const pages: PagesMessages = {
     ],
     plannedTitle: "Planejado",
     planned: [
-      {
-        title: "BNB Chain · PancakeSwap v3",
-        body: "a maior corretora da BNB Chain, lida do mesmo jeito que a Uniswap v3: posições concentradas, quantidades, faixas de preço e taxas pendentes.",
-      },
       {
         title: "Solana · Orca",
         body: "nossa primeira rede fora da família Ethereum. Uma prova de conceito já lê posições da Orca a partir de dados públicos — quantidades, faixa de preço, status dentro da faixa, taxas e recompensas pendentes — então o que resta é encanamento, não pesquisa. Raydium e Meteora viriam depois.",
@@ -338,6 +339,11 @@ const pages: PagesMessages = {
             id: "staked",
             term: "Em stake no gauge",
             def: "A posição foi depositada no gauge da corretora — um contrato que paga emissões (o token da própria corretora) a quem fornece liquidez. O stake tira a posição da carteira, e é por isso que a maioria das carteiras e muitos rastreadores deixam de mostrá-la. O trackdefi lê os gauges diretamente.",
+          },
+          {
+            id: "staked-farm",
+            term: "Em stake na farm",
+            def: "A versão do gauge na PancakeSwap: a posição foi depositada numa farm da PancakeSwap (o contrato MasterChef), que paga CAKE. O efeito é o mesmo — a posição sai da carteira, e o trackdefi lê a farm diretamente.",
           },
           {
             id: "alm",

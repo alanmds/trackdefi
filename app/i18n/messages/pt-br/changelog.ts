@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "bnb-pancakeswap-v3": {
+    title: "BNB Chain e PancakeSwap v3, com as posições em stake",
+    body: "O trackdefi agora lê a PancakeSwap v3 na BNB Chain: posições concentradas com quantidades, faixa de preço e taxas pendentes. As posições em stake nas farms da PancakeSwap também aparecem, com o CAKE pendente e o que estão rendendo em CAKE agora.",
+  },
   portuguese: {
     title: "O trackdefi agora fala português",
     body: "O site inteiro — páginas de carteira, glossário, roadmap e este log — agora está disponível em português do Brasil, com números e datas no formato brasileiro. Use o seletor de idioma no topo de qualquer página. Mais idiomas virão.",

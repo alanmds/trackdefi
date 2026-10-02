@@ -108,7 +108,7 @@ export default function PositionCard({ p, pricesFailed = false }: { p: PositionD
           ) : (
             <span className="badge badge-warn">{t.outOfRange}</span>
           ))}
-        {p.staked && <span className="badge">{t.staked}</span>}
+        {p.staked && <span className="badge">{p.protocol === "pancakeswap-v3" ? t.stakedFarm : t.staked}</span>}
         {p.managedByAlm && <span className="badge">{t.alm}</span>}
         {p.positionId && <span className="badge">{fill(t.nft, { id: p.positionId })}</span>}
       </div>

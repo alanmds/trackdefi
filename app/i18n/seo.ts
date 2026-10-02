@@ -8,17 +8,32 @@
  */
 
 import type { Metadata } from "next";
-import { humanList, NETWORK_COUNT, NETWORK_NAMES, PROTOCOL_FAMILIES, SITE_NAME } from "../site";
+import { FAMILIES_BY_VOLUME, humanList, NETWORK_COUNT, NETWORK_NAMES, PROTOCOL_FAMILIES, SITE_NAME } from "../site";
 import { DEFAULT_LOCALE, localeInfo, LOCALES, localePath, type Locale } from "./config";
 import { fill } from "./rich";
 import { getMessages } from "./get";
 
-/** título da home (≤ 70 caracteres p/ não truncar no Google) */
+/** limite do Google para o título — acima disso ele corta com "…" */
+export const TITLE_MAX = 70;
+
+/**
+ * Título da home (≤ 70 caracteres p/ não truncar no Google).
+ *
+ * Lista as famílias de protocolo; se não couber, tira a de MENOR volume
+ * (`FAMILIES_BY_VOLUME`) até caber, mantendo a ordem de exibição das que
+ * ficam. Decisão do Alan em 02/10/2026, quando a PancakeSwap entrou e o
+ * título foi a 80: a marca saiu do título (o Google já mostra o nome do site
+ * acima dele) e, em conflitos futuros, ficam os protocolos de maior volume.
+ */
 export function siteTitle(locale: Locale): string {
-  return fill(getMessages(locale).pages.meta.siteTitle, {
-    name: SITE_NAME,
-    families: humanList(PROTOCOL_FAMILIES, "&", locale),
-  });
+  const montar = (fams: readonly string[]) =>
+    fill(getMessages(locale).pages.meta.siteTitle, { name: SITE_NAME, families: humanList(fams, "&", locale) });
+  let fams = [...PROTOCOL_FAMILIES];
+  while (montar(fams).length > TITLE_MAX && fams.length > 1) {
+    const menor = [...fams].sort((a, b) => FAMILIES_BY_VOLUME.indexOf(b) - FAMILIES_BY_VOLUME.indexOf(a))[0];
+    fams = fams.filter((f) => f !== menor);
+  }
+  return montar(fams);
 }
 
 /**

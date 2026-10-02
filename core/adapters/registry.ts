@@ -12,6 +12,8 @@ import { UniswapV3Adapter } from "./uniswap-v3/index";
 import { UNISWAP_V3_CHAINS } from "./uniswap-v3/config";
 import { UniswapV4Adapter } from "./uniswap-v4/index";
 import { UNISWAP_V4_CHAINS } from "./uniswap-v4/config";
+import { PancakeV3Adapter } from "./pancake-v3/index";
+import { PANCAKE_V3_CHAINS } from "./pancake-v3/config";
 
 /** Recebe o aviso junto com QUEM avisou — a tela precisa dizer "Uniswap v4
  *  na Robinhood Chain", não um genérico "algo falhou". */
@@ -45,6 +47,9 @@ export function buildAdapters(opts: { onWarn?: AdapterWarn } = {}): ProtocolAdap
     ),
     ...UNISWAP_V4_CHAINS.map((config) =>
       tagged((onWarn) => new UniswapV4Adapter(readerFor(config.chainId), { onWarn, config })),
+    ),
+    ...PANCAKE_V3_CHAINS.map((config) =>
+      tagged((onWarn) => new PancakeV3Adapter(readerFor(config.chainId), { onWarn, config })),
     ),
   ];
 }

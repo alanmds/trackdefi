@@ -6,6 +6,7 @@
 import {
   arbitrum,
   base,
+  bsc,
   celo,
   fraxtal,
   ink,
@@ -288,6 +289,23 @@ export const CHAINS: Record<number, ChainInfo> = {
     rpcEnv: "CELO_RPC_URLS",
     opStackWeth: true,
     defaultRpcs: ["https://forno.celo.org", "https://celo.drpc.org"],
+  },
+  56: {
+    chain: bsc,
+    label: "BNB Chain",
+    priceSlug: "bsc",
+    // conferido no dataset yields.llama.fi em 02/10/2026 ("BSC"); a Pancake v3
+    // NÃO tem linhas lá na BNB — o fee APR sai só da medição on-chain
+    yieldsLabel: "BSC",
+    explorerUrl: "https://bscscan.com",
+    explorerLabel: "BscScan",
+    // medido no PoC de 02/10/2026: 0,444–0,452 s
+    secPerBlock: 0.45,
+    rpcEnv: "BSC_RPC_URLS",
+    dexSlug: "bsc",
+    /* os públicos NÃO servem estado passado (PoC de 02/10): sem BSC_RPC_URLS
+       (Alchemy) o fee APR on-chain cai em "—" */
+    defaultRpcs: ["https://bsc-dataseed.bnbchain.org", "https://bsc-rpc.publicnode.com"],
   },
 };
 

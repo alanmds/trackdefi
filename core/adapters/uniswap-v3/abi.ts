@@ -18,8 +18,11 @@ export const uniFactoryAbi = parseAbi([
   "function getPool(address tokenA, address tokenB, uint24 fee) view returns (address)",
 ]);
 
-export const uniPoolAbi = parseAbi([
+export const uniSlot0Abi = parseAbi([
   "function slot0() view returns (uint160 sqrtPriceX96, int24 tick, uint16 observationIndex, uint16 observationCardinality, uint16 observationCardinalityNext, uint8 feeProtocol, bool unlocked)",
+]);
+
+export const uniPoolAbi = parseAbi([
   "function liquidity() view returns (uint128)",
 ]);
 
@@ -36,6 +39,8 @@ export type UniRawPosition = {
   feeGrowthInside0LastX128: bigint;
   tokensOwed0: bigint;
   tokensOwed1: bigint;
+  /** true = o NFT mora num contrato de stake (ex.: MasterChef v3 da Pancake) */
+  staked: boolean;
 };
 
 export const MAX_UINT128 = (1n << 128n) - 1n;

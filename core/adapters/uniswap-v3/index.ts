@@ -10,6 +10,11 @@
  * - Taxas pendentes por simulação de collect() via eth_call (100% leitura,
  *   nenhuma transação); fallback: tokensOwed do NFPM + aviso.
  * - Uniswap não tem gauges → staked sempre false, sem emissões.
+ *
+ * Forks com o MESMO NFPM (PancakeSwap v3) reaproveitam esta classe por
+ * herança: `protocol` e o ABI do `slot0` vêm das opções, e os ganchos
+ * protegidos (`stakedTokenIds`, `collectTarget`, `afterPositions`) deixam a
+ * subclasse somar os NFTs em stake e as emissões sem duplicar a varredura.
  */
 
 import { erc20Abi, type Address } from "viem";
@@ -19,7 +24,7 @@ import { getSqrtRatioAtTick } from "../../math/tickmath";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { mapLimit } from "../../util";
 import { cleanSymbol } from "../aerodrome/index";
-import { MAX_UINT128, nfpmAbi, uniFactoryAbi, uniPoolAbi, type UniRawPosition } from "./abi";
+import { MAX_UINT128, nfpmAbi, uniFactoryAbi, uniPoolAbi, uniSlot0Abi, type UniRawPosition } from "./abi";
 import { MAX_NFTS, UNISWAP_V3_BASE, type UniV3ChainConfig } from "./config";
 
 export interface UniswapV3Options {
@@ -29,23 +34,30 @@ export interface UniswapV3Options {
   factory?: Address;
   maxNfts?: number;
   onWarn?: WarnSink;
+  /** id do protocolo no DTO (default "uniswap-v3"; forks passam o seu) */
+  protocol?: string;
+  /** ABI do `slot0()` — forks mudam os tipos (a Pancake tem feeProtocol uint32) */
+  slot0Abi?: readonly unknown[];
 }
 
 export class UniswapV3Adapter implements ProtocolAdapter {
-  readonly protocol = "uniswap-v3";
+  readonly protocol: string;
   readonly chainId: number;
 
-  private readonly nfpm: Address;
-  private readonly factory: Address;
-  private readonly maxNfts: number;
-  private readonly warn: WarnSink;
+  protected readonly nfpm: Address;
+  protected readonly factory: Address;
+  protected readonly maxNfts: number;
+  protected readonly warn: WarnSink;
+  private readonly slot0Abi: readonly unknown[];
 
   constructor(
-    private readonly reader: ChainReader,
+    protected readonly reader: ChainReader,
     opts: UniswapV3Options = {},
   ) {
     const config = opts.config ?? UNISWAP_V3_BASE;
     this.chainId = config.chainId;
+    this.protocol = opts.protocol ?? "uniswap-v3";
+    this.slot0Abi = opts.slot0Abi ?? uniSlot0Abi;
     this.nfpm = opts.nfpm ?? config.nfpm;
     this.factory = opts.factory ?? config.factory;
     this.maxNfts = opts.maxNfts ?? MAX_NFTS;
@@ -64,7 +76,7 @@ export class UniswapV3Adapter implements ProtocolAdapter {
     for (const p of raw) {
       const pool = pools.get(poolKey(p));
       if (!pool) {
-        this.warn(`uniswap: pool de ${p.token0}/${p.token1} fee ${p.fee} sem metadados — NFT #${p.tokenId} ignorado`);
+        this.warn(`${this.protocol}: pool de ${p.token0}/${p.token1} fee ${p.fee} sem metadados — NFT #${p.tokenId} ignorado`);
         continue;
       }
       const token0 = tokens.get(p.token0) ?? fallbackToken(p.token0);
@@ -88,7 +100,7 @@ export class UniswapV3Adapter implements ProtocolAdapter {
         poolSymbol: `${token0.symbol}/${token1.symbol} ${feePct}%`,
         kind: "concentrated",
         positionId: p.tokenId.toString(),
-        staked: false,
+        staked: p.staked,
         managedByAlm: null,
         token0,
         token1,
@@ -116,41 +128,30 @@ export class UniswapV3Adapter implements ProtocolAdapter {
         },
       });
     }
-    return out;
+    return this.afterPositions(out);
   }
 
-  /** NFTs da conta → posições cruas com liquidez ou taxas a receber. */
+  /** Gancho: a subclasse completa as posições (ex.: emissões das em stake). */
+  protected async afterPositions(positions: LpPosition[]): Promise<LpPosition[]> {
+    return positions;
+  }
+
+  /** Gancho: NFTs da conta que moram num contrato de stake (default: nenhum). */
+  protected async stakedTokenIds(_account: Address): Promise<bigint[]> {
+    return [];
+  }
+
+  /** Gancho: de onde se simula o `collect()` — NFT em stake coleta pelo contrato de stake. */
+  protected collectTarget(_p: UniRawPosition): Address {
+    return this.nfpm;
+  }
+
+  /** NFTs da conta (na carteira + em stake) → posições cruas com liquidez ou taxas a receber. */
   private async fetchRawPositions(account: Address): Promise<UniRawPosition[]> {
-    const balance = (await this.reader.readContract({
-      address: this.nfpm,
-      abi: nfpmAbi,
-      functionName: "balanceOf",
-      args: [account],
-    })) as bigint;
-    if (balance === 0n) return [];
-
-    const count = Number(balance > BigInt(this.maxNfts) ? BigInt(this.maxNfts) : balance);
-    if (balance > BigInt(this.maxNfts)) {
-      this.warn(`uniswap: carteira tem ${balance} NFTs de posição; enumerando só os ${this.maxNfts} mais recentes`, {
-        kind: "capped",
-        checked: this.maxNfts,
-      });
-    }
-
-    // Do índice mais alto para o mais baixo: `tokenOfOwnerByIndex` devolve os
-    // NFTs na ordem em que chegaram à carteira, e em carteira-robô as posições
-    // abertas são as mais novas — as antigas já foram encerradas.
-    const idResults = await this.reader.multicall({
-      contracts: Array.from({ length: count }, (_, i) => ({
-        address: this.nfpm,
-        abi: nfpmAbi,
-        functionName: "tokenOfOwnerByIndex",
-        args: [account, balance - 1n - BigInt(i)],
-      })),
-      allowFailure: true,
-    });
-    const ids = idResults.filter((r) => r.status === "success").map((r) => r.result as bigint);
-    if (ids.length < count) this.warn(`uniswap: ${count - ids.length} índice(s) de NFT não responderam`);
+    const [livres, emStake] = await Promise.all([this.enumerateIds(this.nfpm, account), this.stakedTokenIds(account)]);
+    const stakedSet = new Set(emStake);
+    const ids = [...livres, ...emStake];
+    if (ids.length === 0) return [];
 
     const posResults = await this.reader.multicall({
       contracts: ids.map((id) => ({ address: this.nfpm, abi: nfpmAbi, functionName: "positions", args: [id] })),
@@ -160,7 +161,7 @@ export class UniswapV3Adapter implements ProtocolAdapter {
     const raw: UniRawPosition[] = [];
     posResults.forEach((r, i) => {
       if (r.status !== "success") {
-        this.warn(`uniswap: positions(${ids[i]}) falhou`);
+        this.warn(`${this.protocol}: positions(${ids[i]}) falhou`);
         return;
       }
       const v = r.result as readonly unknown[];
@@ -175,6 +176,7 @@ export class UniswapV3Adapter implements ProtocolAdapter {
         feeGrowthInside0LastX128: v[8] as bigint,
         tokensOwed0: v[10] as bigint,
         tokensOwed1: v[11] as bigint,
+        staked: stakedSet.has(ids[i]),
       });
     });
 
@@ -182,18 +184,57 @@ export class UniswapV3Adapter implements ProtocolAdapter {
     return raw.filter((p) => p.liquidity > 0n || p.tokensOwed0 > 0n || p.tokensOwed1 > 0n);
   }
 
+  /**
+   * IDs de NFT que `holder` registra para `account`, pelo par ERC-721
+   * Enumerable `balanceOf` / `tokenOfOwnerByIndex` (o NFPM tem; o MasterChef
+   * v3 da Pancake também, para as posições em stake).
+   */
+  protected async enumerateIds(holder: Address, account: Address): Promise<bigint[]> {
+    const balance = (await this.reader.readContract({
+      address: holder,
+      abi: nfpmAbi,
+      functionName: "balanceOf",
+      args: [account],
+    })) as bigint;
+    if (balance === 0n) return [];
+
+    const count = Number(balance > BigInt(this.maxNfts) ? BigInt(this.maxNfts) : balance);
+    if (balance > BigInt(this.maxNfts)) {
+      this.warn(`${this.protocol}: carteira tem ${balance} NFTs de posição; enumerando só os ${this.maxNfts} mais recentes`, {
+        kind: "capped",
+        checked: this.maxNfts,
+      });
+    }
+
+    // Do índice mais alto para o mais baixo: `tokenOfOwnerByIndex` devolve os
+    // NFTs na ordem em que chegaram à carteira, e em carteira-robô as posições
+    // abertas são as mais novas — as antigas já foram encerradas.
+    const idResults = await this.reader.multicall({
+      contracts: Array.from({ length: count }, (_, i) => ({
+        address: holder,
+        abi: nfpmAbi,
+        functionName: "tokenOfOwnerByIndex",
+        args: [account, balance - 1n - BigInt(i)],
+      })),
+      allowFailure: true,
+    });
+    const ids = idResults.filter((r) => r.status === "success").map((r) => r.result as bigint);
+    if (ids.length < count) this.warn(`${this.protocol}: ${count - ids.length} índice(s) de NFT não responderam`);
+    return ids;
+  }
+
   /** Taxas pendentes reais via collect() simulado (inclui as ainda não "poked"). */
   private async simulateFees(account: Address, raw: UniRawPosition[]): Promise<Map<bigint, [bigint, bigint]>> {
     const out = new Map<bigint, [bigint, bigint]>();
     if (!this.reader.simulateContract) {
-      this.warn("uniswap: simulateContract indisponível — taxas pendentes podem estar subestimadas (tokensOwed)");
+      this.warn(`${this.protocol}: simulateContract indisponível — taxas pendentes podem estar subestimadas (tokensOwed)`);
       return out;
     }
     let failures = 0;
     await mapLimit(raw, 5, async (p) => {
       try {
         const sim = await this.reader.simulateContract!({
-          address: this.nfpm,
+          address: this.collectTarget(p),
           abi: nfpmAbi,
           functionName: "collect",
           args: [{ tokenId: p.tokenId, recipient: account, amount0Max: MAX_UINT128, amount1Max: MAX_UINT128 }],
@@ -206,7 +247,7 @@ export class UniswapV3Adapter implements ProtocolAdapter {
       }
     });
     if (failures > 0) {
-      this.warn(`uniswap: simulação de taxas falhou em ${failures} posição(ões) — usando tokensOwed (pode subestimar)`);
+      this.warn(`${this.protocol}: simulação de taxas falhou em ${failures} posição(ões) — usando tokensOwed (pode subestimar)`);
     }
     return out;
   }
@@ -235,7 +276,7 @@ export class UniswapV3Adapter implements ProtocolAdapter {
 
     const poolResults = await this.reader.multicall({
       contracts: found.flatMap((f) => [
-        { address: f.address, abi: uniPoolAbi, functionName: "slot0" },
+        { address: f.address, abi: this.slot0Abi, functionName: "slot0" },
         { address: f.address, abi: uniPoolAbi, functionName: "liquidity" },
       ]),
       allowFailure: true,

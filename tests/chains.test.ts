@@ -16,12 +16,15 @@ import { CHAINS } from "../core/chains";
 import { AERODROME_BASE, VELODROME_LEAF_CHAINS, VELODROME_OPTIMISM } from "../core/adapters/aerodrome/config";
 import { UNISWAP_V3_CHAINS } from "../core/adapters/uniswap-v3/config";
 import { UNISWAP_V4_CHAINS } from "../core/adapters/uniswap-v4/config";
+import { PANCAKE_V3_CHAINS } from "../core/adapters/pancake-v3/config";
 import {
   COVERAGE,
+  FAMILIES_BY_VOLUME,
   humanList,
   NETWORK_COUNT,
   NETWORK_NAMES,
   NETWORKS,
+  PROTOCOL_FAMILIES,
   coverageSentence,
   networksSentence,
 } from "../app/site";
@@ -107,6 +110,18 @@ describe("frase de cobertura", () => {
     // histórico, e o público da Base não aceita. Rede nova entra na config e
     // ESTE teste cobra o texto do site.
     expect(redesDe("Uniswap v4")).toEqual(UNISWAP_V4_CHAINS.map((c) => nomeDaRede(c.chainId)).sort());
+  });
+
+  it("PancakeSwap v3 cobre exatamente as redes do seu config", () => {
+    expect(redesDe("PancakeSwap v3")).toEqual(PANCAKE_V3_CHAINS.map((c) => nomeDaRede(c.chainId)).sort());
+  });
+});
+
+describe("título: quem sai quando não cabe", () => {
+  it("toda família de protocolo tem lugar no ranking de volume", () => {
+    // família nova sem ranking não teria como ser cortada do título com
+    // critério — conferir o volume na DefiLlama e pôr na posição certa
+    expect([...FAMILIES_BY_VOLUME].sort()).toEqual([...PROTOCOL_FAMILIES].sort());
   });
 });
 

@@ -103,7 +103,7 @@ const ui: UiMessages = {
     refresh: "Atualizar",
     scanning: "Varrendo as blockchains…",
     scanningBody:
-      "Lendo Aerodrome, Velodrome e Uniswap v3 em {networks} — posições clássicas, concentradas e em stake nos gauges.",
+      "Lendo Aerodrome, Velodrome, Uniswap e PancakeSwap em {networks} — posições clássicas, concentradas e em stake.",
     elapsed: "{secs}s — a primeira varredura completa leva cerca de 15 s",
     errors: {
       invalid_address: { title: "Endereço inválido", body: "Isso não parece um endereço de carteira válido." },
@@ -121,7 +121,7 @@ const ui: UiMessages = {
     },
     empty: {
       title: "Nenhuma posição de liquidez encontrada",
-      body: "Esta carteira não tem posições ativas na Aerodrome, Velodrome ou Uniswap v3 em {networks} no momento.",
+      body: "Esta carteira não tem posições ativas na Aerodrome, Velodrome, Uniswap ou PancakeSwap em {networks} no momento.",
       another: "Ver outra carteira",
     },
     kpi: {
@@ -160,6 +160,7 @@ const ui: UiMessages = {
     inRange: "✓ Dentro da faixa",
     outOfRange: "⚠ Fora da faixa",
     staked: "Em stake no gauge",
+    stakedFarm: "Em stake na farm",
     alm: "Gerida por ALM",
     nft: "NFT #{id}",
     earningNow: "Rendendo agora",
@@ -180,7 +181,7 @@ const ui: UiMessages = {
     tipOutOfRange:
       "Fora da faixa: esta posição não está ganhando taxas de swap agora. As taxas já acumuladas continuam disponíveis para resgate.",
     tipOutOfRangeStaked:
-      "Fora da faixa: esta posição não está ganhando taxas de swap agora e as emissões do gauge estão pausadas. As taxas já acumuladas continuam disponíveis para resgate.",
+      "Fora da faixa: esta posição não está ganhando taxas de swap agora e as emissões do stake estão pausadas. As taxas já acumuladas continuam disponíveis para resgate.",
     tipPoolInRange: "A liquidez dentro da faixa neste pool rende em média {pct}/ano ({source}).",
     tipEstimate: "Rendimento estimado que ESTA posição está tendo agora ({parts}).",
     tipEstimateNote: "Estimativa a partir de dados ao vivo do pool — não é um retorno já realizado.",

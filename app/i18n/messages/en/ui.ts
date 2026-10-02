@@ -73,7 +73,7 @@ const ui = {
     refresh: "Refresh",
     scanning: "Scanning the blockchains…",
     scanningBody:
-      "Reading Aerodrome, Velodrome and Uniswap v3 across {networks} — classic, concentrated and gauge-staked positions.",
+      "Reading Aerodrome, Velodrome, Uniswap and PancakeSwap across {networks} — classic, concentrated and staked positions.",
     elapsed: "{secs}s — a full scan takes ~15 s on the first visit",
     errors: {
       invalid_address: { title: "Invalid address", body: "That doesn't look like a valid wallet address." },
@@ -91,7 +91,7 @@ const ui = {
     },
     empty: {
       title: "No liquidity positions found",
-      body: "This wallet has no active positions on Aerodrome, Velodrome or Uniswap v3 across {networks} right now.",
+      body: "This wallet has no active positions on Aerodrome, Velodrome, Uniswap or PancakeSwap across {networks} right now.",
       another: "Track another wallet",
     },
     kpi: {
@@ -130,6 +130,8 @@ const ui = {
     inRange: "✓ In range",
     outOfRange: "⚠ Out of range",
     staked: "Staked in gauge",
+    /** PancakeSwap chama o seu "gauge" de farm (contrato MasterChef) */
+    stakedFarm: "Staked in farm",
     alm: "ALM-managed",
     nft: "NFT #{id}",
     earningNow: "Earning now",
@@ -150,7 +152,7 @@ const ui = {
     tipOutOfRange:
       "Out of range: this position is earning no swap fees right now. Fees already accrued stay claimable.",
     tipOutOfRangeStaked:
-      "Out of range: this position is earning no swap fees right now and gauge emissions are paused. Fees already accrued stay claimable.",
+      "Out of range: this position is earning no swap fees right now and its staking emissions are paused. Fees already accrued stay claimable.",
     tipPoolInRange: "In-range liquidity in this pool averages {pct}/yr ({source}).",
     tipEstimate: "Estimated yield THIS position is earning right now ({parts}).",
     tipEstimateNote: "Estimate from live pool data — not a realized return.",
