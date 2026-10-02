@@ -13,27 +13,36 @@ import { DEFAULT_LOCALE, localeInfo, LOCALES, localePath, type Locale } from "./
 import { fill } from "./rich";
 import { getMessages } from "./get";
 
-/** limite do Google para o título — acima disso ele corta com "…" */
+/** limites do Google — acima disso ele corta com "…" */
 export const TITLE_MAX = 70;
+export const DESCRIPTION_MAX = 160;
+
+/**
+ * Monta o texto com as famílias de protocolo; se não couber em `max`, tira a
+ * de MENOR volume (`FAMILIES_BY_VOLUME`) até caber, mantendo a ordem de
+ * exibição das que ficam. Regra do Alan (02/10/2026): em conflito de espaço,
+ * ficam os protocolos de maior volume.
+ */
+function comFamiliasQueCabem(max: number, montar: (families: string) => string, locale: Locale): string {
+  let fams = [...PROTOCOL_FAMILIES];
+  const texto = () => montar(humanList(fams, "&", locale));
+  while (texto().length > max && fams.length > 1) {
+    const menor = [...fams].sort((a, b) => FAMILIES_BY_VOLUME.indexOf(b) - FAMILIES_BY_VOLUME.indexOf(a))[0];
+    fams = fams.filter((f) => f !== menor);
+  }
+  return texto();
+}
 
 /**
  * Título da home (≤ 70 caracteres p/ não truncar no Google).
  *
- * Lista as famílias de protocolo; se não couber, tira a de MENOR volume
- * (`FAMILIES_BY_VOLUME`) até caber, mantendo a ordem de exibição das que
- * ficam. Decisão do Alan em 02/10/2026, quando a PancakeSwap entrou e o
- * título foi a 80: a marca saiu do título (o Google já mostra o nome do site
- * acima dele) e, em conflitos futuros, ficam os protocolos de maior volume.
+ * Decisão do Alan em 02/10/2026, quando a PancakeSwap entrou e o título foi a
+ * 80: a marca saiu do título (o Google já mostra o nome do site acima dele) e,
+ * em conflitos futuros, ficam os protocolos de maior volume.
  */
 export function siteTitle(locale: Locale): string {
-  const montar = (fams: readonly string[]) =>
-    fill(getMessages(locale).pages.meta.siteTitle, { name: SITE_NAME, families: humanList(fams, "&", locale) });
-  let fams = [...PROTOCOL_FAMILIES];
-  while (montar(fams).length > TITLE_MAX && fams.length > 1) {
-    const menor = [...fams].sort((a, b) => FAMILIES_BY_VOLUME.indexOf(b) - FAMILIES_BY_VOLUME.indexOf(a))[0];
-    fams = fams.filter((f) => f !== menor);
-  }
-  return montar(fams);
+  const t = getMessages(locale).pages.meta.siteTitle;
+  return comFamiliasQueCabem(TITLE_MAX, (families) => fill(t, { name: SITE_NAME, families }), locale);
 }
 
 /**
@@ -47,10 +56,8 @@ export function siteTitle(locale: Locale): string {
  * para ranquear — a meta description só decide a aparência do resultado.
  */
 export function siteDescription(locale: Locale): string {
-  return fill(getMessages(locale).pages.meta.siteDescription, {
-    families: humanList(PROTOCOL_FAMILIES, "&", locale),
-    count: NETWORK_COUNT,
-  });
+  const t = getMessages(locale).pages.meta.siteDescription;
+  return comFamiliasQueCabem(DESCRIPTION_MAX, (families) => fill(t, { families, count: NETWORK_COUNT }), locale);
 }
 
 export function siteKeywords(locale: Locale): string[] {

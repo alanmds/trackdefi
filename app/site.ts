@@ -129,6 +129,7 @@ export const COVERAGE = [
   },
   { protocol: "Uniswap v4", networks: ["Robinhood Chain"] as readonly string[] },
   { protocol: "PancakeSwap v3", networks: ["BNB Chain"] as readonly string[] },
+  { protocol: "Ramses", networks: ["Robinhood Chain"] as readonly string[] },
 ] as const;
 
 /**
@@ -160,10 +161,11 @@ export const PROTOCOL_FAMILIES: readonly string[] = [
  * quando ele não cabe em 70 caracteres (regra do Alan, 02/10/2026: em
  * conflito, ficam os protocolos de maior volume). Fonte: DefiLlama,
  * api.llama.fi/overview/dexs, volume de 30 dias em 02/10/2026 — Uniswap
- * US$ 93 bi, PancakeSwap US$ 30 bi, Aerodrome US$ 14 bi, Velodrome US$ 0,6 bi.
+ * US$ 93 bi, PancakeSwap US$ 30 bi, Aerodrome US$ 14 bi, Ramses US$ 3 bi,
+ * Velodrome US$ 0,6 bi.
  * Família nova precisa entrar aqui (teste cobra), conferida na mesma fonte.
  */
-export const FAMILIES_BY_VOLUME: readonly string[] = ["Uniswap", "PancakeSwap", "Aerodrome", "Velodrome"];
+export const FAMILIES_BY_VOLUME: readonly string[] = ["Uniswap", "PancakeSwap", "Aerodrome", "Ramses", "Velodrome"];
 
 /** "Aerodrome on Base, Velodrome on Optimism, and Uniswap v3 on Base, …" */
 export function coverageSentence(locale: Locale = DEFAULT_LOCALE): string {

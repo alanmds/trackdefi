@@ -55,6 +55,20 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "emissions-uncapped",
+    date: "2026-10-02",
+    kind: "improvement",
+    title: "Emissions show their real rate, with dollars per day",
+    body: "The emissions line of Earning now used to hide any rate above 1,000% a year. It now always shows what the gauge is paying your position right now, however high, with how many dollars a day that is at the current rate right next to it.",
+  },
+  {
+    id: "ramses",
+    date: "2026-10-02",
+    kind: "exchange",
+    title: "Ramses on Robinhood Chain",
+    body: "trackdefi now reads Ramses on Robinhood Chain, where most of its liquidity sits: concentrated positions with their amounts, price range and pending fees. HyperEVM, where Ramses pays RAM rewards, is next on the roadmap.",
+  },
+  {
     id: "bnb-pancakeswap-v3",
     date: "2026-10-02",
     kind: "network",

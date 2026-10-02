@@ -53,6 +53,7 @@ const pages = {
       "Uniswap v3",
       "Velodrome",
       "PancakeSwap v3",
+      "Ramses",
     ],
     /** uma por rede */
     keywordNetwork: "{network} LP tracker",
@@ -64,7 +65,7 @@ const pages = {
       networks: "{count} networks — read-only, no keys, no login",
     },
     /** "Aerodrome, Velodrome & Uniswap v3" no cartão — nomes próprios, não traduzir */
-    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap",
+    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap · Ramses",
   },
 
   /** frase de "sem token" — promessa pública e permanente (ver `NO_TOKEN` em app/site.ts) */
@@ -97,7 +98,7 @@ const pages = {
     faq: [
       {
         q: "How do I track my liquidity pool positions across networks?",
-        a: "Paste your wallet address (0x…) in the search box above. {name} reads the blockchains and lists every LP position that address holds on Aerodrome, Velodrome, Uniswap and PancakeSwap across {networks} — value in USD, pending fees, emissions and price ranges.",
+        a: "Paste your wallet address (0x…) in the search box above. {name} reads the blockchains and lists every LP position that address holds on Aerodrome, Velodrome, Uniswap, PancakeSwap and Ramses across {networks} — value in USD, pending fees, emissions and price ranges.",
       },
       {
         q: "Why don't my staked Aerodrome LP positions show up in my wallet?",
@@ -150,7 +151,7 @@ const pages = {
     title: "Roadmap — networks & exchanges",
     heading: "Roadmap",
     description:
-      "Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome, Uniswap and PancakeSwap across {count} networks; wider Uniswap v4 coverage, pool age and P&L next.",
+      "Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome, Uniswap, PancakeSwap and Ramses across {count} networks; wider Uniswap v4 coverage, pool age and P&L next.",
     lede: "Where trackdefi is today and where it's going. No deadlines and no promises — priorities follow what users actually ask for. One thing never changes: <b>read-only, forever</b>.",
     status: { live: "✓ Live", next: "→ Next", planned: "Planned", exploring: "Exploring" } as Record<RoadmapKind, string>,
     liveTitle: "Live today",
@@ -199,6 +200,10 @@ const pages = {
         title: "BNB Chain · PancakeSwap v3",
         body: "the largest exchange on BNB Chain. Concentrated positions, amounts, price ranges and pending fees — and positions staked in PancakeSwap farms, with their pending CAKE and what they earn in CAKE right now. Our first network outside the Ethereum L2s.",
       },
+      {
+        title: "Robinhood Chain · Ramses",
+        body: "the ve(3,3) exchange with dynamic fees, read on the network where most of its liquidity sits: concentrated positions, amounts, price ranges and pending fees.",
+      },
     ] as RoadmapItem[],
     nextTitle: "Next",
     next: [
@@ -209,6 +214,10 @@ const pages = {
     ] as RoadmapItem[],
     plannedTitle: "Planned",
     planned: [
+      {
+        title: "HyperEVM · Ramses",
+        body: "Ramses' other big home, and the one with gauges: it pays RAM to every in-range position in a pool with a gauge, no staking needed. The reading already works in testing — the RAM waiting to be claimed and what each position earns in RAM right now. In most of those pools the swap fees go to RAM voters, so fees will show 0% there: that is the real number, not a gap.",
+      },
       {
         title: "Solana · Orca",
         body: "our first network outside the Ethereum family. A proof of concept already reads Orca positions from public data — amounts, price range, in-range status, pending fees and rewards — so the work left is plumbing, not research. Raydium and Meteora would follow.",
@@ -409,8 +418,8 @@ const pages = {
           },
           {
             id: "emissions-rate",
-            term: "Emissions · current rate",
-            def: "The reward token the gauge is paying this position, at the gauge's current rate and the token's current price. Only for staked positions that are in range.",
+            term: "Emissions · $/day at this rate",
+            def: "The reward token the gauge is paying this position, at the gauge's current rate and the token's current price. Only for staked positions that are in range. The percentage has no ceiling: when a gauge pays a lot to a small position, the number is high — and real. The dollars per day next to it say what that means in money.",
           },
           {
             id: "fees-plus-emissions",

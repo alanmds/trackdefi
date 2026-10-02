@@ -31,6 +31,8 @@ export type UniRawPosition = {
   tokenId: bigint;
   token0: `0x${string}`;
   token1: `0x${string}`;
+  /** fee tier (Uniswap/Pancake, em centésimos de bp) — ou tickSpacing nos forks
+   *  que identificam o pool por ele (Ramses). Só serve de chave do pool. */
   fee: number;
   tickLower: number;
   tickUpper: number;

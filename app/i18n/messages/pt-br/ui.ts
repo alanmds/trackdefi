@@ -103,7 +103,7 @@ const ui: UiMessages = {
     refresh: "Atualizar",
     scanning: "Varrendo as blockchains…",
     scanningBody:
-      "Lendo Aerodrome, Velodrome, Uniswap e PancakeSwap em {networks} — posições clássicas, concentradas e em stake.",
+      "Lendo Aerodrome, Velodrome, Uniswap, PancakeSwap e Ramses em {networks} — posições clássicas, concentradas e em stake.",
     elapsed: "{secs}s — a primeira varredura completa leva cerca de 15 s",
     errors: {
       invalid_address: { title: "Endereço inválido", body: "Isso não parece um endereço de carteira válido." },
@@ -121,7 +121,7 @@ const ui: UiMessages = {
     },
     empty: {
       title: "Nenhuma posição de liquidez encontrada",
-      body: "Esta carteira não tem posições ativas na Aerodrome, Velodrome, Uniswap ou PancakeSwap em {networks} no momento.",
+      body: "Esta carteira não tem posições ativas na Aerodrome, Velodrome, Uniswap, PancakeSwap ou Ramses em {networks} no momento.",
       another: "Ver outra carteira",
     },
     kpi: {
@@ -171,6 +171,7 @@ const ui: UiMessages = {
     inFees: "{usd} em taxas",
     emissions: "Emissões",
     currentRate: "taxa atual",
+    emissionPerDay: "{usd}/dia neste ritmo",
     partFees: "taxas {pct}",
     partEmissions: "emissões {pct}",
     outOfRangeSub: "fora da faixa",

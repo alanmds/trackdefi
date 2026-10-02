@@ -84,6 +84,12 @@ export interface EarningInputsOnchain {
   /** token de emissão do gauge (para o service buscar o preço) */
   emissionToken: TokenInfo | null;
   /**
+   * true = o gauge paga a posição SEM stake (Ramses: o NFT fica na carteira e
+   * toda liquidez dentro da faixa recebe). Sem isto, o cálculo de emissões só
+   * olha posição com `staked`, e o selo "em stake" mentiria se fosse usado.
+   */
+  emissionsWithoutStake?: boolean;
+  /**
    * `feeGrowthInside0LastX128` gravado NA POSIÇÃO no último mint/collect/
    * modify. Serve para saber se ela já existia — e com o mesmo L — no início
    * da janela do fee APR on-chain (ver `core/yields/onchain.ts`). Sem isso,

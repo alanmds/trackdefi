@@ -26,8 +26,18 @@
  * - Aerodrome em stake acumula TAXAS **e** emissões (medido no PoC) → soma.
  *
  * Política "número honesto ou —" (mesma do defillama.ts): guarda de TVL mínimo,
- * teto de sanidade; sem dado confiável para NENHUM componente → null.
+ * teto de sanidade NA ESTIMATIVA de taxas (dado de terceiro); sem dado
+ * confiável para NENHUM componente → null.
+ *
+ * ⚠️ EMISSÕES SEM TETO desde 02/10/2026 (decisão do Alan): o número é o ritmo
+ * que o contrato está pagando AGORA — verdadeiro, provado nos PoCs da Pancake
+ * (razão 1,016 / 0,996) e da Ramses (0,964). "Não me importo que o número seja
+ * alto, contanto que seja verdadeiro e tenha contexto": o contexto é o valor em
+ * dólar por dia (`emissionUsdPerDay`), mostrado ao lado. Só a barreira de
+ * absurdo aritmético (`ABSURD_APR_PCT`, leitura corrompida) continua valendo.
  */
+
+import { ABSURD_APR_PCT } from "./onchain";
 
 const YEAR_SEC = 365 * 24 * 3600;
 
@@ -75,6 +85,9 @@ export interface EarningNow {
   feePct: number | null;
   /** componente de emissões; null = não se aplica ou sem dado */
   emissionPct: number | null;
+  /** quanto as emissões rendem por DIA em US$, no ritmo atual — o contexto do
+   *  percentual (que pode ser altíssimo e verdadeiro); null junto com ele */
+  emissionUsdPerDay: number | null;
 }
 
 function within(pct: number): boolean {
@@ -84,16 +97,17 @@ function within(pct: number): boolean {
 /** Puro e testável. null quando não dá para afirmar NADA com honestidade. */
 export function computeEarning(i: EarningInputs): EarningNow | null {
   // fora do range: rendimento corrente é zero, com certeza (não é "—")
-  if (!i.inRange) return { nowPct: 0, feePct: 0, emissionPct: 0 };
+  if (!i.inRange) return { nowPct: 0, feePct: 0, emissionPct: 0, emissionUsdPerDay: 0 };
 
   const feePct = computeFee(i);
-  const emissionPct = computeEmission(i);
+  const em = computeEmission(i);
+  const emissionPct = em?.pct ?? null;
 
   // em range mas sem dado confiável para nenhum componente → "—"
   if (feePct === null && emissionPct === null) return null;
 
   const nowPct = (feePct ?? 0) + (emissionPct ?? 0);
-  return { nowPct, feePct, emissionPct };
+  return { nowPct, feePct, emissionPct, emissionUsdPerDay: em?.usdPerDay ?? null };
 }
 
 function computeFee(i: EarningInputs): number | null {
@@ -124,7 +138,7 @@ function computeFee(i: EarningInputs): number | null {
   return within(pct) ? pct : null;
 }
 
-function computeEmission(i: EarningInputs): number | null {
+function computeEmission(i: EarningInputs): { pct: number; usdPerDay: number } | null {
   if (
     !i.staked ||
     i.rewardRatePerSec === null ||
@@ -140,5 +154,7 @@ function computeEmission(i: EarningInputs): number | null {
   const share = Number(i.posStakedLiquidity) / Number(i.poolStakedLiquidity);
   const tokensPerSec = (Number(i.rewardRatePerSec) / 10 ** i.emissionDecimals) * share;
   const pct = ((tokensPerSec * YEAR_SEC * i.emissionPriceUsd) / i.valueUsd) * 100;
-  return within(pct) ? pct : null;
+  // sem teto de plausibilidade (ver o topo): só a barreira de leitura corrompida
+  if (!Number.isFinite(pct) || pct < 0 || pct > ABSURD_APR_PCT) return null;
+  return { pct, usdPerDay: tokensPerSec * 86_400 * i.emissionPriceUsd };
 }

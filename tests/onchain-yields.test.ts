@@ -159,6 +159,6 @@ describe("integração com computeEarning", () => {
 
   it("fora do range continua 0% mesmo com número on-chain", () => {
     const r = computeEarning({ ...comum, inRange: false, onchainFeeAprPct: 99, poolFeeAprPct: null, poolTvlUsd: null });
-    expect(r).toEqual({ nowPct: 0, feePct: 0, emissionPct: 0 });
+    expect(r).toEqual({ nowPct: 0, feePct: 0, emissionPct: 0, emissionUsdPerDay: 0 });
   });
 });

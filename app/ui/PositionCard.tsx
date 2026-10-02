@@ -133,7 +133,11 @@ export default function PositionCard({ p, pricesFailed = false }: { p: PositionD
             <div className="earning-row">
               <span className="earning-when">{t.emissions}</span>
               <b className="earning-pct">{fill(t.perYear, { pct: pct(e.emissionPct) })}</b>
-              <span className="earning-usd">{t.currentRate}</span>
+              <span className="earning-usd">
+                {e.emissionUsdPerDay !== null && e.emissionUsdPerDay !== undefined
+                  ? fill(t.emissionPerDay, { usd: fmtUsdFine(e.emissionUsdPerDay, locale) })
+                  : t.currentRate}
+              </span>
             </div>
           )}
         </div>

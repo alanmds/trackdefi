@@ -114,7 +114,42 @@ describe("computeEarning — guardas de honestidade", () => {
     expect(computeEarning({ ...base, activeLiquidity: 1n, valueUsd: 0.01 })).toBeNull();
   });
 
-  it("teto exportado é 1.000%", () => {
+  it("teto exportado é 1.000% (vale só para a ESTIMATIVA de taxas)", () => {
     expect(MAX_SANE_EARNING).toBe(1000);
+  });
+
+  it("emissões: SEM teto de plausibilidade — número alto e verdadeiro aparece, com US$/dia", () => {
+    // posição pequena com fatia grande do gauge: muito acima de 1.000% a.a.
+    const e = computeEarning({
+      ...base,
+      poolFeeAprPct: null,
+      poolTvlUsd: null,
+      staked: true,
+      rewardRatePerSec: 10n ** 18n, // 1 token/s no pool inteiro
+      posStakedLiquidity: 1n,
+      poolStakedLiquidity: 2n, // metade
+      emissionPriceUsd: 0.04,
+      emissionDecimals: 18,
+      valueUsd: 3000,
+    })!;
+    expect(e.emissionPct!).toBeGreaterThan(MAX_SANE_EARNING);
+    expect(e.emissionUsdPerDay).toBeCloseTo(0.5 * 86_400 * 0.04, 6);
+    expect(e.nowPct).toBeCloseTo(e.emissionPct!, 6);
+  });
+
+  it("emissões: leitura corrompida (acima de 100.000%) continua virando '—'", () => {
+    const e = computeEarning({
+      ...base,
+      poolFeeAprPct: null,
+      poolTvlUsd: null,
+      staked: true,
+      rewardRatePerSec: 10n ** 30n,
+      posStakedLiquidity: 1n,
+      poolStakedLiquidity: 1n,
+      emissionPriceUsd: 1,
+      emissionDecimals: 18,
+      valueUsd: 1,
+    });
+    expect(e).toBeNull();
   });
 });

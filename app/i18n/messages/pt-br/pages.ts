@@ -23,6 +23,7 @@ const pages: PagesMessages = {
       "Uniswap v3",
       "Velodrome",
       "PancakeSwap v3",
+      "Ramses",
     ],
     keywordNetwork: "rastreador de LP {network}",
     keywordsExtra: ["portfólio DeFi", "liquidez concentrada", "endereço de carteira"],
@@ -32,7 +33,7 @@ const pages: PagesMessages = {
       subtitle: "Cole o endereço de uma carteira — veja todas as posições de LP, inclusive as em stake.",
       networks: "{count} redes — somente leitura, sem chaves, sem login",
     },
-    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap",
+    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap · Ramses",
   },
 
   noToken: "Sem token, sem pré-venda, sem airdrop.",
@@ -63,7 +64,7 @@ const pages: PagesMessages = {
     faq: [
       {
         q: "Como acompanho minhas posições em pools de liquidez em várias redes?",
-        a: "Cole o endereço da sua carteira (0x…) na caixa de busca acima. O {name} lê as blockchains e lista todas as posições de LP que esse endereço tem na Aerodrome, Velodrome, Uniswap e PancakeSwap em {networks} — valor em dólar, taxas pendentes, emissões e faixas de preço.",
+        a: "Cole o endereço da sua carteira (0x…) na caixa de busca acima. O {name} lê as blockchains e lista todas as posições de LP que esse endereço tem na Aerodrome, Velodrome, Uniswap, PancakeSwap e Ramses em {networks} — valor em dólar, taxas pendentes, emissões e faixas de preço.",
       },
       {
         q: "Por que minhas posições de LP da Aerodrome em stake não aparecem na minha carteira?",
@@ -116,7 +117,7 @@ const pages: PagesMessages = {
     title: "Roadmap — redes e corretoras",
     heading: "Roadmap",
     description:
-      "Onde o trackdefi está hoje e para onde vai: APR por posição, Aerodrome, Velodrome, Uniswap e PancakeSwap em {count} redes; em seguida, mais cobertura da Uniswap v4, idade do pool e P&L.",
+      "Onde o trackdefi está hoje e para onde vai: APR por posição, Aerodrome, Velodrome, Uniswap, PancakeSwap e Ramses em {count} redes; em seguida, mais cobertura da Uniswap v4, idade do pool e P&L.",
     lede: "Onde o trackdefi está hoje e para onde vai. Sem prazos e sem promessas — as prioridades seguem o que os usuários realmente pedem. Uma coisa nunca muda: <b>somente leitura, para sempre</b>.",
     status: { live: "✓ No ar", next: "→ Próximo", planned: "Planejado", exploring: "Explorando" },
     liveTitle: "No ar hoje",
@@ -165,6 +166,10 @@ const pages: PagesMessages = {
         title: "BNB Chain · PancakeSwap v3",
         body: "a maior corretora da BNB Chain. Posições concentradas, quantidades, faixas de preço e taxas pendentes — e as posições em stake nas farms da PancakeSwap, com o CAKE pendente e o que rendem em CAKE agora. Nossa primeira rede fora das L2 do Ethereum.",
       },
+      {
+        title: "Robinhood Chain · Ramses",
+        body: "a corretora ve(3,3) de taxas dinâmicas, lida na rede onde está a maior parte da liquidez dela: posições concentradas, quantidades, faixas de preço e taxas pendentes.",
+      },
     ],
     nextTitle: "Próximo",
     next: [
@@ -175,6 +180,10 @@ const pages: PagesMessages = {
     ],
     plannedTitle: "Planejado",
     planned: [
+      {
+        title: "HyperEVM · Ramses",
+        body: "a outra grande casa da Ramses, e a que tem gauges: ela paga RAM a toda posição dentro da faixa num pool com gauge, sem precisar de stake. A leitura já funciona em teste — o RAM a resgatar e o que cada posição rende em RAM agora. Na maioria desses pools as taxas de swap vão para quem vota com RAM, então as taxas aparecerão como 0% ali: é o número real, não uma falha.",
+      },
       {
         title: "Solana · Orca",
         body: "nossa primeira rede fora da família Ethereum. Uma prova de conceito já lê posições da Orca a partir de dados públicos — quantidades, faixa de preço, status dentro da faixa, taxas e recompensas pendentes — então o que resta é encanamento, não pesquisa. Raydium e Meteora viriam depois.",
@@ -375,8 +384,8 @@ const pages: PagesMessages = {
           },
           {
             id: "emissions-rate",
-            term: "Emissões · taxa atual",
-            def: "O token de recompensa que o gauge está pagando a esta posição, na taxa atual do gauge e ao preço atual do token. Só para posições em stake que estão dentro da faixa.",
+            term: "Emissões · US$/dia neste ritmo",
+            def: "O token de recompensa que o gauge está pagando a esta posição, na taxa atual do gauge e ao preço atual do token. Só para posições em stake que estão dentro da faixa. O percentual não tem teto: quando um gauge paga muito a uma posição pequena, o número fica alto — e é real. Os dólares por dia ao lado dizem o que isso significa em dinheiro.",
           },
           {
             id: "fees-plus-emissions",

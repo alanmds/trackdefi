@@ -95,6 +95,8 @@ export interface EarningDTO {
   feePct: number | null;
   /** componente de emissões do gauge (staked); null = não se aplica */
   emissionPct: number | null;
+  /** US$ por dia das emissões, no ritmo atual — contexto do percentual */
+  emissionUsdPerDay: number | null;
   /**
    * Cada janela medida (24 h e 15 min), da mais longa para a mais curta.
    * Vazio = nenhuma medição no contrato — `feePct` então veio da estimativa
@@ -439,7 +441,7 @@ export function buildResponse(params: {
         poolTvlUsd: m?.tvlUsd ?? null,
         posLiquidity: ei?.liquidity ?? null,
         activeLiquidity: ei?.activeLiquidity ?? null,
-        staked: p.staked,
+        staked: p.staked || ei?.emissionsWithoutStake === true,
         rewardRatePerSec: ei?.emissionRatePerSec ?? null,
         posStakedLiquidity: ei?.stakedLiquidity ?? null,
         poolStakedLiquidity: ei?.poolStakedLiquidity ?? null,
@@ -452,7 +454,7 @@ export function buildResponse(params: {
       } else if (tooNew) {
         /* Em range e sem número por ser nova demais: a tela precisa DIZER isso.
            Um vazio mudo foi exatamente a queixa que abriu esta frente. */
-        earning = { nowPct: 0, feePct: null, emissionPct: null, windows: [], tooNew: true };
+        earning = { nowPct: 0, feePct: null, emissionPct: null, emissionUsdPerDay: null, windows: [], tooNew: true };
       }
     }
 

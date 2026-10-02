@@ -153,9 +153,19 @@ const PANCAKE_LAYOUT: PoolLayout = {
   ]),
 };
 
+/** Ramses V3: `ticks()` igual à Uniswap; `slot0()` com feeProtocol uint24.
+ *  Provado no `poc/probe-ramses.ts` (02/10/2026). */
+const RAMSES_LAYOUT: PoolLayout = {
+  ...UNISWAP_LAYOUT,
+  slot0Abi: parseAbi([
+    "function slot0() view returns (uint160 sqrtPriceX96, int24 tick, uint16 observationIndex, uint16 observationCardinality, uint16 observationCardinalityNext, uint24 feeProtocol, bool unlocked)",
+  ]),
+};
+
 const LAYOUTS: Record<string, PoolLayout> = {
   "uniswap-v3": UNISWAP_LAYOUT,
   "pancakeswap-v3": PANCAKE_LAYOUT,
+  "ramses-v3": RAMSES_LAYOUT,
   aerodrome: SLIPSTREAM_LAYOUT,
   velodrome: SLIPSTREAM_LAYOUT,
 };

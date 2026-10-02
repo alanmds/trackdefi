@@ -15,6 +15,8 @@
  * herança: `protocol` e o ABI do `slot0` vêm das opções, e os ganchos
  * protegidos (`stakedTokenIds`, `collectTarget`, `afterPositions`) deixam a
  * subclasse somar os NFTs em stake e as emissões sem duplicar a varredura.
+ * Forks que mudam o FORMATO da posição (Ramses: tickSpacing no lugar do fee)
+ * trocam também `positionsAbi`/`parsePosition`, `getPoolCall` e `poolSymbol`.
  */
 
 import { erc20Abi, type Address } from "viem";
@@ -91,13 +93,12 @@ export class UniswapV3Adapter implements ProtocolAdapter {
       if (fee0 > 0n) rewards.push({ token: token0, raw: fee0, kind: "fee" });
       if (fee1 > 0n) rewards.push({ token: token1, raw: fee1, kind: "fee" });
 
-      const feePct = (p.fee / 10_000).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
       out.push({
         protocol: this.protocol,
         chainId: this.chainId,
         poolAddress: pool.address,
-        poolSymbol: `${token0.symbol}/${token1.symbol} ${feePct}%`,
+        poolSymbol: this.poolSymbol(token0.symbol, token1.symbol, p),
         kind: "concentrated",
         positionId: p.tokenId.toString(),
         staked: p.staked,
@@ -131,6 +132,35 @@ export class UniswapV3Adapter implements ProtocolAdapter {
     return this.afterPositions(out);
   }
 
+  /** Nome do pool na tela: "WETH/USDC 0.05%" (fee tier da Uniswap). */
+  protected poolSymbol(sym0: string, sym1: string, p: UniRawPosition): string {
+    const feePct = (p.fee / 10_000).toLocaleString("en-US", { maximumFractionDigits: 2 });
+    return `${sym0}/${sym1} ${feePct}%`;
+  }
+
+  /** ABI do `positions(tokenId)` do NFPM — forks mudam o formato. */
+  protected positionsAbi: readonly unknown[] = nfpmAbi;
+
+  /** Retorno de `positions()` → campos crus (layout da Uniswap: 12 campos). */
+  protected parsePosition(v: readonly unknown[]): Omit<UniRawPosition, "tokenId" | "staked"> {
+    return {
+      token0: v[2] as Address,
+      token1: v[3] as Address,
+      fee: Number(v[4]),
+      tickLower: Number(v[5]),
+      tickUpper: Number(v[6]),
+      liquidity: v[7] as bigint,
+      feeGrowthInside0LastX128: v[8] as bigint,
+      tokensOwed0: v[10] as bigint,
+      tokensOwed1: v[11] as bigint,
+    };
+  }
+
+  /** Chamada à factory que devolve o endereço do pool da posição. */
+  protected getPoolCall(p: UniRawPosition): { abi: readonly unknown[]; args: readonly unknown[] } {
+    return { abi: uniFactoryAbi, args: [p.token0, p.token1, p.fee] };
+  }
+
   /** Gancho: a subclasse completa as posições (ex.: emissões das em stake). */
   protected async afterPositions(positions: LpPosition[]): Promise<LpPosition[]> {
     return positions;
@@ -154,7 +184,7 @@ export class UniswapV3Adapter implements ProtocolAdapter {
     if (ids.length === 0) return [];
 
     const posResults = await this.reader.multicall({
-      contracts: ids.map((id) => ({ address: this.nfpm, abi: nfpmAbi, functionName: "positions", args: [id] })),
+      contracts: ids.map((id) => ({ address: this.nfpm, abi: this.positionsAbi, functionName: "positions", args: [id] })),
       allowFailure: true,
     });
 
@@ -164,18 +194,9 @@ export class UniswapV3Adapter implements ProtocolAdapter {
         this.warn(`${this.protocol}: positions(${ids[i]}) falhou`);
         return;
       }
-      const v = r.result as readonly unknown[];
       raw.push({
         tokenId: ids[i],
-        token0: v[2] as Address,
-        token1: v[3] as Address,
-        fee: Number(v[4]),
-        tickLower: Number(v[5]),
-        tickUpper: Number(v[6]),
-        liquidity: v[7] as bigint,
-        feeGrowthInside0LastX128: v[8] as bigint,
-        tokensOwed0: v[10] as bigint,
-        tokensOwed1: v[11] as bigint,
+        ...this.parsePosition(r.result as readonly unknown[]),
         staked: stakedSet.has(ids[i]),
       });
     });
@@ -260,9 +281,8 @@ export class UniswapV3Adapter implements ProtocolAdapter {
     const addrResults = await this.reader.multicall({
       contracts: entries.map(([, p]) => ({
         address: this.factory,
-        abi: uniFactoryAbi,
+        ...this.getPoolCall(p),
         functionName: "getPool",
-        args: [p.token0, p.token1, p.fee],
       })),
       allowFailure: true,
     });

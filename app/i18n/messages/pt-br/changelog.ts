@@ -7,6 +7,14 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "emissions-uncapped": {
+    title: "Emissões mostram o ritmo real, com dólares por dia",
+    body: "A linha de emissões do Rendendo agora escondia qualquer ritmo acima de 1.000% ao ano. Agora ela mostra sempre o que o gauge está pagando à sua posição neste momento, por mais alto que seja, com quantos dólares por dia isso dá no ritmo atual logo ao lado.",
+  },
+  ramses: {
+    title: "Ramses na Robinhood Chain",
+    body: "O trackdefi agora lê a Ramses na Robinhood Chain, onde está a maior parte da liquidez dela: posições concentradas com quantidades, faixa de preço e taxas pendentes. A HyperEVM, onde a Ramses paga recompensas em RAM, é a próxima no roadmap.",
+  },
   "bnb-pancakeswap-v3": {
     title: "BNB Chain e PancakeSwap v3, com as posições em stake",
     body: "O trackdefi agora lê a PancakeSwap v3 na BNB Chain: posições concentradas com quantidades, faixa de preço e taxas pendentes. As posições em stake nas farms da PancakeSwap também aparecem, com o CAKE pendente e o que estão rendendo em CAKE agora.",

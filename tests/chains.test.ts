@@ -17,6 +17,7 @@ import { AERODROME_BASE, VELODROME_LEAF_CHAINS, VELODROME_OPTIMISM } from "../co
 import { UNISWAP_V3_CHAINS } from "../core/adapters/uniswap-v3/config";
 import { UNISWAP_V4_CHAINS } from "../core/adapters/uniswap-v4/config";
 import { PANCAKE_V3_CHAINS } from "../core/adapters/pancake-v3/config";
+import { RAMSES_V3_CHAINS } from "../core/adapters/ramses-v3/config";
 import {
   COVERAGE,
   FAMILIES_BY_VOLUME,
@@ -114,6 +115,10 @@ describe("frase de cobertura", () => {
 
   it("PancakeSwap v3 cobre exatamente as redes do seu config", () => {
     expect(redesDe("PancakeSwap v3")).toEqual(PANCAKE_V3_CHAINS.map((c) => nomeDaRede(c.chainId)).sort());
+  });
+
+  it("Ramses cobre exatamente as redes do seu config", () => {
+    expect(redesDe("Ramses")).toEqual(RAMSES_V3_CHAINS.map((c) => nomeDaRede(c.chainId)).sort());
   });
 });
 
