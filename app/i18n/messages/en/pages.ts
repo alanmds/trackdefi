@@ -151,7 +151,7 @@ const pages = {
     title: "Roadmap — networks & exchanges",
     heading: "Roadmap",
     description:
-      "Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome, Uniswap, PancakeSwap and Ramses across {count} networks; wider Uniswap v4 coverage, pool age and P&L next.",
+      "Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome, Uniswap, PancakeSwap and Ramses across {count} networks; SushiSwap, Polygon, Avalanche and more next.",
     lede: "Where trackdefi is today and where it's going. No deadlines and no promises — priorities follow what users actually ask for. One thing never changes: <b>read-only, forever</b>.",
     status: { live: "✓ Live", next: "→ Next", planned: "Planned", exploring: "Exploring" } as Record<RoadmapKind, string>,
     liveTitle: "Live today",
@@ -208,15 +208,59 @@ const pages = {
     nextTitle: "Next",
     next: [
       {
-        title: "Uniswap v4 on more networks",
-        body: "v4 has no cheap way to ask which positions a wallet owns, so it needs a node that will scan history. Solved on Robinhood Chain; Base and the rest follow.",
+        title: "HyperEVM · Ramses",
+        body: "Ramses' other big home, and the one with gauges: it pays RAM to every in-range position in a pool with a gauge, no staking needed. The reading already works in testing — the RAM waiting to be claimed and what each position earns in RAM right now. In most of those pools the swap fees go to RAM voters, so fees will show 0% there: that is the real number, not a gap.",
+      },
+      {
+        title: "Unichain & BNB Chain · Uniswap v3",
+        body: "Uniswap v3 on two networks trackdefi already reads: positions, amounts, price ranges and pending fees.",
+      },
+      {
+        title: "Ethereum, Base & Arbitrum · PancakeSwap v3",
+        body: "the same reading as on BNB Chain, including positions staked in PancakeSwap farms with their pending CAKE.",
+      },
+      {
+        title: "SushiSwap v3",
+        body: "on Ethereum, Optimism, BNB Chain, Base and Arbitrum: concentrated positions, amounts, price ranges and pending fees. It is built like Uniswap v3, so trackdefi already knows how to read it.",
       },
     ] as RoadmapItem[],
     plannedTitle: "Planned",
     planned: [
       {
-        title: "HyperEVM · Ramses",
-        body: "Ramses' other big home, and the one with gauges: it pays RAM to every in-range position in a pool with a gauge, no staking needed. The reading already works in testing — the RAM waiting to be claimed and what each position earns in RAM right now. In most of those pools the swap fees go to RAM voters, so fees will show 0% there: that is the real number, not a gap.",
+        title: "HyperEVM · Hyperswap & Project X",
+        body: "the two largest native exchanges on HyperEVM, next to Ramses.",
+      },
+      {
+        title: "Polygon · Uniswap v3 & SushiSwap v3",
+        body: "a new network, starting with exchanges trackdefi already reads elsewhere.",
+      },
+      {
+        title: "Avalanche · Uniswap v3 & SushiSwap v3",
+        body: "the same step on Avalanche C-Chain.",
+      },
+      {
+        title: "Uniswap v4 on more networks",
+        body: "Ethereum, Optimism, BNB Chain, Polygon, Base, Arbitrum, Avalanche and Unichain. v4 positions can't be listed by wallet on-chain; a way around that has been tested and works, and it also covers the largest wallets on Robinhood Chain.",
+      },
+      {
+        title: "QuickSwap v3, Camelot v3 & THENA",
+        body: "on Polygon, Arbitrum and BNB Chain. These exchanges run on Algebra, a different concentrated-liquidity engine, so they need their own reader.",
+      },
+      {
+        title: "Classic pools (v2)",
+        body: "the older 50/50 pools of Uniswap, PancakeSwap, SushiSwap, QuickSwap and Camelot, on every network where they run. A classic position is a token, not an NFT, so it needs a different way to be found.",
+      },
+      {
+        title: "Arc · Aerodrome & Uniswap",
+        body: "Circle's network, where the new Aero launches. Aerodrome's part waits for Aero's documentation for integrators.",
+      },
+      {
+        title: "BNB Chain & Base · PancakeSwap Infinity",
+        body: "PancakeSwap's newest version, with concentrated pools and liquidity bins: two different kinds of position, each with its own math.",
+      },
+      {
+        title: "Ethereum · Ekubo",
+        body: "an exchange designed from scratch, with its own architecture and price math rather than a fork of one trackdefi already reads.",
       },
       {
         title: "Solana · Orca",

@@ -117,7 +117,7 @@ const pages: PagesMessages = {
     title: "Roadmap — redes e corretoras",
     heading: "Roadmap",
     description:
-      "Onde o trackdefi está hoje e para onde vai: APR por posição, Aerodrome, Velodrome, Uniswap, PancakeSwap e Ramses em {count} redes; em seguida, mais cobertura da Uniswap v4, idade do pool e P&L.",
+      "Onde o trackdefi está hoje e para onde vai: APR por posição, Aerodrome, Velodrome, Uniswap, PancakeSwap e Ramses em {count} redes; em seguida, SushiSwap, Polygon, Avalanche e mais.",
     lede: "Onde o trackdefi está hoje e para onde vai. Sem prazos e sem promessas — as prioridades seguem o que os usuários realmente pedem. Uma coisa nunca muda: <b>somente leitura, para sempre</b>.",
     status: { live: "✓ No ar", next: "→ Próximo", planned: "Planejado", exploring: "Explorando" },
     liveTitle: "No ar hoje",
@@ -174,15 +174,59 @@ const pages: PagesMessages = {
     nextTitle: "Próximo",
     next: [
       {
-        title: "Uniswap v4 em mais redes",
-        body: "a v4 não tem um jeito barato de perguntar quais posições uma carteira possui, então exige um nó que varra o histórico. Resolvido na Robinhood Chain; a Base e as demais vêm em seguida.",
+        title: "HyperEVM · Ramses",
+        body: "a outra grande casa da Ramses, e a que tem gauges: ela paga RAM a toda posição dentro da faixa num pool com gauge, sem precisar de stake. A leitura já funciona em teste — o RAM a resgatar e o que cada posição rende em RAM agora. Na maioria desses pools as taxas de swap vão para quem vota com RAM, então as taxas aparecerão como 0% ali: é o número real, não uma falha.",
+      },
+      {
+        title: "Unichain e BNB Chain · Uniswap v3",
+        body: "a Uniswap v3 em duas redes que o trackdefi já lê: posições, quantidades, faixas de preço e taxas pendentes.",
+      },
+      {
+        title: "Ethereum, Base e Arbitrum · PancakeSwap v3",
+        body: "a mesma leitura da BNB Chain, inclusive as posições em stake nas farms da PancakeSwap com o CAKE pendente.",
+      },
+      {
+        title: "SushiSwap v3",
+        body: "na Ethereum, Optimism, BNB Chain, Base e Arbitrum: posições concentradas, quantidades, faixas de preço e taxas pendentes. Ela é construída como a Uniswap v3, então o trackdefi já sabe lê-la.",
       },
     ],
     plannedTitle: "Planejado",
     planned: [
       {
-        title: "HyperEVM · Ramses",
-        body: "a outra grande casa da Ramses, e a que tem gauges: ela paga RAM a toda posição dentro da faixa num pool com gauge, sem precisar de stake. A leitura já funciona em teste — o RAM a resgatar e o que cada posição rende em RAM agora. Na maioria desses pools as taxas de swap vão para quem vota com RAM, então as taxas aparecerão como 0% ali: é o número real, não uma falha.",
+        title: "HyperEVM · Hyperswap e Project X",
+        body: "as duas maiores corretoras nativas da HyperEVM, ao lado da Ramses.",
+      },
+      {
+        title: "Polygon · Uniswap v3 e SushiSwap v3",
+        body: "uma rede nova, começando pelas corretoras que o trackdefi já lê em outras redes.",
+      },
+      {
+        title: "Avalanche · Uniswap v3 e SushiSwap v3",
+        body: "o mesmo passo na Avalanche C-Chain.",
+      },
+      {
+        title: "Uniswap v4 em mais redes",
+        body: "Ethereum, Optimism, BNB Chain, Polygon, Base, Arbitrum, Avalanche e Unichain. As posições da v4 não podem ser listadas por carteira na própria rede; um caminho alternativo já foi testado e funciona, e ele também cobre as carteiras maiores na Robinhood Chain.",
+      },
+      {
+        title: "QuickSwap v3, Camelot v3 e THENA",
+        body: "na Polygon, Arbitrum e BNB Chain. Essas corretoras rodam no Algebra, um motor de liquidez concentrada diferente, então precisam de um leitor próprio.",
+      },
+      {
+        title: "Pools clássicos (v2)",
+        body: "os pools 50/50 mais antigos da Uniswap, PancakeSwap, SushiSwap, QuickSwap e Camelot, em todas as redes onde existem. Uma posição clássica é um token, não um NFT, então precisa de outro jeito de ser encontrada.",
+      },
+      {
+        title: "Arc · Aerodrome e Uniswap",
+        body: "a rede da Circle, onde o novo Aero é lançado. A parte da Aerodrome espera a documentação do Aero para integradores.",
+      },
+      {
+        title: "BNB Chain e Base · PancakeSwap Infinity",
+        body: "a versão mais nova da PancakeSwap, com pools concentrados e faixas de liquidez em blocos (bins): dois tipos diferentes de posição, cada um com sua matemática.",
+      },
+      {
+        title: "Ethereum · Ekubo",
+        body: "uma corretora desenhada do zero, com arquitetura e matemática de preço próprias, e não uma cópia de alguma que o trackdefi já lê.",
       },
       {
         title: "Solana · Orca",
