@@ -170,13 +170,13 @@ const pages: PagesMessages = {
         title: "Robinhood Chain · Ramses",
         body: "a corretora ve(3,3) de taxas dinâmicas, lida na rede onde está a maior parte da liquidez dela: posições concentradas, quantidades, faixas de preço e taxas pendentes.",
       },
+      {
+        title: "HyperEVM · Ramses",
+        body: "a outra grande casa da Ramses, e a que tem gauges: ela paga RAM a toda posição dentro da faixa num pool com gauge, sem precisar de stake. O trackdefi mostra o RAM a resgatar e o que cada posição está rendendo em RAM agora. Na maioria desses pools as taxas de swap vão para quem vota com RAM, então as taxas aparecem como 0% ali: é o número real, não uma falha.",
+      },
     ],
     nextTitle: "Próximo",
     next: [
-      {
-        title: "HyperEVM · Ramses",
-        body: "a outra grande casa da Ramses, e a que tem gauges: ela paga RAM a toda posição dentro da faixa num pool com gauge, sem precisar de stake. A leitura já funciona em teste — o RAM a resgatar e o que cada posição rende em RAM agora. Na maioria desses pools as taxas de swap vão para quem vota com RAM, então as taxas aparecerão como 0% ali: é o número real, não uma falha.",
-      },
       {
         title: "Unichain e BNB Chain · Uniswap v3",
         body: "a Uniswap v3 em duas redes que o trackdefi já lê: posições, quantidades, faixas de preço e taxas pendentes.",
@@ -189,13 +189,13 @@ const pages: PagesMessages = {
         title: "SushiSwap v3",
         body: "na Ethereum, Optimism, BNB Chain, Base e Arbitrum: posições concentradas, quantidades, faixas de preço e taxas pendentes. Ela é construída como a Uniswap v3, então o trackdefi já sabe lê-la.",
       },
-    ],
-    plannedTitle: "Planejado",
-    planned: [
       {
         title: "HyperEVM · Hyperswap e Project X",
         body: "as duas maiores corretoras nativas da HyperEVM, ao lado da Ramses.",
       },
+    ],
+    plannedTitle: "Planejado",
+    planned: [
       {
         title: "Polygon · Uniswap v3 e SushiSwap v3",
         body: "uma rede nova, começando pelas corretoras que o trackdefi já lê em outras redes.",
@@ -424,12 +424,12 @@ const pages: PagesMessages = {
           {
             id: "last-24h",
             term: "Últimas 24 h / Últimas 15 min",
-            def: "Taxas de swap que esta posição realmente ganhou, medidas no contrato do pool em duas janelas. Cada linha mostra a taxa anualizada e os dólares ganhos dentro daquela janela. Leia as duas juntas: uma taxa de 15 minutos bem acima da de 24 horas significa que o pool está movimentado agora; bem abaixo, que a correria já passou. Anualizar 15 minutos multiplica o valor por 35.040, então fique de olho no valor em dólar ao lado.",
+            def: "Taxas de swap que esta posição realmente ganhou, medidas no contrato do pool em duas janelas. Cada linha mostra a taxa anualizada e os dólares ganhos dentro daquela janela. Leia as duas juntas: uma taxa de 15 minutos bem acima da de 24 horas significa que o pool está movimentado agora; bem abaixo, que a correria já passou. Anualizar 15 minutos multiplica o valor por 35.040, então fique de olho no valor em dólar ao lado. Nos pools da Ramses com gauge, as taxas de swap vão para quem vota com RAM, então estas linhas mostram 0% — a posição ganha RAM no lugar, na linha de Emissões.",
           },
           {
             id: "emissions-rate",
             term: "Emissões · US$/dia neste ritmo",
-            def: "O token de recompensa que o gauge está pagando a esta posição, na taxa atual do gauge e ao preço atual do token. Só para posições em stake que estão dentro da faixa. O percentual não tem teto: quando um gauge paga muito a uma posição pequena, o número fica alto — e é real. Os dólares por dia ao lado dizem o que isso significa em dinheiro.",
+            def: "O token de recompensa que o gauge está pagando a esta posição, na taxa atual do gauge e ao preço atual do token. Só para posições dentro da faixa e em stake — ou, na Ramses, qualquer posição dentro da faixa num pool com gauge, porque a Ramses paga sem stake. O percentual não tem teto: quando um gauge paga muito a uma posição pequena, o número fica alto — e é real. Os dólares por dia ao lado dizem o que isso significa em dinheiro.",
           },
           {
             id: "fees-plus-emissions",
@@ -496,7 +496,7 @@ const pages: PagesMessages = {
           {
             id: "claimable-emissions",
             term: "emissões",
-            def: "Recompensas de gauge ganhas por uma posição em stake e ainda não resgatadas.",
+            def: "Recompensas de gauge ganhas por uma posição e ainda não resgatadas — uma em stake ou, na Ramses, qualquer posição num pool com gauge.",
           },
           {
             id: "total-claimable",

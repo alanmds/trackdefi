@@ -190,6 +190,12 @@ export type ChainReader = {
   /** bloco mais recente — usado para montar a janela do fee APR on-chain */
   getBlockNumber?(): Promise<bigint>;
   /**
+   * Definição da rede (o cliente do viem já traz). Só o endereço do Multicall3
+   * interessa: a leitura de bloco passado pergunta a ele "em que bloco estou?"
+   * para pegar RPC que ignora o bloco pedido (ver `core/yields/onchain.ts`).
+   */
+  chain?: { contracts?: { multicall3?: { address: Address } } };
+  /**
    * eth_call simulando uma função de escrita SEM transação (continua 100%
    * leitura). Usado p/ ler taxas pendentes da Uniswap via collect().
    * Opcional: adapters devem degradar com aviso quando ausente.

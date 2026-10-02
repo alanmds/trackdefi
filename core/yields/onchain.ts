@@ -104,6 +104,11 @@ export const MEASURED_WINDOWS_HOURS = [DEFAULT_WINDOW_HOURS, 0.25];
  */
 export const ABSURD_APR_PCT = 100_000;
 
+/** Multicall3 no endereço canônico — reserva para quando o reader não traz a
+ *  definição da rede (a Lisk, por exemplo, usa outro; o viem informa). */
+const MULTICALL3: Address = "0xcA11bde05977b3631167028862bE2a173976CA11";
+const multicall3TimestampAbi = parseAbi(["function getCurrentBlockTimestamp() view returns (uint256)"]);
+
 export const poolFeeGrowthAbi = parseAbi([
   "function feeGrowthGlobal0X128() view returns (uint256)",
   "function feeGrowthGlobal1X128() view returns (uint256)",
@@ -302,7 +307,7 @@ async function readSnapshots(
   reader: ChainReader,
   targets: FeeWindowTarget[],
   blockNumber?: bigint,
-): Promise<Map<string, TickSnapshot>> {
+): Promise<{ snaps: Map<string, TickSnapshot>; ts: bigint | null }> {
   // globals e slot0 são POR POOL; ticks são por faixa
   const pools = new Map<string, { pool: Address; layout: PoolLayout }>();
   for (const t of targets) {
@@ -328,13 +333,28 @@ async function readSnapshots(
     }),
   ];
 
+  /* O HORÁRIO do bloco em que a leitura rodou, para provar que o RPC
+     respondeu no bloco PEDIDO (ver `readPositionFeeWindows`). Visto em
+     02/10/2026 no RPC oficial da HyperEVM: aceita o `blockNumber`, não dá erro
+     e devolve o estado ATUAL — "antes" e "agora" saem iguais e a janela vira
+     um 0% falso, com cara de medição. Horário, e não número do bloco: na
+     Arbitrum e nas redes Orbit (Robinhood), `block.number` dentro do contrato
+     é o da rede-mãe, e uma prova por número recusaria leitura honesta. */
+  contracts.push({
+    address: reader.chain?.contracts?.multicall3?.address ?? MULTICALL3,
+    abi: multicall3TimestampAbi,
+    functionName: "getCurrentBlockTimestamp",
+  } as (typeof contracts)[number]);
+
   const res = await reader.multicall({
     contracts,
     allowFailure: true,
     ...(blockNumber === undefined ? {} : { blockNumber }),
   });
+  const prova = res[res.length - 1];
+  const ts = prova?.status === "success" ? (prova.result as bigint) : null;
 
-  const out = new Map<string, TickSnapshot>();
+  const snaps = new Map<string, TickSnapshot>();
   const poolBase = poolList.length * 3;
   targets.forEach((t, i) => {
     const layout = poolLayout(t.protocol);
@@ -348,7 +368,7 @@ async function readSnapshots(
     if ([g0, g1, slot0, tl, tu].some((r) => r === undefined || r.status !== "success")) return;
     const lower = tl.result as readonly unknown[];
     const upper = tu.result as readonly unknown[];
-    out.set(t.key, {
+    snaps.set(t.key, {
       tick: Number((slot0.result as readonly unknown[])[1]),
       global0: g0.result as bigint,
       global1: g1.result as bigint,
@@ -358,7 +378,7 @@ async function readSnapshots(
       outUpper1: upper[layout.fg1] as bigint,
     });
   });
-  return out;
+  return { snaps, ts };
 }
 
 export interface FeeWindowsResult {
@@ -398,8 +418,9 @@ export async function readPositionFeeWindows(
   if (targets.length === 0) return { byTarget, tooNew, unmeasured: 0 };
 
   let agora: Map<string, TickSnapshot>;
+  let agoraTs: bigint | null;
   try {
-    agora = await readSnapshots(reader, targets);
+    ({ snaps: agora, ts: agoraTs } = await readSnapshots(reader, targets));
   } catch (e) {
     onWarn(`fee APR on-chain indisponível (leitura do pool falhou): ${(e as Error).message.split("\n")[0].slice(0, 60)}`);
     return { byTarget, tooNew, unmeasured: targets.length };
@@ -415,7 +436,15 @@ export async function readPositionFeeWindows(
 
     let antes: Map<string, TickSnapshot>;
     try {
-      antes = await readSnapshots(reader, legiveis, currentBlock - blocos);
+      const lido = await readSnapshots(reader, legiveis, currentBlock - blocos);
+      /* Prova do bloco: a leitura "antes" tem de ter rodado num bloco de
+         pelo menos meia janela atrás. RPC que ignora o bloco pedido devolve o
+         horário de agora — sem isto, a janela viraria 0% falso. Sem horário
+         (Multicall3 ausente), não dá para provar nem negar: segue. */
+      if (agoraTs !== null && lido.ts !== null && Number(agoraTs - lido.ts) < (horas * 3600) / 2) {
+        throw new Error(`RPC ignorou o bloco pedido (horário ${lido.ts}, agora ${agoraTs})`);
+      }
+      antes = lido.snaps;
     } catch {
       /* Uma janela pode falhar e a outra passar: um nó podado guarda poucos
          blocos, o que às vezes cobre 15 min e nunca cobre 24 h. Por isso cada

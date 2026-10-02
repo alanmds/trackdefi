@@ -37,7 +37,7 @@ When a token has no reliable price, trackdefi shows `—` instead of guessing.
 | Uniswap v3 | Base, Optimism, Ethereum, Arbitrum, Robinhood Chain |
 | Uniswap v4 | Robinhood Chain |
 | PancakeSwap v3 | BNB Chain |
-| Ramses | Robinhood Chain |
+| Ramses | Robinhood Chain, HyperEVM |
 
 Classic (v2-style) and concentrated positions, staked or not, with pending fees
 and emissions, plus veAERO / veVELO governance locks. For each position it also
@@ -55,7 +55,8 @@ comes from.
 - **viem** — read-only on-chain access (Sugar contracts for the Aerodrome/
   Velodrome family; the NonfungiblePositionManager for Uniswap v3; the
   PositionManager and StateView for Uniswap v4; the same NonfungiblePositionManager
-  plus the MasterChef v3 for PancakeSwap v3; Ramses' own position manager)
+  plus the MasterChef v3 for PancakeSwap v3; Ramses' own position manager and
+  its gauges, which pay emissions without staking)
 - **DefiLlama**, then **DexScreener** — USD prices (free, no key); when neither
   covers a token, its price is read from a pool on the same network. DefiLlama
   also provides pool yield data

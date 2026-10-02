@@ -1,8 +1,7 @@
 /**
  * Adapter Ramses V3 com reader-stub: o formato de 10 campos do `positions()`,
  * o pool achado por tickSpacing, e as recompensas do gauge pagas SEM stake.
- * Usa a config da HyperEVM (ainda fora do site, mas pronta): é lá que existem
- * os gauges. Números redondos, inventados — nada de posição real (repo público).
+ * Usa a config da HyperEVM: é lá que existem os gauges. Números redondos, inventados — nada de posição real (repo público).
  */
 
 import { describe, expect, it } from "vitest";

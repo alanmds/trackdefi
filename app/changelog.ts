@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "hyperevm-ramses",
+    date: "2026-10-02",
+    kind: "network",
+    title: "HyperEVM, with Ramses and its RAM rewards",
+    body: "trackdefi now reads HyperEVM. Ramses positions there show their amounts, price range and pending fees, plus the RAM they earn: Ramses pays RAM to every in-range position in a pool with a gauge, no staking needed, so each one shows the RAM waiting to be claimed and what it is earning in RAM right now. In most of those pools swap fees go to RAM voters, so fees read 0% there — that is the real number.",
+  },
+  {
     id: "emissions-uncapped",
     date: "2026-10-02",
     kind: "improvement",

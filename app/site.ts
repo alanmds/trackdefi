@@ -65,6 +65,7 @@ export const NETWORKS = [
   { label: "Superseed", name: "Superseed" },
   { label: "Celo", name: "Celo" },
   { label: "BNB Chain", name: "BNB Chain" },
+  { label: "HyperEVM", name: "HyperEVM" },
 ] as const;
 
 /** nomes por extenso, na ordem de exibição */
@@ -129,7 +130,7 @@ export const COVERAGE = [
   },
   { protocol: "Uniswap v4", networks: ["Robinhood Chain"] as readonly string[] },
   { protocol: "PancakeSwap v3", networks: ["BNB Chain"] as readonly string[] },
-  { protocol: "Ramses", networks: ["Robinhood Chain"] as readonly string[] },
+  { protocol: "Ramses", networks: ["Robinhood Chain", "HyperEVM"] as readonly string[] },
 ] as const;
 
 /**

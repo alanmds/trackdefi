@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "hyperevm-ramses": {
+    title: "HyperEVM, com a Ramses e as recompensas em RAM",
+    body: "O trackdefi agora lê a HyperEVM. As posições da Ramses ali mostram quantidades, faixa de preço e taxas pendentes, mais o RAM que ganham: a Ramses paga RAM a toda posição dentro da faixa num pool com gauge, sem precisar de stake, então cada uma mostra o RAM a resgatar e o que está rendendo em RAM agora. Na maioria desses pools as taxas de swap vão para quem vota com RAM, então as taxas aparecem como 0% ali — é o número real.",
+  },
   "emissions-uncapped": {
     title: "Emissões mostram o ritmo real, com dólares por dia",
     body: "A linha de emissões do Rendendo agora escondia qualquer ritmo acima de 1.000% ao ano. Agora ela mostra sempre o que o gauge está pagando à sua posição neste momento, por mais alto que seja, com quantos dólares por dia isso dá no ritmo atual logo ao lado.",

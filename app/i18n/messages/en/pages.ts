@@ -204,13 +204,13 @@ const pages = {
         title: "Robinhood Chain · Ramses",
         body: "the ve(3,3) exchange with dynamic fees, read on the network where most of its liquidity sits: concentrated positions, amounts, price ranges and pending fees.",
       },
+      {
+        title: "HyperEVM · Ramses",
+        body: "Ramses' other big home, and the one with gauges: it pays RAM to every in-range position in a pool with a gauge, no staking needed. trackdefi shows the RAM waiting to be claimed and what each position is earning in RAM right now. In most of those pools the swap fees go to RAM voters, so fees show 0% there: that is the real number, not a gap.",
+      },
     ] as RoadmapItem[],
     nextTitle: "Next",
     next: [
-      {
-        title: "HyperEVM · Ramses",
-        body: "Ramses' other big home, and the one with gauges: it pays RAM to every in-range position in a pool with a gauge, no staking needed. The reading already works in testing — the RAM waiting to be claimed and what each position earns in RAM right now. In most of those pools the swap fees go to RAM voters, so fees will show 0% there: that is the real number, not a gap.",
-      },
       {
         title: "Unichain & BNB Chain · Uniswap v3",
         body: "Uniswap v3 on two networks trackdefi already reads: positions, amounts, price ranges and pending fees.",
@@ -223,13 +223,13 @@ const pages = {
         title: "SushiSwap v3",
         body: "on Ethereum, Optimism, BNB Chain, Base and Arbitrum: concentrated positions, amounts, price ranges and pending fees. It is built like Uniswap v3, so trackdefi already knows how to read it.",
       },
-    ] as RoadmapItem[],
-    plannedTitle: "Planned",
-    planned: [
       {
         title: "HyperEVM · Hyperswap & Project X",
         body: "the two largest native exchanges on HyperEVM, next to Ramses.",
       },
+    ] as RoadmapItem[],
+    plannedTitle: "Planned",
+    planned: [
       {
         title: "Polygon · Uniswap v3 & SushiSwap v3",
         body: "a new network, starting with exchanges trackdefi already reads elsewhere.",
@@ -458,12 +458,12 @@ const pages = {
           {
             id: "last-24h",
             term: "Last 24 h / Last 15 min",
-            def: "Swap fees this position actually earned, measured in the pool contract over two windows. Each row shows the annualised rate and the dollars earned inside that window. Read them together: a 15-minute rate far above the 24-hour one means the pool is busy right now; far below means the rush already passed. Annualising 15 minutes multiplies it by 35,040, so keep an eye on the dollar figure next to it.",
+            def: "Swap fees this position actually earned, measured in the pool contract over two windows. Each row shows the annualised rate and the dollars earned inside that window. Read them together: a 15-minute rate far above the 24-hour one means the pool is busy right now; far below means the rush already passed. Annualising 15 minutes multiplies it by 35,040, so keep an eye on the dollar figure next to it. On Ramses pools with a gauge, swap fees go to RAM voters, so these rows read 0% — the position earns RAM instead, on the Emissions row.",
           },
           {
             id: "emissions-rate",
             term: "Emissions · $/day at this rate",
-            def: "The reward token the gauge is paying this position, at the gauge's current rate and the token's current price. Only for staked positions that are in range. The percentage has no ceiling: when a gauge pays a lot to a small position, the number is high — and real. The dollars per day next to it say what that means in money.",
+            def: "The reward token the gauge is paying this position, at the gauge's current rate and the token's current price. Only for positions that are in range and staked — or, on Ramses, any in-range position in a pool with a gauge, since Ramses pays without staking. The percentage has no ceiling: when a gauge pays a lot to a small position, the number is high — and real. The dollars per day next to it say what that means in money.",
           },
           {
             id: "fees-plus-emissions",
@@ -530,7 +530,7 @@ const pages = {
           {
             id: "claimable-emissions",
             term: "emissions",
-            def: "Gauge rewards earned by a staked position and not claimed yet.",
+            def: "Gauge rewards earned by a position and not claimed yet — a staked one, or on Ramses any position in a pool with a gauge.",
           },
           {
             id: "total-claimable",

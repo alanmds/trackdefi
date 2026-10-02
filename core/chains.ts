@@ -9,6 +9,7 @@ import {
   bsc,
   celo,
   fraxtal,
+  hyperEvm,
   ink,
   lisk,
   mainnet,
@@ -306,6 +307,29 @@ export const CHAINS: Record<number, ChainInfo> = {
     /* os públicos NÃO servem estado passado (PoC de 02/10): sem BSC_RPC_URLS
        (Alchemy) o fee APR on-chain cai em "—" */
     defaultRpcs: ["https://bsc-dataseed.bnbchain.org", "https://bsc-rpc.publicnode.com"],
+  },
+  999: {
+    chain: hyperEvm,
+    label: "HyperEVM",
+    // slug de preço conferido na DefiLlama em 02/10/2026 (RAM, WHYPE, USDC)
+    priceSlug: "hyperliquid",
+    // nome da rede no dataset yields.llama.fi ("Ramses CL V2" aparece assim)
+    yieldsLabel: "Hyperliquid L1",
+    explorerUrl: "https://hyperevmscan.io",
+    explorerLabel: "HyperEVMScan",
+    // medido em 02/10/2026: 0,984 s (os blocos "pequenos" da HyperEVM)
+    secPerBlock: 0.98,
+    rpcEnv: "HYPEREVM_RPC_URLS",
+    dexSlug: "hyperevm",
+    /* ⚠️ O RPC OFICIAL IGNORA O BLOCO PEDIDO (medido em 02/10/2026): aceita o
+       `blockNumber`, não dá erro e devolve o estado atual — o fee APR on-chain
+       sairia 0% falso. Por isso o dRPC (histórico de verdade, conferido no
+       mesmo dia) vem PRIMEIRO, e o oficial fica só de reserva para leitura do
+       estado atual; se uma leitura de bloco passado cair nele, a prova do
+       bloco em `core/yields/onchain.ts` recusa e a janela sai "sem medição".
+       A Alchemy (hyperliquid-mainnet) também serve histórico de verdade, se
+       um dia faltar vazão: `HYPEREVM_RPC_URLS`. */
+    defaultRpcs: ["https://hyperliquid.drpc.org", "https://rpc.hyperliquid.xyz/evm"],
   },
 };
 

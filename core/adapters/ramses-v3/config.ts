@@ -4,11 +4,10 @@
  * on-chain no `poc/probe-ramses.ts`: `NFPM.deployer()` bate com o
  * RamsesV3PoolDeployer da doc (este NFPM não tem `factory()`).
  *
- * Decisões do Alan (02/10/2026): entra só a Robinhood por enquanto. A HyperEVM
- * (a única rede com gauges e emissões de RAM) vai para o roadmap — a config
- * dela já está aqui, provada no PoC e coberta pelos testes, mas FORA da lista
- * ativa até a rede entrar em `core/chains.ts`. Arbitrum e Polygon ficaram de
- * fora: quase sem liquidez (49 e 35 posições no total).
+ * Redes ativas: Robinhood (no ar em 02/10/2026) e HyperEVM (passo 1 do plano
+ * de cobertura total, 02/10/2026) — a HyperEVM é a única com gauges, onde a
+ * Ramses paga RAM às posições sem stake. Arbitrum e Polygon ficaram de fora
+ * por decisão do Alan: quase sem liquidez (49 e 35 posições no total).
  */
 
 import type { Address } from "viem";
@@ -36,6 +35,5 @@ export const RAMSES_V3_HYPEREVM: RamsesV3ChainConfig = {
   feeCollector: "0xA22fc9950bE328D8a32a8c1e2c92eAc4e6bADa00",
 };
 
-/** todas as redes Ramses ATIVAS (ordem = ordem no registry). A HyperEVM entra
- *  aqui no dia em que a rede entrar em `core/chains.ts` (ver o roadmap). */
-export const RAMSES_V3_CHAINS: RamsesV3ChainConfig[] = [RAMSES_V3_ROBINHOOD];
+/** todas as redes Ramses ATIVAS (ordem = ordem no registry) */
+export const RAMSES_V3_CHAINS: RamsesV3ChainConfig[] = [RAMSES_V3_ROBINHOOD, RAMSES_V3_HYPEREVM];
