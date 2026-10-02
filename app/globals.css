@@ -1358,10 +1358,26 @@ a.chip:hover {
 
 /* faixa de custo do projeto, no topo de toda página (app/ui/CostBar.tsx) */
 .costbar {
-  border-bottom: 1px dashed var(--border);
-  padding: 8px 0;
-  font-size: 13px;
-  color: var(--ink-2);
+  /* vinho: escuro e saturado contra o laranja-areia do site, para a faixa
+     saltar aos olhos; texto claro sobre ele passa de 10:1 de contraste */
+  background: #7a1038;
+  border-bottom: 3px solid #ffb703;
+  padding: 10px 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #fff1f5;
+}
+
+.costbar .donate-addr {
+  background: #fffdf6;
+  border-color: #fffdf6;
+  color: #7a1038;
+}
+
+.costbar .donate-copy {
+  background: #ffb703;
+  border-color: #ffb703;
+  color: #2e2013;
 }
 
 .costbar .container {
@@ -1381,5 +1397,11 @@ a.chip:hover {
   }
   .costbar-short {
     display: inline;
+  }
+}
+
+@media (hover: hover) {
+  .costbar .donate-copy:hover {
+    background: #ffd36b;
   }
 }
