@@ -64,14 +64,19 @@ Se o import não carregou (clone novo, antes do `npm run retomar`), ler
   **distribuição é a frente da vez**.
 - `ebook/` (gitignored, local) — plano de monetização (material interno).
 
-## Estado atual (set/2026)
-**15 redes** (Base, Optimism, Ethereum, Arbitrum, Robinhood Chain + as leaf
-chains da Superchain da Velodrome: Unichain, Ink, Mode, Soneium e Fraxtal
-desde 10/08; Lisk, Swell, Metal L2, Superseed e Celo desde 27/09) ·
-protocolos Aerodrome, Velodrome, Uniswap v3 e Uniswap v4 (Robinhood).
-Roadmap público em `/roadmap`.
+## Estado atual
+**Não repetir aqui número nem lista de redes/protocolos** — envelhece calado
+(este parágrafo dizia "15 redes" quando já eram 17). A fonte única é
+`NETWORKS` e `COVERAGE` em `app/site.ts`; o que está no ar e o que vem depois
+está no `/roadmap`; a fila de expansão em `privado/PENDENCIAS.md` §4.
 **Nenhum texto do site escreve nome de rede à mão** — tudo sai de `NETWORKS`
 em `app/site.ts`, com teste que impede envelhecer.
+
+**Ao mexer em rede, protocolo, funcionalidade ou ferramenta: seguir
+`privado/CHECKLIST_ATUALIZACAO.md`** — a lista de TODOS os lugares que
+precisam mudar junto (código, textos nos idiomas, roadmap, changelog,
+sitemap, README, `.env.example`, `DEPLOY.md`, painéis, textos prontos de
+divulgação e documentos privados).
 
 ## Idiomas (i18n) — desde 30/09/2026
 O site fala **inglês** (padrão, URL sem prefixo: `/roadmap`) e **pt-BR**

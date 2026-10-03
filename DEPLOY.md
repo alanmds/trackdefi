@@ -36,21 +36,32 @@ Nada disto vive no repositório — só existe no painel:
 | Redirecionamentos 308 | `www.trackdefi.app`, `trackdefi.xyz`, `www.trackdefi.xyz` e `trackdefi.vercel.app` apontam para o principal |
 | `NEXT_PUBLIC_SITE_URL` | `https://trackdefi.app` (Production) |
 | Web Analytics | ligado (sem cookies) |
-| `BASE_RPC_URLS` | **não configurado** — ver abaixo |
+| RPCs dedicados (`<REDE>_RPC_URLS`) | configurados nas redes em que o RPC público não serve histórico — ver abaixo |
 
 > ⚠️ Os redirecionamentos do `trackdefi.xyz` precisam continuar de pé: existe
 > uma "mudança de endereço" registrada no Google Search Console que depende
 > deles.
 
-### Opcional: RPC dedicado
+### RPC dedicado (por rede)
 
-Hoje a varredura leva ~3 s em produção com RPCs públicos, então não é
-necessário. Se um dia ficar lento:
+Cada rede tem a sua variável — `BASE_RPC_URLS`, `OPTIMISM_RPC_URLS`,
+`BSC_RPC_URLS` etc.; a lista completa é o campo `rpcEnv` em `core/chains.ts`.
+Sem ela, a rede usa os RPCs públicos do mesmo arquivo. Duas razões para
+configurar:
 
-1. Crie uma conta grátis em https://alchemy.com, um app na rede **Base**, e
-   copie a **HTTPS URL**.
-2. Vercel → projeto → **Settings → Environment Variables** → **Name:**
-   `BASE_RPC_URLS` · **Value:** a URL (várias separadas por vírgula) → **Save**.
+- **velocidade** em carteira grande;
+- **o "Earning now" medido no contrato** (janelas de 24 h e 15 min) precisa de
+  RPC que sirva estado de blocos passados. Vários RPCs públicos não servem
+  (os da BNB Chain recusam; o oficial da HyperEVM responde o estado atual — o
+  site detecta e mostra "—"). Sem histórico, o número cai na estimativa ou "—".
+
+Para configurar:
+
+1. Crie uma conta grátis em https://alchemy.com, um app com as redes que
+   quiser, e copie a **HTTPS URL** de cada uma.
+2. Vercel → projeto → **Settings → Environment Variables** → **Name:** a
+   variável da rede (ex.: `BSC_RPC_URLS`) · **Value:** a URL (várias separadas
+   por vírgula) → **Save**.
 3. **Deployments** → **Redeploy** no último deploy (variável só vale com deploy
    novo).
 

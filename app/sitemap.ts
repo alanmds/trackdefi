@@ -2,21 +2,7 @@ import type { MetadataRoute } from "next";
 import { CHANGELOG } from "./changelog";
 import { DEFAULT_LOCALE, LOCALES, localePath, type Locale } from "./i18n/config";
 import { SITE_URL } from "./site";
-
-/**
- * Última mudança REAL de conteúdo de cada página (AAAA-MM-DD).
- *
- * ⚠️ Atualizar à mão quando o TEXTO da página mudar — não em todo deploy. Até
- * 27/09/2026 todas carimbavam a data do build: cada deploy dizia ao Google que
- * tudo tinha mudado, e um `lastmod` que muda sempre ele aprende a ignorar.
- * Não dá para tirar do git: a Vercel constrói sem o histórico completo.
- */
-const EDITADA_EM = {
-  home: "2026-09-30",
-  howItWorks: "2026-09-27",
-  roadmap: "2026-09-30",
-  glossary: "2026-09-27",
-} as const;
+import { EDITADA_EM } from "./sitemap-datas";
 
 /**
  * Dia em que cada idioma foi ao ar. Uma tradução nova nunca tem `lastmod`

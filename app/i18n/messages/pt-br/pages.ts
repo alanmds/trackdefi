@@ -56,7 +56,7 @@ const pages: PagesMessages = {
       },
       {
         title: "Números honestos",
-        body: "Os valores vêm do estado on-chain e dos preços da DefiLlama. Quando um token não tem preço confiável, mostramos “—” em vez de chutar.",
+        body: "Os valores vêm do estado on-chain e de dados públicos de preço (DefiLlama, depois DexScreener, depois um pool da mesma rede). Quando um token não tem preço confiável, mostramos “—” em vez de chutar.",
       },
     ],
     faqAria: "Perguntas frequentes",
@@ -293,7 +293,7 @@ const pages: PagesMessages = {
     heading: "Glossário",
     lede: "O que significa cada número e rótulo da página de uma carteira, na ordem em que aparecem na tela.",
     tocAria: "Seções",
-    note: "Os valores em dólar usam dados públicos de preço da DefiLlama e podem atrasar até um minuto em relação à blockchain. Nada aqui é recomendação financeira — confira na blockchain antes de agir. Veja também <how>como funciona e por que é seguro</how>.",
+    note: "Os valores em dólar usam dados públicos de preço (DefiLlama, DexScreener ou um pool da mesma rede) e podem atrasar até um minuto em relação à blockchain. Nada aqui é recomendação financeira — confira na blockchain antes de agir. Veja também <how>como funciona e por que é seguro</how>.",
     sections: [
       {
         id: "summary",

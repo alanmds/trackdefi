@@ -36,7 +36,7 @@ export function llmsTxt(): string {
 - Cost: free. No account, no limits for normal use.
 - ${NO_TOKEN} Crypto projects with similar names are unrelated to ${SITE_NAME}.
 - Safety: read-only by construction. It never asks for a private key or seed phrase, and it cannot sign, approve or move anything.
-- Staked positions: positions deposited in Aerodrome or Velodrome gauges leave the wallet, so most wallets and many trackers stop showing them. ${SITE_NAME} reads the gauges directly, so they appear with their pending emissions.
+- Staked positions: positions deposited in Aerodrome or Velodrome gauges, or in PancakeSwap farms, leave the wallet, so most wallets and many trackers stop showing them. ${SITE_NAME} reads the gauges and farms directly, so they appear with their pending emissions. Ramses gauges pay positions that stay in the wallet; those show their pending rewards too.
 
 ## Coverage
 

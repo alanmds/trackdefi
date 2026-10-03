@@ -89,7 +89,7 @@ const pages = {
       },
       {
         title: "Honest numbers",
-        body: "Values come from on-chain state and DefiLlama prices. When a token has no reliable price, we show “—” instead of guessing.",
+        body: "Values come from on-chain state and public price data (DefiLlama, then DexScreener, then a pool on the same network). When a token has no reliable price, we show “—” instead of guessing.",
       },
     ],
     faqAria: "Frequently asked questions",
@@ -327,7 +327,7 @@ const pages = {
     heading: "Glossary",
     lede: "What every number and label on a wallet page means, in the order they appear on screen.",
     tocAria: "Sections",
-    note: "Dollar values use public price data from DefiLlama and can lag the chain by up to a minute. Nothing here is financial advice — verify on-chain before acting. See also <how>how it works & why it's safe</how>.",
+    note: "Dollar values use public price data (DefiLlama, DexScreener or a pool on the same network) and can lag the chain by up to a minute. Nothing here is financial advice — verify on-chain before acting. See also <how>how it works & why it's safe</how>.",
     sections: [
       {
         id: "summary",
