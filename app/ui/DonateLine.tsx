@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { DONATION_ADDRESS, nextPhrase } from "../donate";
 import { useI18n } from "../i18n/provider";
+import { setPhraseIndex } from "./donatePhrase";
 
 /** onde a rotação fica guardada; o sufixo muda se o formato mudar */
 const STORAGE_KEY = "trackdefi.donate.v1";
@@ -36,6 +37,7 @@ export default function DonateLine() {
   useEffect(() => {
     const { index, bag } = nextPhrase(readBag(), phrases.length);
     setPhrase(phrases[index]);
+    setPhraseIndex(index); // a faixa do topo da página de carteira repete esta frase
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(bag));
     } catch {

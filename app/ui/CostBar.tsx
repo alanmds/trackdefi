@@ -1,14 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { costLine } from "../custos";
+import { usePathname } from "next/navigation";
 import { DONATION_ADDRESS } from "../donate";
 import { useI18n } from "../i18n/provider";
+import { usePhraseIndex } from "./donatePhrase";
 
-/** Faixa no topo de toda página: quanto o site já custou + endereço de apoio. */
+/** /w/<endereço>, com ou sem prefixo de idioma (/pt-br/w/<endereço>) */
+const WALLET_PAGE = /^(\/[a-z]{2}(-[a-z]{2})?)?\/w\//i;
+
+/**
+ * Faixa de apoio no topo da página de carteira — e só nela: é ali que o
+ * visitante acabou de ver as próprias posições, o momento de maior gratidão.
+ * Repete a frase sorteada pelo rodapé (app/ui/DonateLine.tsx), com o endereço.
+ */
 export default function CostBar() {
-  const { locale, ui } = useI18n();
+  const { ui } = useI18n();
+  const pathname = usePathname();
+  const index = usePhraseIndex();
   const [copied, setCopied] = useState(false);
+
+  if (!WALLET_PAGE.test(pathname ?? "")) return null;
+  const phrase = index === null ? null : ui.donate.phrases[index];
 
   async function copy() {
     try {
@@ -21,19 +34,18 @@ export default function CostBar() {
   }
 
   return (
-    <aside className="costbar" aria-label={ui.costbar.aria}>
+    <aside className="costbar" aria-label={ui.donate.aria}>
       <div className="container">
-        <span>
-          {costLine(locale, ui.costbar.line)} {ui.costbar.tips}
-        </span>
+        {/* antes do sorteio o espaço fica reservado, para a faixa não pular */}
+        <span className="costbar-phrase">{phrase ?? " "}</span>
         <code className="donate-addr" translate="no">
           <span className="costbar-full">{DONATION_ADDRESS}</span>
           <span className="costbar-short">
             {DONATION_ADDRESS.slice(0, 8)}…{DONATION_ADDRESS.slice(-6)}
           </span>
         </code>
-        <button type="button" className="donate-copy" onClick={copy} aria-label={ui.costbar.copyAria}>
-          {copied ? ui.costbar.copied : ui.costbar.copy}
+        <button type="button" className="donate-copy" onClick={copy} aria-label={ui.donate.copyAria}>
+          {copied ? ui.donate.copied : ui.donate.copy}
         </button>
       </div>
     </aside>
