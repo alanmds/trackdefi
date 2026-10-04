@@ -53,6 +53,24 @@ export const UNISWAP_V3_ROBINHOOD: UniV3ChainConfig = {
   nfpm: "0x73991a25c818bf1f1128deaab1492d45638de0d3",
 };
 
+/**
+ * Unichain (130) e BNB Chain (56) — endereços CONFIRMADOS na doc oficial em
+ * 04/10/2026 (developers.uniswap.org → v3 → deployments) e conferidos on-chain
+ * no `poc/probe-uniswap-v3-unichain-bnb.ts` (`NFPM.factory()` bate). Nenhuma
+ * das duas usa os canônicos.
+ */
+export const UNISWAP_V3_UNICHAIN: UniV3ChainConfig = {
+  chainId: 130,
+  factory: "0x1f98400000000000000000000000000000000003",
+  nfpm: "0x943e6e07a7e8e791dafc44083e54041d743c46e9",
+};
+
+export const UNISWAP_V3_BSC: UniV3ChainConfig = {
+  chainId: 56,
+  factory: "0xdB1d10011AD0Ff90774D0C6Bb92e5C5c8b4461F7",
+  nfpm: "0x7b8A01B39D58278b5DE7e48c8449c9f4F5170613",
+};
+
 /** todas as redes Uniswap ativas (ordem = ordem no registry) */
 export const UNISWAP_V3_CHAINS: UniV3ChainConfig[] = [
   UNISWAP_V3_BASE,
@@ -60,6 +78,8 @@ export const UNISWAP_V3_CHAINS: UniV3ChainConfig[] = [
   UNISWAP_V3_ARBITRUM,
   UNISWAP_V3_OPTIMISM,
   UNISWAP_V3_ROBINHOOD,
+  UNISWAP_V3_UNICHAIN,
+  UNISWAP_V3_BSC,
 ];
 
 // compatibilidade com código/testes existentes (Base)

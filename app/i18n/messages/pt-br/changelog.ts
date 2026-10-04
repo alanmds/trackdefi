@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "uniswap-v3-unichain-bnb": {
+    title: "Uniswap v3 na Unichain e na BNB Chain",
+    body: "O trackdefi agora lê a Uniswap v3 também na Unichain e na BNB Chain: posições concentradas com quantidades, faixa de preço e taxas pendentes, e o que cada uma está rendendo em taxas agora.",
+  },
   "hyperevm-ramses": {
     title: "HyperEVM, com a Ramses e as recompensas em RAM",
     body: "O trackdefi agora lê a HyperEVM. As posições da Ramses ali mostram quantidades, faixa de preço e taxas pendentes, mais o RAM que ganham: a Ramses paga RAM a toda posição dentro da faixa num pool com gauge, sem precisar de stake, então cada uma mostra o RAM a resgatar e o que está rendendo em RAM agora. Na maioria desses pools as taxas de swap vão para quem vota com RAM, então as taxas aparecem como 0% ali — é o número real.",

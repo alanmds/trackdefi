@@ -208,13 +208,13 @@ const pages = {
         title: "HyperEVM · Ramses",
         body: "Ramses' other big home, and the one with gauges: it pays RAM to every in-range position in a pool with a gauge, no staking needed. trackdefi shows the RAM waiting to be claimed and what each position is earning in RAM right now. In most of those pools the swap fees go to RAM voters, so fees show 0% there: that is the real number, not a gap.",
       },
+      {
+        title: "Unichain & BNB Chain · Uniswap v3",
+        body: "Uniswap v3 on two networks trackdefi already read for other exchanges: positions, amounts, price ranges and pending fees.",
+      },
     ] as RoadmapItem[],
     nextTitle: "Next",
     next: [
-      {
-        title: "Unichain & BNB Chain · Uniswap v3",
-        body: "Uniswap v3 on two networks trackdefi already reads: positions, amounts, price ranges and pending fees.",
-      },
       {
         title: "Ethereum, Base & Arbitrum · PancakeSwap v3",
         body: "the same reading as on BNB Chain, including positions staked in PancakeSwap farms with their pending CAKE.",

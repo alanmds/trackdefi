@@ -174,13 +174,13 @@ const pages: PagesMessages = {
         title: "HyperEVM · Ramses",
         body: "a outra grande casa da Ramses, e a que tem gauges: ela paga RAM a toda posição dentro da faixa num pool com gauge, sem precisar de stake. O trackdefi mostra o RAM a resgatar e o que cada posição está rendendo em RAM agora. Na maioria desses pools as taxas de swap vão para quem vota com RAM, então as taxas aparecem como 0% ali: é o número real, não uma falha.",
       },
+      {
+        title: "Unichain e BNB Chain · Uniswap v3",
+        body: "a Uniswap v3 em duas redes que o trackdefi já lia para outras corretoras: posições, quantidades, faixas de preço e taxas pendentes.",
+      },
     ],
     nextTitle: "Próximo",
     next: [
-      {
-        title: "Unichain e BNB Chain · Uniswap v3",
-        body: "a Uniswap v3 em duas redes que o trackdefi já lê: posições, quantidades, faixas de preço e taxas pendentes.",
-      },
       {
         title: "Ethereum, Base e Arbitrum · PancakeSwap v3",
         body: "a mesma leitura da BNB Chain, inclusive as posições em stake nas farms da PancakeSwap com o CAKE pendente.",

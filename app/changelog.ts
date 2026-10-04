@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "uniswap-v3-unichain-bnb",
+    date: "2026-10-04",
+    kind: "exchange",
+    title: "Uniswap v3 on Unichain and BNB Chain",
+    body: "trackdefi now reads Uniswap v3 on Unichain and BNB Chain too: concentrated positions with their amounts, price range and pending fees, and what each one is earning in fees right now.",
+  },
+  {
     id: "hyperevm-ramses",
     date: "2026-10-02",
     kind: "network",
