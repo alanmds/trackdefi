@@ -3,13 +3,17 @@
  * (developers.uniswap.org → v4 → deployments) em 10/08/2026 e conferidos
  * on-chain nos PoCs `poc/probe-uniswap-v4.ts` e `poc/probe-uniswap-v4-read.ts`.
  *
- * ⚠️ Por que só a Robinhood Chain está aqui, se o v4 também roda na Base:
- * o v4 exige varrer o histórico de `Transfer` do PositionManager para
- * descobrir as posições da carteira (ver `index.ts`). O RPC público da
- * Robinhood aceita a chain inteira numa chamada; **na Base nenhum dos 8 RPCs
- * públicos testados aceita** (10.000 blocos no melhor caso). A Base entra
- * quando houver RPC que aguente — a config abaixo é a única coisa a
- * acrescentar. Endereços da Base, já confirmados na doc, para quando for:
+ * ⚠️ Como cada rede é enumerada (ver `index.ts`): o v4 exige descobrir os NFTs
+ * da carteira pelo histórico de `Transfer` do PositionManager — ele não é
+ * enumerável. O RPC público da Robinhood aceita a chain inteira numa chamada;
+ * **na Base nenhum dos 8 RPCs públicos testados aceita** (10.000 blocos no
+ * melhor caso) e na BNB o público aceita só 2.000 por chamada contra 126M de
+ * blocos (medido em `poc/probe-v4-bnb-varredura.ts`). Onde a varredura não
+ * cabe, `enumeration: "index"` enumera pela API indexada do próprio RPC
+ * (`alchemy_getAssetTransfers`) — é o "caminho alternativo já testado" que o
+ * roadmap promete, e o que faz a posição v4 da BNB aparecer.
+ *
+ * A Base entra com a mesma receita (endereços já confirmados na doc):
  *   positionManager 0x7c5f5a4bbd8fd63184577525326123b519429bdc
  *   stateView       0xa3c0c9b65bad0b08107aa264b0f3db444b867a71
  */
@@ -32,7 +36,19 @@ export interface UniV4ChainConfig {
    * acha o singleton (o APR sai "—", que é o correto aqui).
    */
   poolManager: Address;
-}
+  /**
+   * Como descobrir OS NFTs DA CARTEIRA nesta rede:
+   *  - `"logs"` (padrão): varredura de `Transfer` do início da chain — só onde
+   *    o RPC aguenta a faixa inteira (Robinhood);
+   *  - `"index"`: API indexada do próprio RPC (`alchemy_getAssetTransfers`),
+   *    que devolve o que a carteira recebeu sem varrer bloco a bloco — usado
+   *    onde nenhum RPC aguenta a varredura (BNB). Exige `<REDE>_RPC_URLS` com
+   *    Alchemy; sem ela o adapter tenta a varredura e, se falhar, avisa.
+   * As duas fontes dão os MESMOS candidatos (quem recebeu), e `ownerOf`
+   * confirma em seguida — ver `index.ts`.
+   */
+  enumeration?: "logs" | "index";
+};
 
 export const UNISWAP_V4_ROBINHOOD: UniV4ChainConfig = {
   chainId: 4663,
@@ -41,11 +57,29 @@ export const UNISWAP_V4_ROBINHOOD: UniV4ChainConfig = {
   poolManager: "0x8366a39cc670b4001a1121b8f6a443a643e40951",
 };
 
+/**
+ * BNB Chain. Endereços da doc OFICIAL (developers.uniswap.org →
+ * docs/protocols/v4/deployments → BNB Smart Chain: 56) lidos em 06/10/2026 e
+ * conferidos on-chain no `poc/probe-v4-bnb.ts` (`name()` = "Uniswap v4
+ * Positions NFT"). Entrou porque carteiras reais tinham posição v4 na BNB, rede
+ * que não estava no registry.
+ */
+export const UNISWAP_V4_BSC: UniV4ChainConfig = {
+  chainId: 56,
+  positionManager: "0x7a4a5c919ae2541aed11041a1aeee68f1287f95b",
+  stateView: "0xd13dd3d6e93f276fafc9db9e6bb47c1180aee0c4",
+  poolManager: "0x28e2ea090877bf75740558f6bfb36a5ffee9e9df",
+  enumeration: "index",
+};
+
 /** todas as redes Uniswap v4 ativas (ordem = ordem no registry) */
-export const UNISWAP_V4_CHAINS: UniV4ChainConfig[] = [UNISWAP_V4_ROBINHOOD];
+export const UNISWAP_V4_CHAINS: UniV4ChainConfig[] = [UNISWAP_V4_ROBINHOOD, UNISWAP_V4_BSC];
 
 /** teto de NFTs de posição por carteira (evita carteira-robô derrubar a varredura) */
 export const MAX_V4_NFTS = 400;
+
+/** teto de páginas da API indexada (100 transferências por página) */
+export const MAX_INDEX_PAGES = 40;
 
 /** varredura de `Transfer`: faixa (em blocos) abaixo da qual não se parte mais, só se repete */
 export const MIN_LOG_SPAN = 200_000n;

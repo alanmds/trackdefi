@@ -178,6 +178,10 @@ const pages: PagesMessages = {
         title: "Unichain e BNB Chain · Uniswap v3",
         body: "a Uniswap v3 em duas redes que o trackdefi já lia para outras corretoras: posições, quantidades, faixas de preço e taxas pendentes.",
       },
+      {
+        title: "BNB Chain · Uniswap v4",
+        body: "a arquitetura de contrato único com hooks numa segunda rede. Posições, quantidades, faixas de preço e taxas de swap pendentes. Essas posições não podem ser listadas por carteira na própria rede — seria preciso varrer a chain inteira —, então o trackdefi as lê pelo índice do próprio RPC.",
+      },
     ],
     nextTitle: "Próximo",
     next: [
@@ -206,7 +210,7 @@ const pages: PagesMessages = {
       },
       {
         title: "Uniswap v4 em mais redes",
-        body: "Ethereum, Optimism, BNB Chain, Polygon, Base, Arbitrum, Avalanche e Unichain. As posições da v4 não podem ser listadas por carteira na própria rede; um caminho alternativo já foi testado e funciona, e ele também cobre as carteiras maiores na Robinhood Chain.",
+        body: "Ethereum, Optimism, Polygon, Base, Arbitrum, Avalanche e Unichain. As posições da v4 não podem ser listadas por carteira na própria rede; o caminho alternativo para isso já está no ar na BNB Chain, e ele também cobre as carteiras maiores na Robinhood Chain.",
       },
       {
         title: "QuickSwap v3, Camelot v3 e THENA",

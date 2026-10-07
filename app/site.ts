@@ -128,7 +128,7 @@ export const COVERAGE = [
     protocol: "Uniswap v3",
     networks: ["Base", "Optimism", "Ethereum", "Arbitrum", "Robinhood Chain", "Unichain", "BNB Chain"] as readonly string[],
   },
-  { protocol: "Uniswap v4", networks: ["Robinhood Chain"] as readonly string[] },
+  { protocol: "Uniswap v4", networks: ["BNB Chain", "Robinhood Chain"] as readonly string[] },
   { protocol: "PancakeSwap v3", networks: ["BNB Chain"] as readonly string[] },
   { protocol: "Ramses", networks: ["Robinhood Chain", "HyperEVM"] as readonly string[] },
 ] as const;

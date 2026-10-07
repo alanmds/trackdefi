@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "uniswap-v4-bnb",
+    date: "2026-10-07",
+    kind: "exchange",
+    title: "Uniswap v4 on BNB Chain",
+    body: "trackdefi now reads Uniswap v4 on BNB Chain too: concentrated positions with their amounts, price range and pending fees. Those pools live in a single contract, so they could not be listed wallet by wallet on this network before — wallets holding them now show them like any other position.",
+  },
+  {
     id: "uniswap-v3-unichain-bnb",
     date: "2026-10-04",
     kind: "exchange",

@@ -45,12 +45,19 @@ import {
 } from "./abi";
 import {
   LOG_RETRIES,
+  MAX_INDEX_PAGES,
   MAX_LOG_CALLS,
   MAX_V4_NFTS,
   MIN_LOG_SPAN,
   UNISWAP_V4_ROBINHOOD,
   type UniV4ChainConfig,
 } from "./config";
+
+/** corpo do `alchemy_getAssetTransfers` — só o que este adapter lê */
+type IndiceResposta = {
+  result?: { transfers?: Array<{ tokenId?: string }>; pageKey?: string };
+  error?: { message: string };
+};
 
 export interface UniswapV4Options {
   config?: UniV4ChainConfig;
@@ -70,6 +77,8 @@ export class UniswapV4Adapter implements ProtocolAdapter {
   private readonly maxNfts: number;
   private readonly retryDelayMs: number;
   private readonly warn: WarnSink;
+  /** qual fonte de NFTs a rede prefere — ver `UniV4ChainConfig.enumeration` */
+  private readonly enumeration: "logs" | "index";
 
   constructor(
     private readonly reader: ChainReader,
@@ -83,6 +92,7 @@ export class UniswapV4Adapter implements ProtocolAdapter {
     this.maxNfts = opts.maxNfts ?? MAX_V4_NFTS;
     this.retryDelayMs = opts.retryDelayMs ?? 400;
     this.warn = opts.onWarn ?? (() => {});
+    this.enumeration = config.enumeration ?? "logs";
   }
 
   async getPositions(account: Address): Promise<LpPosition[]> {
@@ -197,31 +207,138 @@ export class UniswapV4Adapter implements ProtocolAdapter {
   }
 
   /**
-   * NFTs da carteira. Duas etapas, porque o histórico só diz o que ENTROU:
-   * `Transfer(to = carteira)` dá os candidatos, e `ownerOf` descarta os que
-   * já saíram.
+   * NFTs que a carteira RECEBEU — o passo que o histórico de `Transfer` fazia
+   * sozinho. Duas fontes, na ordem que a rede preferir (ver
+   * `UniV4ChainConfig.enumeration`), e uma serve de reserva da outra:
+   *
+   *  - **logs**: varredura de `Transfer(to = carteira)` do início da chain.
+   *    Só onde o RPC aceita a faixa (a Robinhood aceita a chain inteira; na
+   *    Base nenhum dos 8 públicos aceita, na BNB o público aceita 2.000
+   *    blocos por chamada contra 126M — medido em `poc/probe-v4-bnb-varredura`).
+   *  - **índice**: a API indexada do próprio RPC (Alchemy), paginada, sem
+   *    varrer bloco a bloco. Mesma semântica, então o resto do caminho —
+   *    `ownerOf` confirmando quem ainda é dono — é idêntico.
+   *
+   * Devolve `null` quando NADA funcionou: aí quem chama avisa e devolve
+   * lista vazia. Lista parcial lida como "é tudo que tenho" é pior que aviso.
    */
-  private async fetchRawPositions(account: Address): Promise<V4RawPosition[]> {
-    if (!this.reader.getLogs || !this.reader.getBlockNumber) {
-      this.warn("uniswap-v4: RPC sem getLogs — posições v4 NÃO foram varridas nesta rede");
-      return [];
-    }
+  private async candidatos(account: Address): Promise<bigint[] | null> {
+    const fontes: Array<() => Promise<{ ids: bigint[] } | { erro: string }>> =
+      this.enumeration === "index"
+        ? [() => this.porIndice(account), () => this.porLogs(account)]
+        : [() => this.porLogs(account), () => this.porIndice(account)];
 
-    let candidatos: bigint[];
+    const erros: string[] = [];
+    for (const fonte of fontes) {
+      const r = await fonte();
+      // fonte que respondeu deu o conjunto COMPLETO de candidatos — a outra
+      // falhou sem prejuízo nenhum para o usuário, então não há o que avisar
+      if ("ids" in r) return r.ids;
+      erros.push(r.erro);
+    }
+    this.warn(`uniswap-v4: ${erros.join(" · ")} — posições v4 não listadas`);
+    return null;
+  }
+
+  /** Fonte "logs": varredura adaptativa de `Transfer` (getLogsAdaptive). */
+  private async porLogs(account: Address): Promise<{ ids: bigint[] } | { erro: string }> {
+    if (!this.reader.getLogs || !this.reader.getBlockNumber) return { erro: "RPC sem getLogs" };
     try {
       const head = await this.reader.getBlockNumber();
       const logs = await this.getLogsAdaptive(account, 0n, head);
-      candidatos = [...new Set(logs.map((l) => l.args.tokenId as bigint).filter((id) => id != null))];
+      return { ids: [...new Set(logs.map((l) => l.args.tokenId as bigint).filter((id) => id != null))] };
     } catch (e) {
-      // RPC que limita a faixa de blocos cai aqui. Melhor avisar alto do que
-      // devolver uma lista parcial que o usuário leria como "é tudo que tenho".
-      this.warn(
-        `uniswap-v4: o RPC recusou a varredura de histórico (${(e as Error).message.split("\n")[0]}) — posições v4 não listadas`,
-      );
-      return [];
+      // RPC que limita a faixa de blocos cai aqui.
+      return { erro: `o RPC recusou a varredura de histórico (${(e as Error).message.split("\n")[0]})` };
     }
+  }
 
-    if (candidatos.length === 0) return [];
+  /**
+   * Fonte "índice": `alchemy_getAssetTransfers` no MESMO endpoint do RPC —
+   * devolve as transferências de ERC-721 PARA a carteira, paginado, com
+   * páginação ilimitada por faixa de blocos. Requer `<REDE>_RPC_URLS` com
+   * Alchemy (é o `BSC_RPC_URLS` que a DEPLOY.md já manda configurar).
+   *
+   * Os ids voltam em hex e são candidatos, como no caminho de logs: quem já
+   * saiu da carteira é descartado pelo `ownerOf` logo adiante.
+   */
+  private async porIndice(account: Address): Promise<{ ids: bigint[] } | { erro: string }> {
+    const env = chainInfo(this.chainId).rpcEnv;
+    const url = (process.env[env] ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .find((u) => u.includes("alchemy.com") && /\/v2\/[^/]+\/?$/.test(u.split("?")[0]));
+    if (!url) return { erro: `sem API indexada (falta ${env} com Alchemy)` };
+
+    const semQuery = url.split("?")[0];
+    const base = semQuery.replace(/\/v2\/[^/]+\/?$/, "");
+    const chave = semQuery.slice(base.length).replace(/^\//, "").replace(/^v2\//, "");
+
+    const ids = new Set<bigint>();
+    let pageKey: string | undefined;
+    let paginas = 0;
+    do {
+      const r = await this.indicePagina(`${base}/v2/${chave}`, account, pageKey);
+      if ("erro" in r) return { erro: r.erro };
+      for (const t of r.corpo.result?.transfers ?? []) if (t.tokenId) ids.add(BigInt(t.tokenId));
+      pageKey = r.corpo.result?.pageKey;
+      paginas++;
+    } while (pageKey && paginas < MAX_INDEX_PAGES);
+
+    if (pageKey) {
+      this.warn(
+        `uniswap-v4: índice do RPC limitado a ${MAX_INDEX_PAGES} páginas (${ids.size} NFTs lidos) — candidatos antigos podem faltar`,
+      );
+    }
+    return { ids: [...ids] };
+  }
+
+  /** uma página do índice — devolve o corpo, ou o motivo de não ter dado */
+  private async indicePagina(
+    endpoint: string,
+    account: Address,
+    pageKey: string | undefined,
+  ): Promise<{ corpo: IndiceResposta } | { erro: string }> {
+    let r: Response;
+    try {
+      r = await fetch(endpoint, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "alchemy_getAssetTransfers",
+          params: [
+            {
+              fromBlock: "0x0",
+              toBlock: "latest",
+              category: ["erc721"],
+              toAddress: account,
+              contractAddresses: [this.positionManager],
+              withMetadata: false,
+              page_size: 100,
+              pageKey,
+            },
+          ],
+        }),
+      });
+    } catch (e) {
+      return { erro: `índice do RPC inacessível (${(e as Error).message.split("\n")[0]})` };
+    }
+    const corpo = (await r.json().catch(() => null)) as IndiceResposta | null;
+    if (!r.ok || !corpo) return { erro: `índice do RPC respondeu HTTP ${r.status}` };
+    if (corpo.error) return { erro: `índice do RPC recusou (${corpo.error.message})` };
+    return { corpo };
+  }
+
+  /**
+   * NFTs da carteira. Duas etapas, porque o histórico só diz o que ENTROU:
+   * a fonte de enumeração da rede dá os candidatos, e `ownerOf` descarta os
+   * que já saíram.
+   */
+  private async fetchRawPositions(account: Address): Promise<V4RawPosition[]> {
+    let candidatos = await this.candidatos(account);
+    if (candidatos === null || candidatos.length === 0) return [];
     if (candidatos.length > this.maxNfts) {
       this.warn(`uniswap-v4: carteira já recebeu ${candidatos.length} NFTs; conferindo só os ${this.maxNfts} mais recentes`, {
         kind: "capped",

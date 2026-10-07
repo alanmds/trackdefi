@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "uniswap-v4-bnb": {
+    title: "Uniswap v4 na BNB Chain",
+    body: "O trackdefi agora lê a Uniswap v4 também na BNB Chain: posições concentradas com quantidades, faixa de preço e taxas pendentes. Esses pools vivem num contrato só e por isso não podiam ser listados por carteira nesta rede antes — carteiras que os têm agora os mostram como qualquer outra posição.",
+  },
   "uniswap-v3-unichain-bnb": {
     title: "Uniswap v3 na Unichain e na BNB Chain",
     body: "O trackdefi agora lê a Uniswap v3 também na Unichain e na BNB Chain: posições concentradas com quantidades, faixa de preço e taxas pendentes, e o que cada uma está rendendo em taxas agora.",

@@ -54,6 +54,13 @@ configurar:
   RPC que sirva estado de blocos passados. Vários RPCs públicos não servem
   (os da BNB Chain recusam; o oficial da HyperEVM responde o estado atual — o
   site detecta e mostra "—"). Sem histórico, o número cai na estimativa ou "—".
+- **a enumeração do Uniswap v4**. O PositionManager do v4 não é enumerável, e
+  na BNB Chain não dá para varrer o histórico (o RPC público aceita 2.000
+  blocos por chamada e a chain tem 126M — medido em
+  `poc/probe-v4-bnb-varredura.ts`). O trackdefi lê essas posições pelo índice
+  do próprio RPC (`alchemy_getAssetTransfers`), que só existe na Alchemy:
+  sem `BSC_RPC_URLS` com Alchemy, o v4 da BNB não é listado e o site diz isso
+  em aviso, em vez de mostrar a carteira como se estivesse vazia.
 
 Para configurar:
 

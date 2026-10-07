@@ -212,6 +212,10 @@ const pages = {
         title: "Unichain & BNB Chain · Uniswap v3",
         body: "Uniswap v3 on two networks trackdefi already read for other exchanges: positions, amounts, price ranges and pending fees.",
       },
+      {
+        title: "BNB Chain · Uniswap v4",
+        body: "the singleton-and-hooks architecture on a second network. Positions, amounts, price ranges and pending swap fees. These positions can't be listed by wallet on-chain here — the whole chain would have to be scanned — so trackdefi reads them from the RPC's own index instead.",
+      },
     ] as RoadmapItem[],
     nextTitle: "Next",
     next: [
@@ -240,7 +244,7 @@ const pages = {
       },
       {
         title: "Uniswap v4 on more networks",
-        body: "Ethereum, Optimism, BNB Chain, Polygon, Base, Arbitrum, Avalanche and Unichain. v4 positions can't be listed by wallet on-chain; a way around that has been tested and works, and it also covers the largest wallets on Robinhood Chain.",
+        body: "Ethereum, Optimism, Polygon, Base, Arbitrum, Avalanche and Unichain. v4 positions can't be listed by wallet on-chain; the way around that is already live on BNB Chain, and it also covers the largest wallets on Robinhood Chain.",
       },
       {
         title: "QuickSwap v3, Camelot v3 & THENA",
