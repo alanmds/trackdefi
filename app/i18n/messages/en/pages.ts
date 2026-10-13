@@ -102,7 +102,7 @@ const pages = {
       },
       {
         q: "Why don't my staked Aerodrome LP positions show up in my wallet?",
-        a: "When you stake a position in an Aerodrome gauge to earn AERO, the LP token (or NFT) moves into the gauge contract, so wallets and most portfolio trackers stop showing it. {name} reads the gauges directly, so staked positions appear with their pending emissions. The same applies to Velodrome gauges on {velodromeNetworks}, and to PancakeSwap v3 positions staked in its farms (the MasterChef) on BNB Chain, with their pending CAKE.",
+        a: "When you stake a position in an Aerodrome gauge to earn AERO, the LP token (or NFT) moves into the gauge contract, so wallets and most portfolio trackers stop showing it. {name} reads the gauges directly, so staked positions appear with their pending emissions. The same applies to Velodrome gauges on {velodromeNetworks}, and to PancakeSwap v3 positions staked in its farms (the MasterChef) on {pancakeNetworks}, with their pending CAKE.",
       },
       {
         q: "Do I need to connect my wallet or create an account?",
@@ -201,6 +201,10 @@ const pages = {
         body: "the largest exchange on BNB Chain. Concentrated positions, amounts, price ranges and pending fees — and positions staked in PancakeSwap farms, with their pending CAKE and what they earn in CAKE right now. Our first network outside the Ethereum L2s.",
       },
       {
+        title: "Ethereum, Base & Arbitrum · PancakeSwap v3",
+        body: "the same reading as on BNB Chain, now on Ethereum, Base and Arbitrum: concentrated positions, amounts, price ranges and pending fees — and positions staked in PancakeSwap farms, with their pending CAKE and what they earn in CAKE right now. The farm contract and the CAKE token are not the same on every network, and each one is read from its own chain.",
+      },
+      {
         title: "Robinhood Chain · Ramses",
         body: "the ve(3,3) exchange with dynamic fees, read on the network where most of its liquidity sits: concentrated positions, amounts, price ranges and pending fees.",
       },
@@ -219,10 +223,6 @@ const pages = {
     ] as RoadmapItem[],
     nextTitle: "Next",
     next: [
-      {
-        title: "Ethereum, Base & Arbitrum · PancakeSwap v3",
-        body: "the same reading as on BNB Chain, including positions staked in PancakeSwap farms with their pending CAKE.",
-      },
       {
         title: "SushiSwap v3",
         body: "on Ethereum, Optimism, BNB Chain, Base and Arbitrum: concentrated positions, amounts, price ranges and pending fees. It is built like Uniswap v3, so trackdefi already knows how to read it.",

@@ -27,6 +27,7 @@ export default async function Home({ params }: LangParams) {
     name: SITE_NAME,
     networks: networksSentence("and", lang),
     velodromeNetworks: humanList(networksOf("Velodrome"), "and", lang),
+    pancakeNetworks: humanList(networksOf("PancakeSwap v3"), "and", lang),
     coverage: coverageSentence(lang),
     noToken: pages.noToken,
   };

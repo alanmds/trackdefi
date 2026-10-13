@@ -68,7 +68,7 @@ const pages: PagesMessages = {
       },
       {
         q: "Por que minhas posições de LP da Aerodrome em stake não aparecem na minha carteira?",
-        a: "Quando você coloca uma posição em stake num gauge da Aerodrome para ganhar AERO, o token de LP (ou NFT) vai para o contrato do gauge, e por isso as carteiras e a maioria dos rastreadores de portfólio deixam de mostrá-la. O {name} lê os gauges diretamente, então as posições em stake aparecem com as emissões pendentes. O mesmo vale para os gauges da Velodrome em {velodromeNetworks} e para as posições da PancakeSwap v3 em stake nas farms dela (o MasterChef) na BNB Chain, com o CAKE pendente.",
+        a: "Quando você coloca uma posição em stake num gauge da Aerodrome para ganhar AERO, o token de LP (ou NFT) vai para o contrato do gauge, e por isso as carteiras e a maioria dos rastreadores de portfólio deixam de mostrá-la. O {name} lê os gauges diretamente, então as posições em stake aparecem com as emissões pendentes. O mesmo vale para os gauges da Velodrome em {velodromeNetworks} e para as posições da PancakeSwap v3 em stake nas farms dela (o MasterChef) em {pancakeNetworks}, com o CAKE pendente.",
       },
       {
         q: "Preciso conectar minha carteira ou criar uma conta?",
@@ -167,6 +167,10 @@ const pages: PagesMessages = {
         body: "a maior corretora da BNB Chain. Posições concentradas, quantidades, faixas de preço e taxas pendentes — e as posições em stake nas farms da PancakeSwap, com o CAKE pendente e o que rendem em CAKE agora. Nossa primeira rede fora das L2 do Ethereum.",
       },
       {
+        title: "Ethereum, Base e Arbitrum · PancakeSwap v3",
+        body: "a mesma leitura da BNB Chain, agora na Ethereum, na Base e na Arbitrum: posições concentradas, quantidades, faixas de preço e taxas pendentes — e as posições em stake nas farms da PancakeSwap, com o CAKE pendente e o que rendem em CAKE agora. O contrato da farm e o token CAKE não são os mesmos em todas as redes, e cada um é lido na sua própria chain.",
+      },
+      {
         title: "Robinhood Chain · Ramses",
         body: "a corretora ve(3,3) de taxas dinâmicas, lida na rede onde está a maior parte da liquidez dela: posições concentradas, quantidades, faixas de preço e taxas pendentes.",
       },
@@ -185,10 +189,6 @@ const pages: PagesMessages = {
     ],
     nextTitle: "Próximo",
     next: [
-      {
-        title: "Ethereum, Base e Arbitrum · PancakeSwap v3",
-        body: "a mesma leitura da BNB Chain, inclusive as posições em stake nas farms da PancakeSwap com o CAKE pendente.",
-      },
       {
         title: "SushiSwap v3",
         body: "na Ethereum, Optimism, BNB Chain, Base e Arbitrum: posições concentradas, quantidades, faixas de preço e taxas pendentes. Ela é construída como a Uniswap v3, então o trackdefi já sabe lê-la.",

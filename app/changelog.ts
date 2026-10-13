@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "pancake-v3-ethereum-base-arbitrum",
+    date: "2026-10-13",
+    kind: "exchange",
+    title: "PancakeSwap v3 on Ethereum, Base and Arbitrum",
+    body: "trackdefi now reads PancakeSwap v3 on Ethereum, Base and Arbitrum One too, with the same depth as on BNB Chain: concentrated positions with their amounts, price range and pending fees. Positions staked in PancakeSwap farms show up as well, with the CAKE waiting to be claimed and what each one is earning in CAKE right now. The farm contract and the CAKE token are not the same on every network, and each one is read where it lives.",
+  },
+  {
     id: "uniswap-v4-bnb",
     date: "2026-10-07",
     kind: "exchange",

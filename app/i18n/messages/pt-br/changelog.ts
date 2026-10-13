@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "pancake-v3-ethereum-base-arbitrum": {
+    title: "PancakeSwap v3 na Ethereum, Base e Arbitrum",
+    body: "O trackdefi agora lê a PancakeSwap v3 também na Ethereum, Base e Arbitrum One, com a mesma profundidade da BNB Chain: posições concentradas com quantidades, faixa de preço e taxas pendentes. As posições em stake nas farms da PancakeSwap também aparecem, com o CAKE a resgatar e o que cada uma está rendendo em CAKE agora. O contrato da farm e o token CAKE não são os mesmos em todas as redes, e cada um é lido onde mora.",
+  },
   "uniswap-v4-bnb": {
     title: "Uniswap v4 na BNB Chain",
     body: "O trackdefi agora lê a Uniswap v4 também na BNB Chain: posições concentradas com quantidades, faixa de preço e taxas pendentes. Esses pools vivem num contrato só e por isso não podiam ser listados por carteira nesta rede antes — carteiras que os têm agora os mostram como qualquer outra posição.",

@@ -36,7 +36,7 @@ When a token has no reliable price, trackdefi shows `—` instead of guessing.
 | Velodrome | Optimism, Unichain, Ink, Mode, Soneium, Fraxtal, Lisk, Swell, Metal L2, Superseed, Celo |
 | Uniswap v3 | Base, Optimism, Ethereum, Arbitrum, Robinhood Chain, Unichain, BNB Chain |
 | Uniswap v4 | Robinhood Chain, BNB Chain |
-| PancakeSwap v3 | BNB Chain |
+| PancakeSwap v3 | BNB Chain, Ethereum, Base, Arbitrum |
 | Ramses | Robinhood Chain, HyperEVM |
 
 Classic (v2-style) and concentrated positions, staked or not, with pending fees
