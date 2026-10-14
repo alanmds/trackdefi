@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAddress, isAddress } from "viem";
+import { parseWalletAddress, shortAddress } from "../../../../core/address";
 import { localePath } from "../../../i18n/config";
 import { getMessages } from "../../../i18n/get";
 import { fill } from "../../../i18n/rich";
@@ -12,8 +12,8 @@ type Props = { params: Promise<{ lang: string; address: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const lang = await localeFrom(params);
   const { address } = await params;
-  const label = isAddress(address)
-    ? `${address.slice(0, 6)}…${address.slice(-4)}`
+  const label = parseWalletAddress(address)
+    ? shortAddress(address)
     : getMessages(lang).pages.meta.walletFallback;
   // páginas de carteira são infinitas/dinâmicas: fora do índice do Google
   // (o robots.txt bloqueia a varredura; isto cobre links externos diretos)
@@ -24,7 +24,8 @@ export default async function WalletPage({ params }: Props) {
   const lang = await localeFrom(params);
   const { address } = await params;
 
-  if (!isAddress(address)) {
+  const parsed = parseWalletAddress(address);
+  if (!parsed) {
     const t = getMessages(lang).ui.wallet.invalidAddress;
     return (
       <main className="container">
@@ -39,5 +40,5 @@ export default async function WalletPage({ params }: Props) {
     );
   }
 
-  return <PositionsView address={getAddress(address)} />;
+  return <PositionsView address={parsed.address} />;
 }

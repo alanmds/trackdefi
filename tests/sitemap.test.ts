@@ -20,9 +20,9 @@ import { getMessages } from "../app/i18n/get";
 import { EDITADA_EM } from "../app/sitemap-datas";
 
 const IMPRESSAO: Record<keyof typeof EDITADA_EM, { data: string; hash: string }> = {
-  home: { data: "2026-10-13", hash: "6c16839c7a5fed86" },
+  home: { data: "2026-10-14", hash: "2b0395bf5bc9735b" },
   howItWorks: { data: "2026-10-02", hash: "70213f1268a272af" },
-  roadmap: { data: "2026-10-13", hash: "064b282a39ccfba3" },
+  roadmap: { data: "2026-10-14", hash: "f844442bcfc8d782" },
   glossary: { data: "2026-10-02", hash: "f57c180473922052" },
 };
 

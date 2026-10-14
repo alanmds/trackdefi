@@ -12,10 +12,14 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "horas": "node scripts/horas.mjs",
-    "retomar":"scripts\\retomar.cmd",
+    "retomar": "scripts\\retomar.cmd",
     "salvar": "scripts\\salvar.cmd"
   },
   "dependencies": {
+    "@orca-so/whirlpools": "^8.0.1",
+    "@orca-so/whirlpools-client": "^7.0.0",
+    "@orca-so/whirlpools-core": "^3.1.1",
+    "@solana/kit": "^5.5.1",
     "@vercel/analytics": "^2.0.1",
     "next": "^16.2.10",
     "react": "^19.2.7",

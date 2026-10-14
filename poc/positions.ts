@@ -8,7 +8,7 @@
  */
 
 import { writeFileSync } from "node:fs";
-import { getAddress, isAddress } from "viem";
+import { parseWalletAddress } from "../core/address";
 import { createBaseReader } from "../core/chain";
 import { AerodromeAdapter } from "../core/adapters/aerodrome/index";
 import { CHAINS } from "../core/chains";
@@ -38,11 +38,12 @@ async function main() {
   const args = process.argv.slice(2).filter((a) => a !== "--json");
   const wantJson = process.argv.includes("--json");
   const input = args[0] ?? "0x892Ff98a46e5bd141E2D12618f4B2Fe6284debac";
-  if (!isAddress(input)) {
+  const parsed = parseWalletAddress(input);
+  if (!parsed) {
     console.error(`Endereço inválido: ${input}`);
     process.exit(1);
   }
-  const account = getAddress(input);
+  const account = parsed.address;
 
   console.log(`\ntrackdefi — caminho completo de produção (todas as redes)`);
   console.log(`Carteira: ${account}\n`);
@@ -146,9 +147,9 @@ async function main() {
   console.log(`TOTAL a receber:  ${usd(dto.totals.rewardsUsd)}`);
   console.log(`Conferir: https://trackdefi.app/w/${account}\n`);
 
-  if (wantJson) {
+  if (wantJson && parsed.kind === "evm") {
     const adapter = new AerodromeAdapter(createBaseReader());
-    const raw = await adapter.fetchRawPositions(account);
+    const raw = await adapter.fetchRawPositions(account as `0x${string}`);
     const file = `poc/fixture-${account.slice(0, 10)}.json`;
     writeFileSync(
       file,

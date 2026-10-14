@@ -24,8 +24,18 @@ import {
 } from "viem/chains";
 import type { Chain } from "viem";
 
+/**
+ * A Solana não tem chainId (não é EVM). Este número é só a CHAVE interna dela
+ * no `CHAINS` e no DTO — o mesmo que agregadores como a Relay usam para a
+ * Solana. Nunca vai a RPC nenhum.
+ */
+export const SOLANA_CHAIN_ID = 792703809;
+
 export interface ChainInfo {
-  chain: Chain;
+  /** definição do viem; ausente = rede não-EVM (Solana), que não usa o viem */
+  chain?: Chain;
+  /** família da rede — decide que tipo de endereço de carteira ela aceita */
+  vm: "evm" | "solana";
   label: string;
   /** slug da DefiLlama (coins.llama.fi) */
   priceSlug: string;
@@ -36,6 +46,8 @@ export interface ChainInfo {
   yieldsLabel: string;
   explorerUrl: string;
   explorerLabel: string;
+  /** caminho de conta no explorer: `address` (padrão EVM) ou `account` (Solscan) */
+  explorerAccountPath?: string;
   /**
    * segundos por bloco — converte janela de TEMPO em janela de BLOCOS para o
    * fee APR on-chain (`core/yields/onchain.ts`). Valor nominal da rede; varia
@@ -63,6 +75,7 @@ export interface ChainInfo {
 export const CHAINS: Record<number, ChainInfo> = {
   8453: {
     chain: base,
+    vm: "evm",
     label: "Base",
     priceSlug: "base",
     yieldsLabel: "Base",
@@ -76,6 +89,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   10: {
     chain: optimism,
+    vm: "evm",
     label: "Optimism",
     priceSlug: "optimism",
     yieldsLabel: "OP Mainnet",
@@ -93,6 +107,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   1: {
     chain: mainnet,
+    vm: "evm",
     label: "Ethereum",
     priceSlug: "ethereum",
     yieldsLabel: "Ethereum",
@@ -109,6 +124,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   4663: {
     chain: robinhood,
+    vm: "evm",
     label: "Robinhood",
     priceSlug: "robinhood",
     // conferido no dataset yields.llama.fi em 27/07/2026
@@ -128,6 +144,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   42161: {
     chain: arbitrum,
+    vm: "evm",
     label: "Arbitrum",
     priceSlug: "arbitrum",
     yieldsLabel: "Arbitrum",
@@ -157,6 +174,7 @@ export const CHAINS: Record<number, ChainInfo> = {
      Até lá o APR sai "—" honesto, como na Robinhood Chain. */
   34443: {
     chain: mode,
+    vm: "evm",
     label: "Mode",
     priceSlug: "mode",
     yieldsLabel: "Mode",
@@ -169,6 +187,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   57073: {
     chain: ink,
+    vm: "evm",
     label: "Ink",
     priceSlug: "ink",
     yieldsLabel: "Ink",
@@ -182,6 +201,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   130: {
     chain: unichain,
+    vm: "evm",
     label: "Unichain",
     priceSlug: "unichain",
     yieldsLabel: "Unichain",
@@ -199,6 +219,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   1868: {
     chain: soneium,
+    vm: "evm",
     label: "Soneium",
     priceSlug: "soneium",
     yieldsLabel: "Soneium",
@@ -212,6 +233,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   252: {
     chain: fraxtal,
+    vm: "evm",
     label: "Fraxtal",
     priceSlug: "fraxtal",
     yieldsLabel: "Fraxtal",
@@ -232,6 +254,7 @@ export const CHAINS: Record<number, ChainInfo> = {
      dataset de APR. */
   1135: {
     chain: lisk,
+    vm: "evm",
     label: "Lisk",
     priceSlug: "lisk",
     yieldsLabel: "Lisk",
@@ -244,6 +267,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   1923: {
     chain: swellchain,
+    vm: "evm",
     label: "Swell",
     priceSlug: "swellchain",
     yieldsLabel: "Swellchain",
@@ -257,6 +281,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   1750: {
     chain: metalL2,
+    vm: "evm",
     label: "Metal L2",
     priceSlug: "metal",
     yieldsLabel: "Metal L2",
@@ -269,6 +294,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   5330: {
     chain: superseed,
+    vm: "evm",
     label: "Superseed",
     priceSlug: "superseed",
     yieldsLabel: "Superseed",
@@ -281,6 +307,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   42220: {
     chain: celo,
+    vm: "evm",
     label: "Celo",
     priceSlug: "celo",
     yieldsLabel: "Celo",
@@ -293,6 +320,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   56: {
     chain: bsc,
+    vm: "evm",
     label: "BNB Chain",
     priceSlug: "bsc",
     // conferido no dataset yields.llama.fi em 02/10/2026 ("BSC"); a Pancake v3
@@ -310,6 +338,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   999: {
     chain: hyperEvm,
+    vm: "evm",
     label: "HyperEVM",
     // slug de preço conferido na DefiLlama em 02/10/2026 (RAM, WHYPE, USDC)
     priceSlug: "hyperliquid",
@@ -331,10 +360,37 @@ export const CHAINS: Record<number, ChainInfo> = {
        um dia faltar vazão: `HYPEREVM_RPC_URLS`. */
     defaultRpcs: ["https://hyperliquid.drpc.org", "https://rpc.hyperliquid.xyz/evm"],
   },
+  /* Solana (14/10/2026) — motor próprio (core/solana.ts), sem viem. PoC em
+     poc/solana/. priceSlug conferido pedindo um preço real à coins.llama.fi
+     (a chave é o mint EXATO: em caixa baixa a DefiLlama não acha nada);
+     yieldsLabel conferido no dataset (projeto "orca-dex", 759 pools).
+     ⚠️ O RPC público recusa (429) com poucos visitantes simultâneos — produção
+     precisa de SOLANA_RPC_URLS (Helius, QuickNode…). */
+  [SOLANA_CHAIN_ID]: {
+    vm: "solana",
+    label: "Solana",
+    priceSlug: "solana",
+    yieldsLabel: "Solana",
+    explorerUrl: "https://solscan.io",
+    explorerLabel: "Solscan",
+    explorerAccountPath: "account",
+    // slot nominal; não usado (o fee APR medido em janela não existe na Solana)
+    secPerBlock: 0.4,
+    rpcEnv: "SOLANA_RPC_URLS",
+    dexSlug: "solana",
+    defaultRpcs: ["https://api.mainnet-beta.solana.com"],
+  },
 };
 
 export function chainInfo(chainId: number): ChainInfo {
   const info = CHAINS[chainId];
   if (!info) throw new Error(`rede não suportada: ${chainId}`);
   return info;
+}
+
+/** definição do viem de uma rede EVM; a Solana não tem (e não usa o viem) */
+export function evmChain(chainId: number): Chain {
+  const { chain, label } = chainInfo(chainId);
+  if (!chain) throw new Error(`${label} não é EVM — sem definição do viem`);
+  return chain;
 }

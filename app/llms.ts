@@ -27,7 +27,7 @@ export function llmsTxt(): string {
 
   return `# ${SITE_NAME}
 
-> Free, read-only liquidity pool position tracker. Paste any wallet address (0x…) to see every LP position it holds on ${families} across ${NETWORK_COUNT} networks — gauge-staked positions included — with value, pending fees, emissions, price range and what each position is earning now. No login, no wallet connection. ${NO_TOKEN}
+> Free, read-only liquidity pool position tracker. Paste any wallet address (0x…, or a Solana address) to see every LP position it holds on ${families} across ${NETWORK_COUNT} networks — gauge-staked positions included — with value, pending fees, emissions, price range and what each position is earning now. No login, no wallet connection. ${NO_TOKEN}
 
 ## Key facts
 

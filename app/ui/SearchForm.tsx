@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { isAddress } from "viem";
+import { parseWalletAddress } from "../../core/address";
 import { localePath } from "../i18n/config";
 import { useI18n } from "../i18n/provider";
 
@@ -16,7 +16,7 @@ export default function SearchForm({ autoFocus = false }: { autoFocus?: boolean 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const addr = value.trim();
-    if (!isAddress(addr)) {
+    if (!parseWalletAddress(addr)) {
       setError(ui.search.invalid);
       return;
     }

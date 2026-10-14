@@ -17,7 +17,10 @@ export async function fetchUsdPrices(
   onWarn: (msg: string) => void = () => {},
 ): Promise<Map<string, number>> {
   const out = new Map<string, number>();
-  const unique = [...new Set(addresses.map((a) => a.toLowerCase()))];
+  /* único por caixa baixa, mas PEDIDO na caixa original: o mint da Solana
+     (base58) diferencia maiúscula de minúscula — em caixa baixa a fonte não
+     acha o token. A chave do Map devolvido continua em minúsculas. */
+  const unique = [...new Map(addresses.map((a) => [a.toLowerCase(), a] as const)).values()];
   for (const group of chunks(unique, CHUNK)) {
     const keys = group.map((a) => `${chainSlug}:${a}`).join(",");
     try {

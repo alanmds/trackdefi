@@ -27,7 +27,7 @@ import type { ChainReader, LpPosition, ProtocolAdapter, RewardAmount, TokenInfo,
 import { amountsForLiquidity } from "../../math/liquidity";
 import { getSqrtRatioAtTick } from "../../math/tickmath";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
-import { chainInfo } from "../../chains";
+import { chainInfo, evmChain } from "../../chains";
 import { cleanSymbol } from "../aerodrome/index";
 import {
   NATIVE_CURRENCY,
@@ -487,7 +487,7 @@ export class UniswapV4Adapter implements ProtocolAdapter {
     const out = new Map<Address, TokenInfo>();
 
     if (todos.includes(NATIVE_CURRENCY)) {
-      const nativa = chainInfo(this.chainId).chain.nativeCurrency;
+      const nativa = evmChain(this.chainId).nativeCurrency;
       out.set(NATIVE_CURRENCY, {
         address: NATIVE_CURRENCY,
         symbol: nativa.symbol,

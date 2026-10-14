@@ -97,7 +97,7 @@ export default function PositionsView({ address }: { address: string }) {
               mandava todo mundo para o BaseScan, que só conhece a Base. Cada
               card já linka o seu pool no explorer da rede certa
               (PositionCard usa CHAINS[chainId].explorerUrl). */}
-          <span className="wallet-sub">{networksDotted()}</span>
+          <span className="wallet-sub">{networksDotted(address.startsWith("0x") ? "evm" : "solana")}</span>
         </div>
         <div className="wallet-actions">
           <button type="button" className="btn btn-ghost btn-sm" onClick={copy}>

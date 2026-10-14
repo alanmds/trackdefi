@@ -61,6 +61,11 @@ configurar:
   do próprio RPC (`alchemy_getAssetTransfers`), que só existe na Alchemy:
   sem `BSC_RPC_URLS` com Alchemy, o v4 da BNB não é listado e o site diz isso
   em aviso, em vez de mostrar a carteira como se estivesse vazia.
+- **a Solana (Orca)**. O RPC público dela (`api.mainnet-beta.solana.com`)
+  recusa com 429 depois de poucas leituras — serve para desenvolvimento, não
+  para visitantes simultâneos. Em produção, `SOLANA_RPC_URLS` com um provedor
+  (Helius, QuickNode… têm plano grátis). Sem ela, a Solana falha e o site
+  avisa que as posições daquela rede podem faltar.
 
 Para configurar:
 

@@ -1,5 +1,5 @@
 /**
- * GET /api/positions?address=0x...
+ * GET /api/positions?address=0x... (EVM) ou ?address=<base58> (Solana)
  *
  * Casca fina de HTTP sobre core/service (mesma filosofia da CLI): valida o
  * endereço, aplica rate-limit por IP e cache por carteira, com timeout e
@@ -14,7 +14,7 @@
  */
 
 import { readFileSync } from "node:fs";
-import { getAddress, isAddress } from "viem";
+import { parseWalletAddress } from "../../../core/address";
 import { getWalletPositions } from "../../../core/service";
 import { FixedWindowLimiter, Semaphore, TtlCache } from "../../../core/guards";
 
@@ -69,11 +69,13 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   const raw = new URL(request.url).searchParams.get("address")?.trim() ?? "";
-  if (!isAddress(raw)) {
+  const parsed = parseWalletAddress(raw);
+  if (!parsed) {
     return jsonResponse({ error: "invalid_address", message: "Invalid wallet address." }, 400);
   }
-  const address = getAddress(raw);
-  const cacheKey = address.toLowerCase();
+  const address = parsed.address;
+  // EVM ignora a caixa; base58 NÃO (outra caixa = outra carteira)
+  const cacheKey = parsed.kind === "evm" ? address.toLowerCase() : address;
 
   // Modo fixture (dev/preview sem rede): serve um DTO congelado do disco.
   // Ignorado na Vercel por segurança, além de documentado no .env.example.

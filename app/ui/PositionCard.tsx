@@ -4,7 +4,7 @@ import type { PositionDTO } from "../../core/service";
 import { CHAINS } from "../../core/chains";
 import { basicTags, fill, rich } from "../i18n/rich";
 import { useI18n } from "../i18n/provider";
-import { fmtAmount, fmtPct, fmtUsd, fmtUsdFine, fmtWindow, protocolLabel } from "./format";
+import { fmtAmount, fmtPct, fmtUsd, fmtUsdFine, fmtWindow, protocolLabel, shortAddress } from "./format";
 import RangeBar from "./RangeBar";
 import { noPriceTip, poolPriceTip } from "./notices";
 
@@ -81,7 +81,7 @@ export default function PositionCard({ p, pricesFailed = false }: { p: PositionD
       <div className="pos-head">
         <h3 className="pos-title">
           <a
-            href={`${explorerUrl}/address/${p.poolAddress}`}
+            href={`${explorerUrl}/${chain?.explorerAccountPath ?? "address"}/${p.poolAddress}`}
             target="_blank"
             rel="noopener noreferrer"
             title={fill(t.viewPool, { explorer: chain?.explorerLabel ?? t.theExplorer })}
@@ -110,7 +110,10 @@ export default function PositionCard({ p, pricesFailed = false }: { p: PositionD
           ))}
         {p.staked && <span className="badge">{p.protocol === "pancakeswap-v3" ? t.stakedFarm : t.staked}</span>}
         {p.managedByAlm && <span className="badge">{t.alm}</span>}
-        {p.positionId && <span className="badge">{fill(t.nft, { id: p.positionId })}</span>}
+        {p.positionId && <span className="badge">{fill(t.nft, {
+              // na Solana o "id" é o mint do NFT (44 caracteres): encurtado como endereço
+              id: p.positionId.length > 20 ? shortAddress(p.positionId) : p.positionId,
+            })}</span>}
       </div>
 
       {e && janelas.length > 0 ? (

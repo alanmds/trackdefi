@@ -66,6 +66,13 @@ export interface LpPosition {
    * e o `earning` do DTO degrada (fee "—" ou só a parte disponível).
    */
   earningInputs?: EarningInputsOnchain;
+  /**
+   * Saldo dos cofres do pool (unidades cruas). Só a Orca traz: o dataset de
+   * APR dela não diz nem o endereço nem a taxa do pool, e o mesmo par existe
+   * em vários pools — o TVL calculado daqui é o que separa o pool certo dos
+   * vizinhos (ver `YieldsIndex.match`).
+   */
+  poolReserves?: { amount0Raw: bigint; amount1Raw: bigint };
 }
 
 /** Números on-chain que o service combina com preços + APR do pool para o
@@ -154,12 +161,19 @@ export type WarnSink = (msg: string, notice?: AdapterNotice | null) => void;
 export interface ProtocolAdapter {
   readonly protocol: string;
   readonly chainId: number;
-  getPositions(account: Address): Promise<LpPosition[]>;
+  /**
+   * Que endereço de carteira o adapter entende. Ausente = "evm" (0x…). O
+   * service só chama o adapter com endereço da família dele — a Orca nunca
+   * recebe um 0x, a Uniswap nunca recebe um base58.
+   */
+  readonly addressKind?: "evm" | "solana";
+  /** `account` já validado e da família `addressKind` (EVM: com checksum) */
+  getPositions(account: string): Promise<LpPosition[]>;
   /**
    * Locks de governança da carteira. OPCIONAL: só protocolos ve(3,3) têm, e
    * só nas redes onde a governança mora (as redes-folha da Superchain não).
    */
-  getLocks?(account: Address): Promise<LockPosition[]>;
+  getLocks?(account: string): Promise<LockPosition[]>;
 }
 
 /**

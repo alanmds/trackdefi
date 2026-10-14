@@ -141,9 +141,8 @@ export function fmtUnixDate(sec: number, labels: DateLabels = EN_DATE_LABELS): s
   return fmtDate(new Date(sec * 1000).toISOString().slice(0, 10), labels);
 }
 
-export function shortAddress(addr: string): string {
-  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
-}
+/** "0x1234…abcd" / "8DT5…25AB" — a regra mora junto da validação */
+export { shortAddress } from "../../core/address";
 
 /** percentual de APR: null → "—"; 2 casas até 10%, 1 casa acima */
 export function fmtPct(n: number | null | undefined, locale: Locale = DEFAULT_LOCALE): string {
@@ -159,6 +158,7 @@ const PROTOCOL_LABELS: Record<string, string> = {
   "uniswap-v4": "Uniswap v4",
   "pancakeswap-v3": "PancakeSwap v3",
   "ramses-v3": "Ramses",
+  orca: "Orca",
 };
 
 export function protocolLabel(id: string): string {

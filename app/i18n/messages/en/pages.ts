@@ -54,6 +54,7 @@ const pages = {
       "Velodrome",
       "PancakeSwap v3",
       "Ramses",
+      "Orca",
     ],
     /** uma por rede */
     keywordNetwork: "{network} LP tracker",
@@ -65,7 +66,7 @@ const pages = {
       networks: "{count} networks — read-only, no keys, no login",
     },
     /** "Aerodrome, Velodrome & Uniswap v3" no cartão — nomes próprios, não traduzir */
-    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap · Ramses",
+    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap · Ramses · Orca",
   },
 
   /** frase de "sem token" — promessa pública e permanente (ver `NO_TOKEN` em app/site.ts) */
@@ -98,7 +99,7 @@ const pages = {
     faq: [
       {
         q: "How do I track my liquidity pool positions across networks?",
-        a: "Paste your wallet address (0x…) in the search box above. {name} reads the blockchains and lists every LP position that address holds on Aerodrome, Velodrome, Uniswap, PancakeSwap and Ramses across {networks} — value in USD, pending fees, emissions and price ranges.",
+        a: "Paste your wallet address (0x…, or a Solana address) in the search box above. {name} reads the blockchains and lists every LP position that address holds on Aerodrome, Velodrome, Uniswap, PancakeSwap, Ramses and Orca across {networks} — value in USD, pending fees, emissions and price ranges.",
       },
       {
         q: "Why don't my staked Aerodrome LP positions show up in my wallet?",
@@ -151,7 +152,7 @@ const pages = {
     title: "Roadmap — networks & exchanges",
     heading: "Roadmap",
     description:
-      "Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome, Uniswap, PancakeSwap and Ramses across {count} networks; SushiSwap, Polygon, Avalanche and more next.",
+      "Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome, Uniswap, PancakeSwap, Ramses and Orca on {count} networks; SushiSwap and more next.",
     lede: "Where trackdefi is today and where it's going. No deadlines and no promises — priorities follow what users actually ask for. One thing never changes: <b>read-only, forever</b>.",
     status: { live: "✓ Live", next: "→ Next", planned: "Planned", exploring: "Exploring" } as Record<RoadmapKind, string>,
     liveTitle: "Live today",
@@ -220,6 +221,10 @@ const pages = {
         title: "BNB Chain · Uniswap v4",
         body: "the singleton-and-hooks architecture on a second network. Positions, amounts, price ranges and pending swap fees. These positions can't be listed by wallet on-chain here — the whole chain would have to be scanned — so trackdefi reads them from the RPC's own index instead.",
       },
+      {
+        title: "Solana · Orca",
+        body: "our first network outside the Ethereum family, and a Solana address works in the same search box. Concentrated positions, amounts, price ranges, in-range status, pending fees and pool rewards. What a position earns now is an estimate from the pool's average and the position's share of active liquidity: the 24-hour and 15-minute measurements read on the other networks don't exist on Solana yet.",
+      },
     ] as RoadmapItem[],
     nextTitle: "Next",
     next: [
@@ -267,8 +272,8 @@ const pages = {
         body: "an exchange designed from scratch, with its own architecture and price math rather than a fork of one trackdefi already reads.",
       },
       {
-        title: "Solana · Orca",
-        body: "our first network outside the Ethereum family. A proof of concept already reads Orca positions from public data — amounts, price range, in-range status, pending fees and rewards — so the work left is plumbing, not research. Raydium and Meteora would follow.",
+        title: "Solana · Raydium & Meteora",
+        body: "the other two big Solana exchanges, next to Orca. Each stores positions its own way, so each starts with its own proof of concept.",
       },
       {
         title: "Every major DeFi network",

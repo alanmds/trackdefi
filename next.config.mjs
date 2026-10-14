@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  // SDK da Orca (Solana): o núcleo é wasm carregado do disco pelo Node — o
+  // bundler do Next não pode empacotá-lo; fica como dependência externa
+  serverExternalPackages: ["@orca-so/whirlpools", "@orca-so/whirlpools-client", "@orca-so/whirlpools-core"],
   async headers() {
     // Headers de segurança aplicados a todas as rotas. Não usam nonce/CSP de
     // scripts (evita quebrar a hidratação do Next); focam clickjacking,

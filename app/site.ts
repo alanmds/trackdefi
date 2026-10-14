@@ -66,6 +66,8 @@ export const NETWORKS = [
   { label: "Celo", name: "Celo" },
   { label: "BNB Chain", name: "BNB Chain" },
   { label: "HyperEVM", name: "HyperEVM" },
+  // única rede fora da família EVM: só ela aceita endereço base58
+  { label: "Solana", name: "Solana", vm: "solana" },
 ] as const;
 
 /** nomes por extenso, na ordem de exibição */
@@ -90,9 +92,14 @@ export function networksSentence(last: "and" | "&" = "and", locale: Locale = DEF
   return humanList(NETWORK_NAMES, last, locale);
 }
 
-/** "Base · Optimism · Ethereum · Arbitrum · Robinhood Chain" */
-export function networksDotted(): string {
-  return NETWORK_NAMES.join(" · ");
+/**
+ * "Base · Optimism · Ethereum · Arbitrum · Robinhood Chain". Com `kind`, só as
+ * redes que aquele tipo de endereço alcança — uma carteira Solana não é lida
+ * na Base, e o cabeçalho dela não deve dizer que foi.
+ */
+export function networksDotted(kind?: "evm" | "solana"): string {
+  const redes = kind ? NETWORKS.filter((n) => ("vm" in n ? n.vm : "evm") === kind) : NETWORKS;
+  return redes.map((n) => n.name).join(" · ");
 }
 
 /**
@@ -134,6 +141,7 @@ export const COVERAGE = [
     networks: ["BNB Chain", "Ethereum", "Base", "Arbitrum"] as readonly string[],
   },
   { protocol: "Ramses", networks: ["Robinhood Chain", "HyperEVM"] as readonly string[] },
+  { protocol: "Orca", networks: ["Solana"] as readonly string[] },
 ] as const;
 
 /**
@@ -166,10 +174,11 @@ export const PROTOCOL_FAMILIES: readonly string[] = [
  * conflito, ficam os protocolos de maior volume). Fonte: DefiLlama,
  * api.llama.fi/overview/dexs, volume de 30 dias em 02/10/2026 — Uniswap
  * US$ 93 bi, PancakeSwap US$ 30 bi, Aerodrome US$ 14 bi, Ramses US$ 3 bi,
- * Velodrome US$ 0,6 bi.
+ * Velodrome US$ 0,6 bi. Orca entrou em 14/10/2026 com US$ 8,5 bi (mesma
+ * fonte), entre a Aerodrome (US$ 15 bi) e a Ramses (US$ 2 bi).
  * Família nova precisa entrar aqui (teste cobra), conferida na mesma fonte.
  */
-export const FAMILIES_BY_VOLUME: readonly string[] = ["Uniswap", "PancakeSwap", "Aerodrome", "Ramses", "Velodrome"];
+export const FAMILIES_BY_VOLUME: readonly string[] = ["Uniswap", "PancakeSwap", "Aerodrome", "Orca", "Ramses", "Velodrome"];
 
 /** "Aerodrome on Base, Velodrome on Optimism, and Uniswap v3 on Base, …" */
 export function coverageSentence(locale: Locale = DEFAULT_LOCALE): string {

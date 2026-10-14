@@ -58,9 +58,9 @@ const ui = {
   },
 
   search: {
-    placeholder: "Paste a wallet address (0x…)",
+    placeholder: "Paste a wallet address (0x… or Solana)",
     aria: "Wallet address",
-    invalid: "That doesn't look like a wallet address. Paste the full 0x… address (42 characters).",
+    invalid: "That doesn't look like a wallet address. Paste the full address: 0x… (42 characters) or a Solana address (32 to 44 letters and numbers).",
     submit: "Track positions",
     opening: "Opening…",
   },
@@ -73,7 +73,7 @@ const ui = {
     refresh: "Refresh",
     scanning: "Scanning the blockchains…",
     scanningBody:
-      "Reading Aerodrome, Velodrome, Uniswap, PancakeSwap and Ramses across {networks} — classic, concentrated and staked positions.",
+      "Reading Aerodrome, Velodrome, Uniswap, PancakeSwap, Ramses and Orca across {networks} — classic, concentrated and staked positions.",
     elapsed: "{secs}s — a full scan takes ~15 s on the first visit",
     errors: {
       invalid_address: { title: "Invalid address", body: "That doesn't look like a valid wallet address." },
@@ -91,7 +91,7 @@ const ui = {
     },
     empty: {
       title: "No liquidity positions found",
-      body: "This wallet has no active positions on Aerodrome, Velodrome, Uniswap, PancakeSwap or Ramses across {networks} right now.",
+      body: "This wallet has no active positions on Aerodrome, Velodrome, Uniswap, PancakeSwap, Ramses or Orca across {networks} right now.",
       another: "Track another wallet",
     },
     kpi: {

@@ -32,7 +32,7 @@ import {
   type Address,
 } from "viem";
 import { robinhood } from "viem/chains";
-import { chainInfo } from "../core/chains";
+import { chainInfo, evmChain } from "../core/chains";
 import { amountsForLiquidity } from "../core/math/liquidity";
 import { getSqrtRatioAtTick } from "../core/math/tickmath";
 import { isInRange, tickToPrice0In1 } from "../core/math/ticks";
@@ -157,7 +157,7 @@ async function main() {
   let layoutOk = 0;
   const simbolos = new Map<Address, { symbol: string; decimals: number }>();
   const meta = async (a: Address) => {
-    if (a === NATIVE) return { symbol: chainInfo(CHAIN_ID).chain.nativeCurrency.symbol, decimals: 18 };
+    if (a === NATIVE) return { symbol: evmChain(CHAIN_ID).nativeCurrency.symbol, decimals: 18 };
     if (!simbolos.has(a)) {
       const [symbol, decimals] = await Promise.all([
         client.readContract({ address: a, abi: erc20Abi, functionName: "symbol" }).catch(() => "?"),

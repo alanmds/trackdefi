@@ -16,6 +16,8 @@ import { PancakeV3Adapter } from "./pancake-v3/index";
 import { PANCAKE_V3_CHAINS } from "./pancake-v3/config";
 import { RamsesV3Adapter } from "./ramses-v3/index";
 import { RAMSES_V3_CHAINS } from "./ramses-v3/config";
+import { OrcaAdapter } from "./orca/index";
+import { createSolanaReader } from "../solana";
 
 /** Recebe o aviso junto com QUEM avisou — a tela precisa dizer "Uniswap v4
  *  na Robinhood Chain", não um genérico "algo falhou". */
@@ -56,5 +58,7 @@ export function buildAdapters(opts: { onWarn?: AdapterWarn } = {}): ProtocolAdap
     ...RAMSES_V3_CHAINS.map((config) =>
       tagged((onWarn) => new RamsesV3Adapter(readerFor(config.chainId), { onWarn, config })),
     ),
+    // Solana: motor próprio, sem viem (core/solana.ts)
+    tagged((onWarn) => new OrcaAdapter(createSolanaReader(), { onWarn })),
   ];
 }

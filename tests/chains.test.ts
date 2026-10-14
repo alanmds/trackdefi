@@ -12,7 +12,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { CHAINS } from "../core/chains";
+import { CHAINS, SOLANA_CHAIN_ID } from "../core/chains";
 import { AERODROME_BASE, VELODROME_LEAF_CHAINS, VELODROME_OPTIMISM } from "../core/adapters/aerodrome/config";
 import { UNISWAP_V3_CHAINS } from "../core/adapters/uniswap-v3/config";
 import { UNISWAP_V4_CHAINS } from "../core/adapters/uniswap-v4/config";
@@ -119,6 +119,10 @@ describe("frase de cobertura", () => {
 
   it("Ramses cobre exatamente as redes do seu config", () => {
     expect(redesDe("Ramses")).toEqual(RAMSES_V3_CHAINS.map((c) => nomeDaRede(c.chainId)).sort());
+  });
+
+  it("Orca cobre exatamente a Solana", () => {
+    expect(redesDe("Orca")).toEqual([nomeDaRede(SOLANA_CHAIN_ID)]);
   });
 });
 

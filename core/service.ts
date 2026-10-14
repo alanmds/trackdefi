@@ -396,6 +396,11 @@ export function buildResponse(params: {
           poolSymbol: p.poolSymbol,
           token0: p.token0.address,
           token1: p.token1.address,
+          poolTvlUsd:
+            p.poolReserves && p0 !== null && p1 !== null
+              ? human(p.poolReserves.amount0Raw, p.token0.decimals) * p0 +
+                human(p.poolReserves.amount1Raw, p.token1.decimals) * p1
+              : null,
         })
       : null;
     const apr: AprDTO | null = m
@@ -581,7 +586,8 @@ export function buildLockDTOs(locks: LockPosition[], prices: Map<string, number>
  * parcial); só falha tudo se TODOS os protocolos falharem.
  */
 export async function getWalletPositions(
-  address: Address,
+  /** já validado por `parseWalletAddress` — EVM com checksum, Solana como veio */
+  address: string,
   adaptersOverride?: ProtocolAdapter[],
   /** fonte de preços; trocar de provedor não toca em mais nada (Receita H) */
   priceProvider: PriceProvider = defillamaPrices,
@@ -592,7 +598,9 @@ export async function getWalletPositions(
 ): Promise<PositionsResponseDTO> {
   const warnings: string[] = [];
   const notices: ScanNotice[] = [];
-  const adapters =
+  // só os adapters da família do endereço: 0x → redes EVM; base58 → Solana
+  const kind = address.startsWith("0x") ? "evm" : "solana";
+  const adapters = (
     adaptersOverride ??
     buildAdapters({
       onWarn: (m, notice, src) => {
@@ -601,7 +609,8 @@ export async function getWalletPositions(
         const at = { protocol: src.protocol, chainId: src.chainId };
         notices.push(notice ? { ...at, ...notice } : { kind: "partial", ...at });
       },
-    });
+    })
+  ).filter((a) => (a.addressKind ?? "evm") === kind);
 
   const t0 = Date.now();
   // APR (DefiLlama) baixa em paralelo com a varredura on-chain; falha vira "—"

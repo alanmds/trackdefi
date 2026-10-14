@@ -6,6 +6,12 @@
       "runtimeExecutable": "cmd.exe",
       "runtimeArgs": ["/c", "set", "TRACKDEFI_FIXTURE=poc/fixture-dto.json", "&&", "npm", "run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "trackdefi-build",
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": ["/c", "npx", "next", "start", "-p", "3001"],
+      "port": 3001
     }
   ]
 }

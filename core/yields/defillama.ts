@@ -53,6 +53,8 @@ export interface MatchQuery {
   poolSymbol: string;
   token0: Address;
   token1: Address;
+  /** TVL do pool lido na rede (US$) — só a Orca usa; ver o ramo dela no match */
+  poolTvlUsd?: number | null;
 }
 
 /** slug de projeto DefiLlama → nosso id de protocolo */
@@ -62,11 +64,14 @@ const PROJECT_TO_PROTOCOL: Record<string, string> = {
   "velodrome-v3": "velodrome",
   "velodrome-v2": "velodrome",
   "uniswap-v3": "uniswap-v3",
+  // Solana (14/10/2026): 759 pools no dataset, todos com poolMeta null
+  "orca-dex": "orca",
 };
 
 export const MIN_TVL_USD = 10_000; // abaixo disto o APR não é confiável
 export const MAX_SANE_APR = 1_000; // % a.a.; acima é ruído de TVL ínfimo
 const DOMINANCE = 10; // com 2+ candidatos, o maior TVL precisa de 10x o 2º
+const ORCA_TVL_TOLERANCE = 1.5; // TVL da DefiLlama x TVL lido nos cofres (Orca)
 
 const CL_OURS = /^CL(\d+)-/; // nosso poolSymbol: "CL100-WETH/USDC"
 const CL_META = /^CL(\d+)\b/; // poolMeta da DefiLlama: "CL100 - 0.0217%"
@@ -105,7 +110,16 @@ export class YieldsIndex {
 
     // 1) filtra pela "forma" do pool (spacing na CL, fee na uniswap, v2 sem meta)
     let candidates: LlamaRow[];
-    if (q.protocol === "uniswap-v3") {
+    if (q.protocol === "orca") {
+      /* O dataset da Orca não diz nem o endereço nem a taxa do pool (poolMeta
+         sempre null; 9 pools SOL/USDC em 14/10/2026) — pegar o maior TVL daria
+         a uma posição o APR de OUTRO pool. O que identifica o pool é o TVL:
+         ficam só as linhas a até 1,5x do TVL lido nos cofres; sem esse TVL,
+         "—". */
+      const tvl = q.poolTvlUsd;
+      if (!tvl || !(tvl > 0)) return null;
+      candidates = rows.filter((r) => r.tvlUsd <= tvl * ORCA_TVL_TOLERANCE && r.tvlUsd >= tvl / ORCA_TVL_TOLERANCE);
+    } else if (q.protocol === "uniswap-v3") {
       const ours = q.poolSymbol.match(FEE_OURS);
       if (!ours) return null;
       const fee = parseFloat(ours[1]);

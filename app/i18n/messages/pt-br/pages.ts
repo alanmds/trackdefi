@@ -24,6 +24,7 @@ const pages: PagesMessages = {
       "Velodrome",
       "PancakeSwap v3",
       "Ramses",
+      "Orca",
     ],
     keywordNetwork: "rastreador de LP {network}",
     keywordsExtra: ["portfólio DeFi", "liquidez concentrada", "endereço de carteira"],
@@ -33,7 +34,7 @@ const pages: PagesMessages = {
       subtitle: "Cole o endereço de uma carteira — veja todas as posições de LP, inclusive as em stake.",
       networks: "{count} redes — somente leitura, sem chaves, sem login",
     },
-    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap · Ramses",
+    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap · Ramses · Orca",
   },
 
   noToken: "Sem token, sem pré-venda, sem airdrop.",
@@ -64,7 +65,7 @@ const pages: PagesMessages = {
     faq: [
       {
         q: "Como acompanho minhas posições em pools de liquidez em várias redes?",
-        a: "Cole o endereço da sua carteira (0x…) na caixa de busca acima. O {name} lê as blockchains e lista todas as posições de LP que esse endereço tem na Aerodrome, Velodrome, Uniswap, PancakeSwap e Ramses em {networks} — valor em dólar, taxas pendentes, emissões e faixas de preço.",
+        a: "Cole o endereço da sua carteira (0x…, ou um endereço Solana) na caixa de busca acima. O {name} lê as blockchains e lista todas as posições de LP que esse endereço tem na Aerodrome, Velodrome, Uniswap, PancakeSwap, Ramses e Orca em {networks} — valor em dólar, taxas pendentes, emissões e faixas de preço.",
       },
       {
         q: "Por que minhas posições de LP da Aerodrome em stake não aparecem na minha carteira?",
@@ -117,7 +118,7 @@ const pages: PagesMessages = {
     title: "Roadmap — redes e corretoras",
     heading: "Roadmap",
     description:
-      "Onde o trackdefi está hoje e para onde vai: APR por posição, Aerodrome, Velodrome, Uniswap, PancakeSwap e Ramses em {count} redes; em seguida, SushiSwap, Polygon, Avalanche e mais.",
+      "Onde o trackdefi está hoje e para onde vai: APR por posição, Aerodrome, Velodrome, Uniswap, PancakeSwap, Ramses e Orca em {count} redes; depois, SushiSwap e mais.",
     lede: "Onde o trackdefi está hoje e para onde vai. Sem prazos e sem promessas — as prioridades seguem o que os usuários realmente pedem. Uma coisa nunca muda: <b>somente leitura, para sempre</b>.",
     status: { live: "✓ No ar", next: "→ Próximo", planned: "Planejado", exploring: "Explorando" },
     liveTitle: "No ar hoje",
@@ -186,6 +187,10 @@ const pages: PagesMessages = {
         title: "BNB Chain · Uniswap v4",
         body: "a arquitetura de contrato único com hooks numa segunda rede. Posições, quantidades, faixas de preço e taxas de swap pendentes. Essas posições não podem ser listadas por carteira na própria rede — seria preciso varrer a chain inteira —, então o trackdefi as lê pelo índice do próprio RPC.",
       },
+      {
+        title: "Solana · Orca",
+        body: "nossa primeira rede fora da família Ethereum, e um endereço Solana funciona na mesma caixa de busca. Posições concentradas, quantidades, faixas de preço, status dentro da faixa, taxas pendentes e recompensas do pool. O que uma posição rende agora é uma estimativa a partir da média do pool e da fatia da posição na liquidez ativa: as medições de 24 horas e 15 minutos feitas nas outras redes ainda não existem na Solana.",
+      },
     ],
     nextTitle: "Próximo",
     next: [
@@ -233,8 +238,8 @@ const pages: PagesMessages = {
         body: "uma corretora desenhada do zero, com arquitetura e matemática de preço próprias, e não uma cópia de alguma que o trackdefi já lê.",
       },
       {
-        title: "Solana · Orca",
-        body: "nossa primeira rede fora da família Ethereum. Uma prova de conceito já lê posições da Orca a partir de dados públicos — quantidades, faixa de preço, status dentro da faixa, taxas e recompensas pendentes — então o que resta é encanamento, não pesquisa. Raydium e Meteora viriam depois.",
+        title: "Solana · Raydium e Meteora",
+        body: "as outras duas grandes corretoras da Solana, ao lado da Orca. Cada uma guarda as posições do seu jeito, então cada uma começa com sua própria prova de conceito.",
       },
       {
         title: "Todas as principais redes DeFi",

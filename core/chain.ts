@@ -6,7 +6,7 @@
  */
 
 import { createPublicClient, fallback, http } from "viem";
-import { chainInfo } from "./chains";
+import { chainInfo, evmChain } from "./chains";
 import type { ChainReader } from "./types";
 
 /**
@@ -30,8 +30,9 @@ export function rpcUrls(chainId: number): string[] {
 }
 
 export function createReader(chainId: number): ChainReader {
+  // a Solana não passa por aqui: tem cliente próprio em core/solana.ts
   const client = createPublicClient({
-    chain: chainInfo(chainId).chain,
+    chain: evmChain(chainId),
     transport: fallback(rpcUrls(chainId).map((url) => http(url, { timeout: 30_000 }))),
   });
   return client as unknown as ChainReader;
