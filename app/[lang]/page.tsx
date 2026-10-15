@@ -62,7 +62,16 @@ export default async function Home({ params }: LangParams) {
           <br />
           {h.heading[1]}
         </h1>
-        <p className="lede">{fill(h.lede, { networks: faqVars.networks })}</p>
+        {/* logos das redes; o mouse em cima mostra o nome e as corretoras de
+            cada uma (desde 15/10/2026 logo abaixo do título; a frase com as redes desceu) */}
+        <NetworkLogos
+          label={h.networksAria}
+          networks={NETWORKS.map((n) => ({
+            name: n.name,
+            slug: logoSlug(n.label),
+            protocols: protocolsOn(n.name).map((p) => ({ name: p.name, slug: logoSlug(p.family) })),
+          }))}
+        />
         <SearchForm autoFocus />
         <p className="try-demo">
           {rich(h.tryDemo, { link: (c) => <Link href={to(`/w/${DEMO_WALLET}`)}>{c}</Link> })}
@@ -79,16 +88,8 @@ export default async function Home({ params }: LangParams) {
             { date: fmtDate(latest.date, ui.dates), title: latest.title },
           )}
         </p>
-        {/* logos das redes; o mouse em cima mostra o nome e as corretoras de
-            cada uma (até 15/10/2026 eram chips de texto "protocolo · redes") */}
-        <NetworkLogos
-          label={h.networksAria}
-          networks={NETWORKS.map((n) => ({
-            name: n.name,
-            slug: logoSlug(n.label),
-            protocols: protocolsOn(n.name).map((p) => ({ name: p.name, slug: logoSlug(p.family) })),
-          }))}
-        />
+        {/* a frase com as redes por extenso: abaixo da busca desde 15/10/2026 */}
+        <p className="lede">{fill(h.lede, { networks: faqVars.networks })}</p>
         <div className="coverage">
           <Link href={to("/roadmap")} className="chip">
             {rich(h.more, { soon: (c) => <span className="soon">{c}</span> })}
