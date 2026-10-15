@@ -16,8 +16,8 @@
  * Não dá para tirar do git: a Vercel constrói sem o histórico completo.
  */
 export const EDITADA_EM = {
-  home: "2026-10-14",
+  home: "2026-10-15",
   howItWorks: "2026-10-02",
-  roadmap: "2026-10-14",
+  roadmap: "2026-10-15",
   glossary: "2026-10-02",
 } as const;

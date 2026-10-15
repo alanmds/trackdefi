@@ -56,8 +56,7 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 export const CHANGELOG: ChangeEntry[] = [
   {
     id: "solana-orca",
-    // ⚠️ data provisória: trocar pelo dia do push (depende do RPC da Solana na Vercel)
-    date: "2026-10-14",
+    date: "2026-10-15",
     kind: "network",
     title: "Solana, with Orca",
     body: "trackdefi now reads Solana — paste a Solana address in the same search box. Orca positions show amounts, price range, in-range status, pending fees and pool rewards. What a position earns now is an estimate from the pool's average and the position's share of active liquidity, because the 24-hour and 15-minute measurements made on the other networks don't exist on Solana yet.",
