@@ -1489,6 +1489,7 @@ a.chip:hover {
 }
 
 .netlogos-card {
+  position: relative;
   margin: 0 auto;
   width: fit-content;
   min-width: 180px;
@@ -1519,7 +1520,6 @@ a.chip:hover {
 }
 
 .protologo {
-  position: relative;
   display: grid;
   place-items: center;
   width: 40px;
@@ -1531,13 +1531,18 @@ a.chip:hover {
   cursor: default;
 }
 
-/* nome da corretora: aparece sob o logo no hover, no foco (teclado) e no toque */
+/* nome da corretora: no RODAPÉ do cartão, centrado — e não sob o logo, que
+   na borda do cartão jogava o nome para fora ("PancakeSwap v3", Android,
+   15/10/2026). O espaço é o padding-bottom do cartão. */
 .protologo-name {
   position: absolute;
-  top: calc(100% + 4px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  text-align: center;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 12px;
   font-weight: 600;
   color: var(--ink-2);
@@ -1546,7 +1551,8 @@ a.chip:hover {
   pointer-events: none;
 }
 
-.protologo:focus .protologo-name,
+/* teclado: foco visível. (Clique de mouse NÃO: o foco ficaria preso num logo
+   e o nome dele se sobreporia ao do logo sob o mouse.) */
 .protologo:focus-visible .protologo-name {
   opacity: 1;
 }
@@ -1562,6 +1568,25 @@ a.chip:hover {
   }
   .protologo:hover {
     border-color: var(--border-strong);
+  }
+}
+
+/* TELA DE TOQUE (sem hover). O cartão cobre a caixa de busca, e o toque
+   ali caía no cartão: nem o campo recebia o toque nem o cartão fechava
+   (Android, 15/10/2026). Aqui o cartão deixa o toque ATRAVESSAR para o que
+   está embaixo — só os logos das corretoras continuam tocáveis. Tocar no
+   campo foca o campo e, por ser fora da faixa, fecha o cartão junto.
+   No computador não: lá o mouse sobre o cartão precisa contar como "dentro",
+   senão o cartão fecharia no caminho até os logos. */
+@media (hover: none) {
+  .netlogos-panel.is-open {
+    pointer-events: none;
+  }
+  .netlogos-panel.is-open .protologo {
+    pointer-events: auto;
+  }
+  .protologo:focus .protologo-name {
+    opacity: 1;
   }
 }
 
