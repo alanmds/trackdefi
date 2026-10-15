@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "home-network-logos",
+    date: "2026-10-15",
+    kind: "improvement",
+    title: "Network logos on the home page",
+    body: "The home page now shows the logo of every network trackdefi reads. Hover over one — or tap it on a phone — to see its name and the exchanges read there, then hover over an exchange's logo to see its name.",
+  },
+  {
     id: "solana-orca",
     date: "2026-10-15",
     kind: "network",

@@ -180,6 +180,30 @@ export const PROTOCOL_FAMILIES: readonly string[] = [
  */
 export const FAMILIES_BY_VOLUME: readonly string[] = ["Uniswap", "PancakeSwap", "Aerodrome", "Orca", "Ramses", "Velodrome"];
 
+/** nome do arquivo de logo: "Metal L2" → "metal-l2" (public/logos/…/<slug>.webp) */
+export function logoSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, "-");
+}
+
+/**
+ * Os protocolos de UMA rede, agrupados por família (um logo por família):
+ * BNB Chain → Uniswap "Uniswap v3 & v4", PancakeSwap "PancakeSwap v3".
+ * Sai de `COVERAGE` — a faixa de logos da home não tem lista própria.
+ */
+export function protocolsOn(network: string): { family: string; name: string }[] {
+  const porFamilia = new Map<string, string[]>();
+  for (const c of COVERAGE) {
+    if (!c.networks.includes(network)) continue;
+    const family = c.protocol.replace(/ v\d+$/, "");
+    const versao = c.protocol.slice(family.length).trim();
+    porFamilia.set(family, [...(porFamilia.get(family) ?? []), ...(versao ? [versao] : [])]);
+  }
+  return [...porFamilia].map(([family, versoes]) => ({
+    family,
+    name: versoes.length ? `${family} ${versoes.join(" & ")}` : family,
+  }));
+}
+
 /** "Aerodrome on Base, Velodrome on Optimism, and Uniswap v3 on Base, …" */
 export function coverageSentence(locale: Locale = DEFAULT_LOCALE): string {
   const g = GRAMMAR[locale];

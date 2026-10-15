@@ -1410,3 +1410,164 @@ a.chip:hover {
     background: #ffa952;
   }
 }
+
+/* ---------------------------------------- faixa de logos das redes (home) */
+/* painel por CIMA do conteúdo de baixo (position absolute): abrir e fechar
+   não empurra a página */
+.netlogos {
+  position: relative;
+  max-width: 640px;
+  margin: 30px auto 0;
+}
+
+.netlogos-row {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.netlogo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.netlogo img,
+.protologo img {
+  display: block;
+  border-radius: 999px;
+}
+
+.netlogo.is-active,
+.netlogo:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+  transform: translateY(-2px);
+}
+
+@media (hover: hover) {
+  .netlogo:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+  }
+}
+
+/* o padding-top é a "ponte" invisível entre a faixa e o cartão: o mouse
+   desce sem sair da área e o painel não fecha no caminho */
+.netlogos-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding-top: 8px;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s linear 0.12s;
+  pointer-events: none;
+}
+
+.netlogos-panel.is-open {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  pointer-events: auto;
+}
+
+.netlogos-card {
+  margin: 0 auto;
+  width: fit-content;
+  min-width: 180px;
+  max-width: 100%;
+  padding: 12px 18px 30px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.netlogos-name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.netlogos-protocols {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.protologo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card-2);
+  cursor: default;
+}
+
+/* nome da corretora: aparece sob o logo no hover, no foco (teclado) e no toque */
+.protologo-name {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  pointer-events: none;
+}
+
+.protologo:focus .protologo-name,
+.protologo:focus-visible .protologo-name {
+  opacity: 1;
+}
+
+.protologo:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .protologo:hover .protologo-name {
+    opacity: 1;
+  }
+  .protologo:hover {
+    border-color: var(--border-strong);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .netlogo,
+  .netlogos-panel,
+  .protologo-name {
+    transition: none;
+  }
+}

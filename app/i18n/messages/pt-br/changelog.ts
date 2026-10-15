@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "home-network-logos": {
+    title: "Logos das redes na página inicial",
+    body: "A página inicial agora mostra o logo de cada rede que o trackdefi lê. Passe o mouse sobre uma — ou toque nela no celular — para ver o nome e as corretoras lidas ali; depois passe o mouse sobre o logo de uma corretora para ver o nome dela.",
+  },
   "solana-orca": {
     title: "Solana, com a Orca",
     body: "O trackdefi agora lê a Solana — cole um endereço Solana na mesma caixa de busca. As posições da Orca mostram quantidades, faixa de preço, status dentro da faixa, taxas pendentes e recompensas do pool. O que uma posição rende agora é uma estimativa a partir da média do pool e da fatia da posição na liquidez ativa, porque as medições de 24 horas e 15 minutos feitas nas outras redes ainda não existem na Solana.",

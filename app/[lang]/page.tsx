@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import NetworkLogos from "../ui/NetworkLogos";
 import SearchForm from "../ui/SearchForm";
 import { fmtDate } from "../ui/format";
 import { localePath } from "../i18n/config";
@@ -7,7 +8,17 @@ import { getMessages, localizedChangelog } from "../i18n/get";
 import { basicTags, fill, rich, stripTags } from "../i18n/rich";
 import { localeFrom, type LangParams } from "../i18n/server";
 import { pageMetadata } from "../i18n/seo";
-import { COVERAGE, coverageSentence, DEMO_WALLET, humanList, networksOf, networksSentence, SITE_NAME } from "../site";
+import {
+  coverageSentence,
+  DEMO_WALLET,
+  humanList,
+  logoSlug,
+  NETWORKS,
+  networksOf,
+  networksSentence,
+  protocolsOn,
+  SITE_NAME,
+} from "../site";
 
 export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
   return pageMetadata({ locale: await localeFrom(params), path: "/" });
@@ -68,12 +79,17 @@ export default async function Home({ params }: LangParams) {
             { date: fmtDate(latest.date, ui.dates), title: latest.title },
           )}
         </p>
+        {/* logos das redes; o mouse em cima mostra o nome e as corretoras de
+            cada uma (até 15/10/2026 eram chips de texto "protocolo · redes") */}
+        <NetworkLogos
+          label={h.networksAria}
+          networks={NETWORKS.map((n) => ({
+            name: n.name,
+            slug: logoSlug(n.label),
+            protocols: protocolsOn(n.name).map((p) => ({ name: p.name, slug: logoSlug(p.family) })),
+          }))}
+        />
         <div className="coverage">
-          {COVERAGE.map((c) => (
-            <span className="chip" key={c.protocol}>
-              {c.protocol} · {humanList(c.networks, "&", lang)}
-            </span>
-          ))}
           <Link href={to("/roadmap")} className="chip">
             {rich(h.more, { soon: (c) => <span className="soon">{c}</span> })}
           </Link>

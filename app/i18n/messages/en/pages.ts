@@ -78,6 +78,7 @@ const pages = {
     tryDemo: "No wallet handy? <link>Try a demo wallet →</link>",
     whatsNew: "<date>Updated {date}</date> — {title}. <link>What's new →</link>",
     more: "More <soon>— see the roadmap →</soon>",
+    networksAria: "Supported networks — hover or tap one to see its exchanges",
     featuresAria: "How it works",
     features: [
       {

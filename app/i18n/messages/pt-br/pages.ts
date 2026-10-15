@@ -45,6 +45,7 @@ const pages: PagesMessages = {
     tryDemo: "Sem uma carteira à mão? <link>Experimente uma carteira de demonstração →</link>",
     whatsNew: "<date>Atualizado em {date}</date> — {title}. <link>Novidades →</link>",
     more: "Mais <soon>— veja o roadmap →</soon>",
+    networksAria: "Redes cobertas — passe o mouse ou toque numa delas para ver as corretoras",
     featuresAria: "Como funciona",
     features: [
       {
