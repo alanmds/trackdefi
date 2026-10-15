@@ -49,3 +49,16 @@ describe("limpeza da URL enviada ao painel", () => {
     expect(withoutOptOutParam(u)).toBe(u);
   });
 });
+
+describe("Cloudflare Web Analytics", () => {
+  it("sem token (variável ausente ou vazia) não carrega nada", async () => {
+    const { cfBeaconConfig } = await import("../app/cf-analytics");
+    expect(cfBeaconConfig(undefined)).toBeNull();
+    expect(cfBeaconConfig("  ")).toBeNull();
+  });
+
+  it("com token, só o token — SPA fica no padrão do script (mede todas as páginas)", async () => {
+    const { cfBeaconConfig } = await import("../app/cf-analytics");
+    expect(cfBeaconConfig(" abc123 ")).toBe('{"token":"abc123"}');
+  });
+});
