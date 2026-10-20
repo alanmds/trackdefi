@@ -170,6 +170,9 @@ const RAMSES_LAYOUT: PoolLayout = {
 const LAYOUTS: Record<string, PoolLayout> = {
   "uniswap-v3": UNISWAP_LAYOUT,
   "pancakeswap-v3": PANCAKE_LAYOUT,
+  // SushiSwap v3: `slot0()` e `ticks()` iguais à Uniswap (feeProtocol uint8 —
+  // `poc/probe-sushiswap-v3.ts`, 20/10/2026)
+  "sushiswap-v3": UNISWAP_LAYOUT,
   "ramses-v3": RAMSES_LAYOUT,
   aerodrome: SLIPSTREAM_LAYOUT,
   velodrome: SLIPSTREAM_LAYOUT,

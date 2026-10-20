@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "sushiswap-v3",
+    date: "2026-10-20",
+    kind: "exchange",
+    title: "SushiSwap v3 on five networks",
+    body: "trackdefi now reads SushiSwap v3 on Ethereum, Optimism, BNB Chain, Base and Arbitrum One: concentrated positions with amounts, price range and pending fees, and what each one is earning in fees right now. Extra SushiSwap rewards paid outside the blockchain (through Merkl) are not shown.",
+  },
+  {
     id: "home-network-logos",
     date: "2026-10-15",
     kind: "improvement",

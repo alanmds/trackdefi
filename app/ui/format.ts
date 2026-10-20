@@ -157,6 +157,7 @@ const PROTOCOL_LABELS: Record<string, string> = {
   "uniswap-v3": "Uniswap v3",
   "uniswap-v4": "Uniswap v4",
   "pancakeswap-v3": "PancakeSwap v3",
+  "sushiswap-v3": "SushiSwap v3",
   "ramses-v3": "Ramses",
   orca: "Orca",
 };

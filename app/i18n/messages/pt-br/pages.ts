@@ -23,6 +23,7 @@ const pages: PagesMessages = {
       "Uniswap v3",
       "Velodrome",
       "PancakeSwap v3",
+      "SushiSwap v3",
       "Ramses",
       "Orca",
     ],
@@ -34,7 +35,7 @@ const pages: PagesMessages = {
       subtitle: "Cole o endereço de uma carteira — veja todas as posições de LP, inclusive as em stake.",
       networks: "{count} redes — somente leitura, sem chaves, sem login",
     },
-    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap · Ramses · Orca",
+    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap · SushiSwap · Ramses · Orca",
   },
 
   noToken: "Sem token, sem pré-venda, sem airdrop.",
@@ -66,7 +67,7 @@ const pages: PagesMessages = {
     faq: [
       {
         q: "Como acompanho minhas posições em pools de liquidez em várias redes?",
-        a: "Cole o endereço da sua carteira (0x…, ou um endereço Solana) na caixa de busca acima. O {name} lê as blockchains e lista todas as posições de LP que esse endereço tem na Aerodrome, Velodrome, Uniswap, PancakeSwap, Ramses e Orca em {networks} — valor em dólar, taxas pendentes, emissões e faixas de preço.",
+        a: "Cole o endereço da sua carteira (0x…, ou um endereço Solana) na caixa de busca acima. O {name} lê as blockchains e lista todas as posições de LP que esse endereço tem na Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses e Orca em {networks} — valor em dólar, taxas pendentes, emissões e faixas de preço.",
       },
       {
         q: "Por que minhas posições de LP da Aerodrome em stake não aparecem na minha carteira?",
@@ -119,7 +120,7 @@ const pages: PagesMessages = {
     title: "Roadmap — redes e corretoras",
     heading: "Roadmap",
     description:
-      "Onde o trackdefi está hoje e para onde vai: APR por posição, Aerodrome, Velodrome, Uniswap, PancakeSwap, Ramses e Orca em {count} redes; depois, SushiSwap e mais.",
+      "Onde o trackdefi está hoje e o que vem depois: APR por posição, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses e Orca em {count} redes.",
     lede: "Onde o trackdefi está hoje e para onde vai. Sem prazos e sem promessas — as prioridades seguem o que os usuários realmente pedem. Uma coisa nunca muda: <b>somente leitura, para sempre</b>.",
     status: { live: "✓ No ar", next: "→ Próximo", planned: "Planejado", exploring: "Explorando" },
     liveTitle: "No ar hoje",
@@ -192,13 +193,13 @@ const pages: PagesMessages = {
         title: "Solana · Orca",
         body: "nossa primeira rede fora da família Ethereum, e um endereço Solana funciona na mesma caixa de busca. Posições concentradas, quantidades, faixas de preço, status dentro da faixa, taxas pendentes e recompensas do pool. O que uma posição rende agora é uma estimativa a partir da média do pool e da fatia da posição na liquidez ativa: as medições de 24 horas e 15 minutos feitas nas outras redes ainda não existem na Solana.",
       },
+      {
+        title: "Ethereum, Optimism, BNB Chain, Base e Arbitrum · SushiSwap v3",
+        body: "posições concentradas, quantidades, faixas de preço e taxas pendentes em cinco redes de uma vez. A SushiSwap v3 é construída como a Uniswap v3, então é lida do mesmo jeito, direto da blockchain. As recompensas extras da SushiSwap pagas fora da blockchain (pelo Merkl) não aparecem — só as taxas de swap que a posição rende.",
+      },
     ],
     nextTitle: "Próximo",
     next: [
-      {
-        title: "SushiSwap v3",
-        body: "na Ethereum, Optimism, BNB Chain, Base e Arbitrum: posições concentradas, quantidades, faixas de preço e taxas pendentes. Ela é construída como a Uniswap v3, então o trackdefi já sabe lê-la.",
-      },
       {
         title: "HyperEVM · Hyperswap e Project X",
         body: "as duas maiores corretoras nativas da HyperEVM, ao lado da Ramses.",

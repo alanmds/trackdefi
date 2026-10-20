@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "sushiswap-v3": {
+    title: "SushiSwap v3 em cinco redes",
+    body: "O trackdefi agora lê a SushiSwap v3 na Ethereum, Optimism, BNB Chain, Base e Arbitrum One: posições concentradas com quantidades, faixa de preço e taxas pendentes, e o que cada uma está rendendo em taxas agora. As recompensas extras da SushiSwap pagas fora da blockchain (pelo Merkl) não aparecem.",
+  },
   "home-network-logos": {
     title: "Logos das redes na página inicial",
     body: "A página inicial agora mostra o logo de cada rede que o trackdefi lê. Passe o mouse sobre uma — ou toque nela no celular — para ver o nome e as corretoras lidas ali; depois passe o mouse sobre o logo de uma corretora para ver o nome dela.",

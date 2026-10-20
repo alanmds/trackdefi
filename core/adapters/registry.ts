@@ -14,6 +14,7 @@ import { UniswapV4Adapter } from "./uniswap-v4/index";
 import { UNISWAP_V4_CHAINS } from "./uniswap-v4/config";
 import { PancakeV3Adapter } from "./pancake-v3/index";
 import { PANCAKE_V3_CHAINS } from "./pancake-v3/config";
+import { SUSHISWAP_V3_CHAINS } from "./sushiswap-v3/config";
 import { RamsesV3Adapter } from "./ramses-v3/index";
 import { RAMSES_V3_CHAINS } from "./ramses-v3/config";
 import { OrcaAdapter } from "./orca/index";
@@ -54,6 +55,10 @@ export function buildAdapters(opts: { onWarn?: AdapterWarn } = {}): ProtocolAdap
     ),
     ...PANCAKE_V3_CHAINS.map((config) =>
       tagged((onWarn) => new PancakeV3Adapter(readerFor(config.chainId), { onWarn, config })),
+    ),
+    // SushiSwap v3: fork com o formato da Uniswap — mesmo adapter, só config
+    ...SUSHISWAP_V3_CHAINS.map((config) =>
+      tagged((onWarn) => new UniswapV3Adapter(readerFor(config.chainId), { onWarn, config, protocol: "sushiswap-v3" })),
     ),
     ...RAMSES_V3_CHAINS.map((config) =>
       tagged((onWarn) => new RamsesV3Adapter(readerFor(config.chainId), { onWarn, config })),

@@ -64,6 +64,8 @@ const PROJECT_TO_PROTOCOL: Record<string, string> = {
   "velodrome-v3": "velodrome",
   "velodrome-v2": "velodrome",
   "uniswap-v3": "uniswap-v3",
+  // 20/10/2026: Ethereum, Base, Arbitrum e BSC (OP ainda não); poolMeta "0.3%"
+  "sushiswap-v3": "sushiswap-v3",
   // Solana (14/10/2026): 759 pools no dataset, todos com poolMeta null
   "orca-dex": "orca",
 };
@@ -77,6 +79,8 @@ const CL_OURS = /^CL(\d+)-/; // nosso poolSymbol: "CL100-WETH/USDC"
 const CL_META = /^CL(\d+)\b/; // poolMeta da DefiLlama: "CL100 - 0.0217%"
 const FEE_OURS = /\s(\d+(?:\.\d+)?)%$/; // nosso: "WETH/USDC 0.05%"
 const FEE_META = /^(\d+(?:\.\d+)?)%$/; // deles: "0.05%"
+/** pools identificados pelo fee tier no poolMeta (Uniswap e forks com o mesmo formato) */
+const FEE_TIER_PROTOCOLS = new Set(["uniswap-v3", "sushiswap-v3"]);
 
 function key(chainLabel: string, protocol: string, a: string, b: string): string {
   const [lo, hi] = [a.toLowerCase(), b.toLowerCase()].sort();
@@ -119,7 +123,7 @@ export class YieldsIndex {
       const tvl = q.poolTvlUsd;
       if (!tvl || !(tvl > 0)) return null;
       candidates = rows.filter((r) => r.tvlUsd <= tvl * ORCA_TVL_TOLERANCE && r.tvlUsd >= tvl / ORCA_TVL_TOLERANCE);
-    } else if (q.protocol === "uniswap-v3") {
+    } else if (FEE_TIER_PROTOCOLS.has(q.protocol)) {
       const ours = q.poolSymbol.match(FEE_OURS);
       if (!ours) return null;
       const fee = parseFloat(ours[1]);

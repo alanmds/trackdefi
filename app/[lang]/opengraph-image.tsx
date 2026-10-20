@@ -76,7 +76,9 @@ export default async function OpengraphImage({ params }: { params: Promise<{ lan
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ display: "flex", fontSize: 30, fontWeight: 600, color: INK }}>
+          {/* 27 (era 30): com a SushiSwap (20/10/2026) a lista passou da largura e
+              a Orca caía sozinha numa segunda linha */}
+          <div style={{ display: "flex", fontSize: 27, fontWeight: 600, color: INK }}>
             {m.ogProtocols}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 27, color: INK_SOFT }}>

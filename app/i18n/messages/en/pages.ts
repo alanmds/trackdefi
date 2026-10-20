@@ -53,6 +53,7 @@ const pages = {
       "Uniswap v3",
       "Velodrome",
       "PancakeSwap v3",
+      "SushiSwap v3",
       "Ramses",
       "Orca",
     ],
@@ -66,7 +67,7 @@ const pages = {
       networks: "{count} networks — read-only, no keys, no login",
     },
     /** "Aerodrome, Velodrome & Uniswap v3" no cartão — nomes próprios, não traduzir */
-    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap · Ramses · Orca",
+    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap · SushiSwap · Ramses · Orca",
   },
 
   /** frase de "sem token" — promessa pública e permanente (ver `NO_TOKEN` em app/site.ts) */
@@ -100,7 +101,7 @@ const pages = {
     faq: [
       {
         q: "How do I track my liquidity pool positions across networks?",
-        a: "Paste your wallet address (0x…, or a Solana address) in the search box above. {name} reads the blockchains and lists every LP position that address holds on Aerodrome, Velodrome, Uniswap, PancakeSwap, Ramses and Orca across {networks} — value in USD, pending fees, emissions and price ranges.",
+        a: "Paste your wallet address (0x…, or a Solana address) in the search box above. {name} reads the blockchains and lists every LP position that address holds on Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses and Orca across {networks} — value in USD, pending fees, emissions and price ranges.",
       },
       {
         q: "Why don't my staked Aerodrome LP positions show up in my wallet?",
@@ -153,7 +154,7 @@ const pages = {
     title: "Roadmap — networks & exchanges",
     heading: "Roadmap",
     description:
-      "Where trackdefi is today and where it's going: per-position APR, Aerodrome, Velodrome, Uniswap, PancakeSwap, Ramses and Orca on {count} networks; SushiSwap and more next.",
+      "Where trackdefi is today and what's next: per-position APR, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses and Orca on {count} networks.",
     lede: "Where trackdefi is today and where it's going. No deadlines and no promises — priorities follow what users actually ask for. One thing never changes: <b>read-only, forever</b>.",
     status: { live: "✓ Live", next: "→ Next", planned: "Planned", exploring: "Exploring" } as Record<RoadmapKind, string>,
     liveTitle: "Live today",
@@ -226,13 +227,13 @@ const pages = {
         title: "Solana · Orca",
         body: "our first network outside the Ethereum family, and a Solana address works in the same search box. Concentrated positions, amounts, price ranges, in-range status, pending fees and pool rewards. What a position earns now is an estimate from the pool's average and the position's share of active liquidity: the 24-hour and 15-minute measurements read on the other networks don't exist on Solana yet.",
       },
+      {
+        title: "Ethereum, Optimism, BNB Chain, Base & Arbitrum · SushiSwap v3",
+        body: "concentrated positions, amounts, price ranges and pending fees on five networks at once. SushiSwap v3 is built like Uniswap v3, so it is read the same way, straight from the blockchain. Extra SushiSwap rewards paid outside the blockchain (through Merkl) are not shown — only the swap fees the position earns.",
+      },
     ] as RoadmapItem[],
     nextTitle: "Next",
     next: [
-      {
-        title: "SushiSwap v3",
-        body: "on Ethereum, Optimism, BNB Chain, Base and Arbitrum: concentrated positions, amounts, price ranges and pending fees. It is built like Uniswap v3, so trackdefi already knows how to read it.",
-      },
       {
         title: "HyperEVM · Hyperswap & Project X",
         body: "the two largest native exchanges on HyperEVM, next to Ramses.",

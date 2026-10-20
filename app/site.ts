@@ -140,6 +140,10 @@ export const COVERAGE = [
     protocol: "PancakeSwap v3",
     networks: ["BNB Chain", "Ethereum", "Base", "Arbitrum"] as readonly string[],
   },
+  {
+    protocol: "SushiSwap v3",
+    networks: ["Ethereum", "Optimism", "BNB Chain", "Base", "Arbitrum"] as readonly string[],
+  },
   { protocol: "Ramses", networks: ["Robinhood Chain", "HyperEVM"] as readonly string[] },
   { protocol: "Orca", networks: ["Solana"] as readonly string[] },
 ] as const;
@@ -175,10 +179,12 @@ export const PROTOCOL_FAMILIES: readonly string[] = [
  * api.llama.fi/overview/dexs, volume de 30 dias em 02/10/2026 — Uniswap
  * US$ 93 bi, PancakeSwap US$ 30 bi, Aerodrome US$ 14 bi, Ramses US$ 3 bi,
  * Velodrome US$ 0,6 bi. Orca entrou em 14/10/2026 com US$ 8,5 bi (mesma
- * fonte), entre a Aerodrome (US$ 15 bi) e a Ramses (US$ 2 bi).
+ * fonte), entre a Aerodrome (US$ 15 bi) e a Ramses (US$ 2 bi). SushiSwap
+ * entrou em 20/10/2026 com US$ 0,24 bi (todos os produtos da Sushi, mesma
+ * fonte) — abaixo da Velodrome (US$ 0,59 bi).
  * Família nova precisa entrar aqui (teste cobra), conferida na mesma fonte.
  */
-export const FAMILIES_BY_VOLUME: readonly string[] = ["Uniswap", "PancakeSwap", "Aerodrome", "Orca", "Ramses", "Velodrome"];
+export const FAMILIES_BY_VOLUME: readonly string[] = ["Uniswap", "PancakeSwap", "Aerodrome", "Orca", "Ramses", "Velodrome", "SushiSwap"];
 
 /** nome do arquivo de logo: "Metal L2" → "metal-l2" (public/logos/…/<slug>.webp) */
 export function logoSlug(name: string): string {

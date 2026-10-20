@@ -26,6 +26,7 @@ describe("logos da home", () => {
     expect(protocolsOn("BNB Chain")).toEqual([
       { family: "Uniswap", name: "Uniswap v3 & v4" },
       { family: "PancakeSwap", name: "PancakeSwap v3" },
+      { family: "SushiSwap", name: "SushiSwap v3" },
     ]);
     expect(protocolsOn("Solana")).toEqual([{ family: "Orca", name: "Orca" }]);
   });
