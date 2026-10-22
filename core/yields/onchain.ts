@@ -438,6 +438,7 @@ export async function readPositionFeeWindows(
     if (currentBlock <= blocos) continue; // rede jovem demais para esta janela
 
     let antes: Map<string, TickSnapshot>;
+    let antesTs: bigint | null;
     try {
       const lido = await readSnapshots(reader, legiveis, currentBlock - blocos);
       /* Prova do bloco: a leitura "antes" tem de ter rodado num bloco de
@@ -448,6 +449,7 @@ export async function readPositionFeeWindows(
         throw new Error(`RPC ignorou o bloco pedido (horário ${lido.ts}, agora ${agoraTs})`);
       }
       antes = lido.snaps;
+      antesTs = lido.ts;
     } catch {
       /* Uma janela pode falhar e a outra passar: um nó podado guarda poucos
          blocos, o que às vezes cobre 15 min e nunca cobre 24 h. Por isso cada
@@ -455,6 +457,16 @@ export async function readPositionFeeWindows(
       falhasDeLeitura++;
       continue;
     }
+
+    /* Duração REAL da janela: a diferença entre os horários dos dois blocos
+       lidos, quando os dois vieram. `secPerBlock` é só a média que escolheu
+       quantos blocos voltar — a Robinhood, configurada em 0,1 s, faz ~0,104 s
+       por bloco, e 864 mil blocos cobrem ~24,9 h, não 24 h; dividir as taxas
+       de 24,9 h por 24 h inflava o APR em ~4%. Sem horário, fica a média. */
+    const windowSec =
+      agoraTs !== null && antesTs !== null && agoraTs > antesTs
+        ? Number(agoraTs - antesTs)
+        : Number(blocos) * secPerBlock;
 
     for (const t of legiveis) {
       const a = agora.get(t.key)!;
@@ -470,7 +482,7 @@ export async function readPositionFeeWindows(
       lista.push({
         delta0: wrapSub(i0n, i0o),
         delta1: wrapSub(i1n, i1o),
-        windowSec: Number(blocos) * secPerBlock,
+        windowSec,
       });
       byTarget.set(t.key, lista);
     }
