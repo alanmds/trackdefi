@@ -18,7 +18,7 @@ const HEAD = 1_000_000n;
 const ALVO: FeeWindowTarget = { key: "k", protocol: "uniswap-v3", pool: POOL, tickLower: -100, tickUpper: 100, inside0Last: null };
 
 /** Pool fictício: o acumulador global cresce 1.000 por bloco; tick 0, dentro da faixa. */
-function makeReader(modo: "honesto" | "ignora-bloco" | "sem-multicall3"): ChainReader {
+function makeReader(modo: "honesto" | "ignora-bloco" | "sem-multicall3", segPorBloco = 1n): ChainReader {
   return {
     async readContract() {
       throw new Error("não usado");
@@ -37,8 +37,8 @@ function makeReader(modo: "honesto" | "ignora-bloco" | "sem-multicall3"): ChainR
             return ok([79228162514264337593543950336n, 0, 0, 0, 0, 0, true]);
           case "ticks":
             return ok([1n, 0n, 0n, 0n, 0n, 0n, 0, true]);
-          case "getCurrentBlockTimestamp": // 1 s por bloco
-            return modo === "sem-multicall3" ? { status: "failure" as const, error: new Error("sem multicall3") } : ok(efetivo);
+          case "getCurrentBlockTimestamp": // `segPorBloco` s por bloco (1 s por padrão)
+            return modo === "sem-multicall3" ? { status: "failure" as const, error: new Error("sem multicall3") } : ok(efetivo * segPorBloco);
           default:
             return { status: "failure" as const, error: new Error(c.functionName) };
         }
@@ -70,5 +70,18 @@ describe("fee APR on-chain — prova do bloco", () => {
   it("sem horário (Multicall3 ausente): não dá para provar nem negar — mede", async () => {
     const r = await readPositionFeeWindows(makeReader("sem-multicall3"), [ALVO], HEAD, 1);
     expect((r.byTarget.get("k") ?? []).length).toBeGreaterThan(0);
+  });
+
+  it("a duração da janela é a medida pelos horários dos blocos, não a média configurada", async () => {
+    // a rede faz 2 s por bloco, mas a configuração diz 1 s: os blocos que
+    // voltamos cobrem o DOBRO do tempo, e as taxas têm de ser divididas por ele
+    const r = await readPositionFeeWindows(makeReader("honesto", 2n), [ALVO], HEAD, 1);
+    const janelas = r.byTarget.get("k") ?? [];
+    expect(janelas.map((w) => w.windowSec)).toEqual([2 * 24 * 3600, 2 * 900]);
+  });
+
+  it("sem horário, a duração da janela cai na média configurada", async () => {
+    const r = await readPositionFeeWindows(makeReader("sem-multicall3"), [ALVO], HEAD, 1);
+    expect((r.byTarget.get("k") ?? []).map((w) => w.windowSec)).toEqual([24 * 3600, 900]);
   });
 });
