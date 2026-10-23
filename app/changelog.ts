@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "aero-launch",
+    date: "2026-10-23",
+    kind: "improvement",
+    title: "Aerodrome and Velodrome after the Aero launch",
+    body: "Aerodrome and Velodrome merged into Aero. Staked positions now show emissions as ended, and wallets with positions there get a note explaining what changed. Aero positions themselves aren't read yet.",
+  },
+  {
     id: "sushiswap-v3",
     date: "2026-10-20",
     kind: "exchange",

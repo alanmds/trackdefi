@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { PositionsResponseDTO } from "../../core/service";
-import { localePath } from "../i18n/config";
+import { CHAINS } from "../../core/chains";
+import { aeroWalletNotices } from "../aero";
+import { GRAMMAR, localePath } from "../i18n/config";
 import { fill, pl } from "../i18n/rich";
 import { useI18n } from "../i18n/provider";
 import { networksDotted, networksSentence } from "../site";
@@ -80,6 +82,20 @@ export default function PositionsView({ address }: { address: string }) {
   const notices = state.phase === "done" ? (state.data.notices ?? []) : [];
   // a fonte de preços falhou NESTA varredura → "—" pode sumir ao recarregar
   const pricesFailed = notices.some((n) => n.kind === "prices");
+  // lançamento do Aero (22/10/2026): só fala depois da hora, e só com quem tem algo lá
+  const aero =
+    state.phase === "done"
+      ? aeroWalletNotices(state.data.positions, state.data.locks ?? [], Date.now() / 1000)
+      : null;
+  const aeroLines: string[] = [];
+  if (aero?.merged) aeroLines.push(ui.notices.aeroMerged);
+  if (aero && aero.leafChains.length > 0) {
+    const names = aero.leafChains.map((id) => CHAINS[id]?.label ?? String(id));
+    const network =
+      names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} ${GRAMMAR[locale].and} ${names[names.length - 1]}`;
+    aeroLines.push(fill(ui.notices.aeroLeaf, { network }));
+  }
+  if (aero?.liskDeadline) aeroLines.push(ui.notices.aeroLisk);
   const rewardsWithoutPrice = state.phase === "done" ? (state.data.totals.rewardsWithoutPrice ?? 0) : 0;
   const networks = networksSentence("and", locale);
 
@@ -211,6 +227,14 @@ export default function PositionsView({ address }: { address: string }) {
           {/* Um aviso por linha, dizendo o que aconteceu. O log interno
               (`warnings`, em português) não aparece mais na tela — nem no
               tooltip, onde vazava texto de depuração para o visitante. */}
+          {aeroLines.length > 0 && (
+            <ul className="scan-warnings scan-notices scan-info">
+              {aeroLines.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          )}
+
           {notices.length > 0 && (
             <ul className="scan-warnings scan-notices">
               {notices.map((n, i) => {

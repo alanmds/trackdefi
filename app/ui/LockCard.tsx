@@ -4,6 +4,7 @@ import type { LockDTO } from "../../core/service";
 import { CHAINS } from "../../core/chains";
 import { fill } from "../i18n/rich";
 import { useI18n } from "../i18n/provider";
+import { aeroLaunched, isSugarProtocol } from "../aero";
 import { fmtAmount, fmtUnixDate, fmtUsd, protocolLabel } from "./format";
 
 /**
@@ -66,6 +67,11 @@ export default function LockCard({ l }: { l: LockDTO }) {
           </span>
         </div>
       </div>
+
+      {/* veAERO/veVELO viram sAERO no Aero (22/10/2026); o convertido some */}
+      {isSugarProtocol(l.protocol) && aeroLaunched(Date.now() / 1000) && (
+        <p className="lock-note">{t.aeroUpgrade}</p>
+      )}
 
       {l.rewards.length > 0 && (
         <div>

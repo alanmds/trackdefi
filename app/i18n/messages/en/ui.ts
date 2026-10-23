@@ -142,6 +142,12 @@ const ui = {
     inFees: "{usd} in fees",
     emissions: "Emissions",
     currentRate: "current rate",
+    /** gauge que parou de pagar (periodFinish no passado) */
+    emissionsEnded: "ended {date}",
+    tipEmissionsAero:
+      "Emissions ended: since the Aero launch on Oct 22, 2026, Aerodrome and Velodrome gauges are switched off. Any rewards earned before that stay claimable.",
+    tipEmissionsEnded:
+      "Emissions ended: this pool's gauge stopped paying on {date}. Any rewards earned before that stay claimable.",
     /** contexto do % de emissões, que pode ser altíssimo e verdadeiro */
     emissionPerDay: "{usd}/day at this rate",
     partFees: "fees {pct}",
@@ -191,6 +197,8 @@ const ui = {
     votes: "votes",
     rebaseTip: "Rebase: new tokens paid to lockers every week to offset emission dilution.",
     votesTip: "Voting rewards: swap fees and incentives from the pools this lock voted for.",
+    aeroUpgrade:
+      "Locks can be upgraded to sAERO on Aero. An upgraded lock disappears from this list — its new sAERO position isn't read yet.",
     totalClaimable: "Total claimable",
   },
 
@@ -220,6 +228,11 @@ const ui = {
         "{n} {where} positions sit in a pool with a custom hook — any extra rewards the hook pays aren't counted.",
     } as Plural,
     where: "{protocol} on {network}",
+    /** lançamento do Aero — textos aprovados pelo Alan em 21/10/2026 */
+    aeroMerged:
+      "Aerodrome and Velodrome merged into Aero on Oct 22, 2026. Their old gauges no longer pay emissions, so staked positions here now earn swap fees only. Positions and locks moved to Aero aren't read by trackdefi yet.",
+    aeroLeaf: "Velodrome on {network} keeps trading and liquidity after the Aero launch, but without gauges or emissions.",
+    aeroLisk: "Velodrome asks for deposits on Lisk to be withdrawn by Oct 31, 2026.",
     thisToken: "this token",
     noPriceFailed:
       "No USD price for {who} right now — either our price source doesn't cover {them}, or it didn't answer this time (see the warning above).",

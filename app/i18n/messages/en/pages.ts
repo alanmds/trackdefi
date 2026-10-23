@@ -474,7 +474,7 @@ const pages = {
           {
             id: "emissions-rate",
             term: "Emissions · $/day at this rate",
-            def: "The reward token the gauge is paying this position, at the gauge's current rate and the token's current price. Only for positions that are in range and staked — or, on Ramses, any in-range position in a pool with a gauge, since Ramses pays without staking. The percentage has no ceiling: when a gauge pays a lot to a small position, the number is high — and real. The dollars per day next to it say what that means in money.",
+            def: "The reward token the gauge is paying this position, at the gauge's current rate and the token's current price. Only for positions that are in range and staked — or, on Ramses, any in-range position in a pool with a gauge, since Ramses pays without staking. The percentage has no ceiling: when a gauge pays a lot to a small position, the number is high — and real. The dollars per day next to it say what that means in money. When the gauge has stopped paying, the row reads 0% and “ended” with the date it stopped.",
           },
           {
             id: "fees-plus-emissions",

@@ -139,6 +139,8 @@ function computeFee(i: EarningInputs): number | null {
 }
 
 function computeEmission(i: EarningInputs): { pct: number; usdPerDay: number } | null {
+  // gauge que parou de pagar: zero é certeza, com ou sem preço do token
+  if (i.staked && i.rewardRatePerSec === 0n) return { pct: 0, usdPerDay: 0 };
   if (
     !i.staked ||
     i.rewardRatePerSec === null ||

@@ -41,6 +41,8 @@ export const poolProbeAbi = parseAbi([
 /** gauge CL do Slipstream — taxa de emissão por segundo (token do gauge). */
 export const gaugeAbi = parseAbi([
   "function rewardRate() view returns (uint256)",
+  // fim do período pago; depois dele o gauge não paga, mas o rewardRate fica
+  "function periodFinish() view returns (uint256)",
 ]);
 
 /** Formato cru retornado pelo Sugar (espelha o struct Position). */

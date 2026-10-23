@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "aero-launch": {
+    title: "Aerodrome e Velodrome depois do lançamento do Aero",
+    body: "A Aerodrome e a Velodrome se fundiram no Aero. As posições em stake agora mostram as emissões como encerradas, e as carteiras com posições lá ganham um aviso explicando o que mudou. As posições no próprio Aero ainda não são lidas.",
+  },
   "sushiswap-v3": {
     title: "SushiSwap v3 em cinco redes",
     body: "O trackdefi agora lê a SushiSwap v3 na Ethereum, Optimism, BNB Chain, Base e Arbitrum One: posições concentradas com quantidades, faixa de preço e taxas pendentes, e o que cada uma está rendendo em taxas agora. As recompensas extras da SushiSwap pagas fora da blockchain (pelo Merkl) não aparecem.",

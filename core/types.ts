@@ -88,6 +88,15 @@ export interface EarningInputsOnchain {
   poolStakedLiquidity: bigint | null;
   /** gauge.rewardRate(): token de emissão por segundo (unidades cruas) */
   emissionRatePerSec: bigint | null;
+  /**
+   * Unix (s) em que o gauge PAROU de pagar, quando já parou — e aí
+   * `emissionRatePerSec` vem 0. O `rewardRate` não zera sozinho: depois do
+   * `periodFinish` ele guarda o ritmo da última semana paga. Visto em
+   * 21/10/2026 (`poc/probe-aero-gauges.ts`): gauges das redes-folha da
+   * Velodrome parados desde 01/10 ainda "pagavam" na tela. Ausente = pagando
+   * ou desconhecido.
+   */
+  emissionsEndedAt?: number;
   /** token de emissão do gauge (para o service buscar o preço) */
   emissionToken: TokenInfo | null;
   /**

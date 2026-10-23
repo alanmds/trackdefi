@@ -4,7 +4,8 @@ import type { PositionDTO } from "../../core/service";
 import { CHAINS } from "../../core/chains";
 import { basicTags, fill, rich } from "../i18n/rich";
 import { useI18n } from "../i18n/provider";
-import { fmtAmount, fmtPct, fmtUsd, fmtUsdFine, fmtWindow, protocolLabel, shortAddress } from "./format";
+import { stoppedByAero } from "../aero";
+import { fmtAmount, fmtPct, fmtUnixDate, fmtUsd, fmtUsdFine, fmtWindow, protocolLabel, shortAddress } from "./format";
 import RangeBar from "./RangeBar";
 import { noPriceTip, poolPriceTip } from "./notices";
 
@@ -38,6 +39,14 @@ export default function PositionCard({ p, pricesFailed = false }: { p: PositionD
   /** frases do tooltip, juntas por espaço — a média do pool só entra se houver */
   const sentences = (...parts: string[]) => parts.filter(Boolean).join(" ");
 
+  /* Gauge que parou de pagar: a emissão é 0 de verdade, e a tela diz desde
+     quando e por quê — sem isso, "Emissões 0%" num pool em stake parece
+     defeito. O lançamento do Aero (22/10/2026) tem frase própria. */
+  const endedAt = e?.emissionsEndedAt;
+  const endedDate = endedAt !== undefined ? fmtUnixDate(endedAt, ui.dates) : "";
+  const endedTip =
+    endedAt === undefined ? "" : stoppedByAero(p) ? t.tipEmissionsAero : fill(t.tipEmissionsEnded, { date: endedDate });
+
   const tipJanelas = sentences(t.tipWindows, poolAvg);
 
   let earningSub = "";
@@ -57,6 +66,7 @@ export default function PositionCard({ p, pricesFailed = false }: { p: PositionD
       fill(t.tipEstimate, { parts: parts.join(" + ") || pct(e.nowPct) }),
       poolAvg,
       t.tipEstimateNote,
+      endedTip,
     );
   }
 
@@ -133,13 +143,15 @@ export default function PositionCard({ p, pricesFailed = false }: { p: PositionD
             </div>
           ))}
           {e.emissionPct !== null && (
-            <div className="earning-row">
+            <div className={`earning-row${endedTip ? " has-tip" : ""}`} title={endedTip || undefined}>
               <span className="earning-when">{t.emissions}</span>
               <b className="earning-pct">{fill(t.perYear, { pct: pct(e.emissionPct) })}</b>
               <span className="earning-usd">
-                {e.emissionUsdPerDay !== null && e.emissionUsdPerDay !== undefined
-                  ? fill(t.emissionPerDay, { usd: fmtUsdFine(e.emissionUsdPerDay, locale) })
-                  : t.currentRate}
+                {endedTip
+                  ? fill(t.emissionsEnded, { date: endedDate })
+                  : e.emissionUsdPerDay !== null && e.emissionUsdPerDay !== undefined
+                    ? fill(t.emissionPerDay, { usd: fmtUsdFine(e.emissionUsdPerDay, locale) })
+                    : t.currentRate}
               </span>
             </div>
           )}

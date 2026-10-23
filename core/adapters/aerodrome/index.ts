@@ -52,6 +52,8 @@ export interface PoolMeta {
   gauge?: Address | null;
   /** gauge.rewardRate(): token de emissão por segundo (preenchido em 2º passo) */
   emissionRatePerSec?: bigint | null;
+  /** gauge.periodFinish(), quando já passou: o gauge parou de pagar */
+  emissionsEndedAt?: number;
 }
 
 export interface AerodromeOptions {
@@ -359,15 +361,32 @@ export class AerodromeAdapter implements ProtocolAdapter {
       m.gauge = g && g !== ZERO_ADDR ? g : null;
     });
 
-    // rewardRate() dos gauges (só pools CL com gauge)
+    /* rewardRate() e periodFinish() dos gauges (só pools CL com gauge). Gauge
+       desligado — o lançamento do Aero em 22/10/2026 desligou todos os da
+       Aerodrome e da Velodrome — continua respondendo o rewardRate da última
+       semana paga; só o periodFinish diz que acabou. */
     const withGauge = cl.map(([, m]) => m).filter((m) => m.gauge != null);
     if (withGauge.length === 0) return;
+    const GFNS = ["rewardRate", "periodFinish"] as const;
     const rates = await this.reader.multicall({
-      contracts: withGauge.map((m) => ({ address: m.gauge as Address, abi: gaugeAbi, functionName: "rewardRate" })),
+      contracts: withGauge.flatMap((m) =>
+        GFNS.map((fn) => ({ address: m.gauge as Address, abi: gaugeAbi, functionName: fn })),
+      ),
       allowFailure: true,
     });
+    const nowSec = Math.floor(Date.now() / 1000);
     withGauge.forEach((m, i) => {
-      if (rates[i].status === "success") m.emissionRatePerSec = rates[i].result as bigint;
+      const rate = rates[i * GFNS.length];
+      const finish = rates[i * GFNS.length + 1];
+      // sem saber se o período acabou, o ritmo não prova nada → "—"
+      if (rate.status !== "success" || finish.status !== "success") return;
+      const end = Number(finish.result as bigint);
+      if (end <= nowSec) {
+        m.emissionRatePerSec = 0n;
+        m.emissionsEndedAt = end;
+      } else {
+        m.emissionRatePerSec = rate.result as bigint;
+      }
     });
   }
 
@@ -460,6 +479,7 @@ export function toLpPosition(
         stakedLiquidity: p.staked,
         poolStakedLiquidity: pool.poolStakedLiquidity ?? null,
         emissionRatePerSec: pool.emissionRatePerSec ?? null,
+        ...(pool.emissionsEndedAt !== undefined ? { emissionsEndedAt: pool.emissionsEndedAt } : {}),
         emissionToken: pool.gauge ? aero : null,
         // o Sugar não devolve feeGrowthInside da posição → janela não validada
         feeGrowthInside0LastX128: null,

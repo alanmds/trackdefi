@@ -440,7 +440,7 @@ const pages: PagesMessages = {
           {
             id: "emissions-rate",
             term: "Emissões · US$/dia neste ritmo",
-            def: "O token de recompensa que o gauge está pagando a esta posição, na taxa atual do gauge e ao preço atual do token. Só para posições dentro da faixa e em stake — ou, na Ramses, qualquer posição dentro da faixa num pool com gauge, porque a Ramses paga sem stake. O percentual não tem teto: quando um gauge paga muito a uma posição pequena, o número fica alto — e é real. Os dólares por dia ao lado dizem o que isso significa em dinheiro.",
+            def: "O token de recompensa que o gauge está pagando a esta posição, na taxa atual do gauge e ao preço atual do token. Só para posições dentro da faixa e em stake — ou, na Ramses, qualquer posição dentro da faixa num pool com gauge, porque a Ramses paga sem stake. O percentual não tem teto: quando um gauge paga muito a uma posição pequena, o número fica alto — e é real. Os dólares por dia ao lado dizem o que isso significa em dinheiro. Quando o gauge parou de pagar, a linha mostra 0% e “encerradas” com a data em que ele parou.",
           },
           {
             id: "fees-plus-emissions",

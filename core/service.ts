@@ -108,6 +108,8 @@ export interface EarningDTO {
   /** em range, porém mais nova que a menor janela — a tela avisa em vez de
    *  deixar um vazio mudo */
   tooNew: boolean;
+  /** unix (s) em que o gauge parou de pagar; ausente = pagando ou desconhecido */
+  emissionsEndedAt?: number;
 }
 
 export interface PositionDTO {
@@ -456,6 +458,7 @@ export function buildResponse(params: {
       const tooNew = feeWindows?.tooNew.has(chave) ?? false;
       if (base) {
         earning = { ...base, windows: janelas, tooNew };
+        if (p.staked && ei?.emissionsEndedAt !== undefined) earning.emissionsEndedAt = ei.emissionsEndedAt;
       } else if (tooNew) {
         /* Em range e sem número por ser nova demais: a tela precisa DIZER isso.
            Um vazio mudo foi exatamente a queixa que abriu esta frente. */

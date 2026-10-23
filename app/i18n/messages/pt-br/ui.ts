@@ -171,6 +171,11 @@ const ui: UiMessages = {
     inFees: "{usd} em taxas",
     emissions: "Emissões",
     currentRate: "taxa atual",
+    emissionsEnded: "encerradas em {date}",
+    tipEmissionsAero:
+      "Emissões encerradas: desde o lançamento do Aero, em 22/10/2026, os gauges da Aerodrome e da Velodrome estão desligados. As recompensas acumuladas antes disso continuam disponíveis para resgate.",
+    tipEmissionsEnded:
+      "Emissões encerradas: o gauge deste pool parou de pagar em {date}. As recompensas acumuladas antes disso continuam disponíveis para resgate.",
     emissionPerDay: "{usd}/dia neste ritmo",
     partFees: "taxas {pct}",
     partEmissions: "emissões {pct}",
@@ -219,6 +224,8 @@ const ui: UiMessages = {
     votes: "votos",
     rebaseTip: "Rebase: tokens novos pagos toda semana a quem tem lock, para compensar a diluição das emissões.",
     votesTip: "Recompensas de voto: taxas de swap e incentivos dos pools em que este lock votou.",
+    aeroUpgrade:
+      "Os locks podem ser convertidos em sAERO no Aero. Um lock convertido some desta lista — a nova posição em sAERO ainda não é lida.",
     totalClaimable: "Total a resgatar",
   },
 
@@ -248,6 +255,10 @@ const ui: UiMessages = {
         "{n} posições em {where} estão num pool com hook personalizado — recompensas extras pagas pelo hook não são contadas.",
     },
     where: "{protocol} em {network}",
+    aeroMerged:
+      "A Aerodrome e a Velodrome se fundiram no Aero em 22/10/2026. Os gauges antigos não pagam mais emissões, então as posições em stake aqui passam a render só taxas de swap. Posições e locks levados para o Aero ainda não são lidos pelo trackdefi.",
+    aeroLeaf: "A Velodrome na {network} continua com troca e liquidez depois do lançamento do Aero, mas sem gauges nem emissões.",
+    aeroLisk: "A Velodrome pede que os depósitos na Lisk sejam sacados até 31/10/2026.",
     thisToken: "este token",
     noPriceFailed:
       "Sem preço em USD para {who} agora — ou nossa fonte de preços não cobre {them}, ou ela não respondeu desta vez (veja o aviso acima).",

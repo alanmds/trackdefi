@@ -19,5 +19,5 @@ export const EDITADA_EM = {
   home: "2026-10-20",
   howItWorks: "2026-10-02",
   roadmap: "2026-10-20",
-  glossary: "2026-10-02",
+  glossary: "2026-10-23",
 } as const;

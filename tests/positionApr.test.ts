@@ -153,3 +153,29 @@ describe("computeEarning — guardas de honestidade", () => {
     expect(e).toBeNull();
   });
 });
+
+describe("computeEarning — gauge que parou de pagar", () => {
+  /* rewardRate 0 vem do adapter quando o periodFinish do gauge já passou
+     (lançamento do Aero, 22/10/2026; redes-folha desde 01/10) */
+  const parado: EarningInputs = {
+    ...base,
+    poolFeeAprPct: null,
+    poolTvlUsd: null,
+    staked: true,
+    rewardRatePerSec: 0n,
+    posStakedLiquidity: 1n,
+    poolStakedLiquidity: 2n,
+    emissionPriceUsd: null, // nem o preço do token importa: zero é zero
+    valueUsd: 1000,
+  };
+
+  it("emissão 0%, não '—', mesmo sem preço do token", () => {
+    const e = computeEarning(parado)!;
+    expect(e.emissionPct).toBe(0);
+    expect(e.emissionUsdPerDay).toBe(0);
+  });
+
+  it("sem stake, rewardRate 0 não inventa linha de emissão", () => {
+    expect(computeEarning({ ...parado, staked: false })).toBeNull();
+  });
+});
