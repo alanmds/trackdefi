@@ -262,6 +262,10 @@ const pages: PagesMessages = {
         title: "Idade do pool",
         body: "há quanto tempo o pool existe, mostrado ao lado do APR. Um pool novinho com APR alto é um sinal diferente de um pool antigo com o mesmo número.",
       },
+      {
+        title: "Simulações e calculadoras",
+        body: "ferramentas para testar uma posição antes de abri-la ou mudá-la: o que uma faixa de preço teria em mãos a um dado preço, a perda impermanente comparada a simplesmente segurar os tokens, e o que um APR significa em dólares por dia. São só calculadoras — nunca tocam numa carteira.",
+      },
     ],
     neverTitle: "O que nunca vai mudar",
     never: [

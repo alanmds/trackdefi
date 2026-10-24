@@ -22,7 +22,7 @@ import { EDITADA_EM } from "../app/sitemap-datas";
 const IMPRESSAO: Record<keyof typeof EDITADA_EM, { data: string; hash: string }> = {
   home: { data: "2026-10-20", hash: "b611e0448bb84a61" },
   howItWorks: { data: "2026-10-02", hash: "70213f1268a272af" },
-  roadmap: { data: "2026-10-20", hash: "788e3420bc6cf4cb" },
+  roadmap: { data: "2026-10-24", hash: "0fb11ae53c3eeae7" },
   glossary: { data: "2026-10-23", hash: "98777894f901f861" },
 };
 

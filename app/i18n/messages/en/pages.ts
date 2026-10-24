@@ -296,6 +296,10 @@ const pages = {
         title: "Pool age",
         body: "how long a pool has existed, shown next to its APR. A brand-new pool with a high APR is a different signal from an old one with the same number.",
       },
+      {
+        title: "Simulations & calculators",
+        body: "tools to test a position before opening or changing it: what a price range would hold at a given price, impermanent loss compared with simply holding the tokens, and what an APR means in dollars per day. Calculators only — they never touch a wallet.",
+      },
     ] as RoadmapItem[],
     neverTitle: "What will never change",
     never: [
