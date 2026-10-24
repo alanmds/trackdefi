@@ -82,7 +82,14 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
      * ⚠️ Não remover sem conferir antes: se a Base revalidar o domínio e não
      * achar a tag, o app cai do cadastro.
      */
-    other: { "base:app_id": "6a74c0ad80688a9243409bfa" },
+    other: {
+      "base:app_id": "6a74c0ad80688a9243409bfa",
+      /* Coinzilla (rede de anúncios cripto): prova de que o domínio é nosso,
+         pedida no cadastro do site em 24/10/2026. Mesma lógica da tag da
+         Base: público por natureza, não é segredo. Só verifica — não carrega
+         script nenhum. */
+      coinzilla: "440a5794048ccdc090e18b5934d08c6f",
+    },
   };
 }
 
