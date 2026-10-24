@@ -22,8 +22,66 @@
   --radius: 14px;
   --radius-sm: 9px;
   --shadow: 0 1px 2px rgba(70, 45, 10, 0.06), 0 8px 24px -12px rgba(70, 45, 10, 0.25);
+  --shadow-pop: 0 10px 30px -8px rgba(46, 32, 19, 0.55);
+  --glow: #fff0d6;
+  --btn-hover: #46331e;
+  color-scheme: light;
   --font-ui: var(--font-inter), system-ui, -apple-system, sans-serif;
   --font-display: var(--font-fraunces), Georgia, serif;
+}
+
+/* Tema noturno: a mesma família quente (âmbar sobre marrom-café), não um
+   cinza genérico. Vale quando o sistema está no escuro e o visitante não
+   escolheu "dia" no botão do cabeçalho (app/ui/ThemeToggle.tsx), ou quando
+   escolheu "noite". Os dois blocos têm de ficar IGUAIS. */
+:root[data-theme="dark"] {
+  --bg: #17110b;
+  --bg-deep: #0f0b07;
+  --card: #241a11;
+  --card-2: #2d2116;
+  --border: #3d2e1f;
+  --border-strong: #56412b;
+  --ink: #f6e9d6;
+  --ink-2: #c9b498;
+  --ink-3: #a58f73;
+  --accent: #f2a654;
+  --good: #5fcf8c;
+  --good-bg: #16301f;
+  --warn: #f0a052;
+  --warn-bg: #36230f;
+  --bad: #f1857b;
+  --bad-bg: #3a1a16;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 24px -12px rgba(0, 0, 0, 0.7);
+  --shadow-pop: 0 10px 30px -8px rgba(0, 0, 0, 0.8);
+  --glow: #2c1f12;
+  --btn-hover: #ffd9a8;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17110b;
+    --bg-deep: #0f0b07;
+    --card: #241a11;
+    --card-2: #2d2116;
+    --border: #3d2e1f;
+    --border-strong: #56412b;
+    --ink: #f6e9d6;
+    --ink-2: #c9b498;
+    --ink-3: #a58f73;
+    --accent: #f2a654;
+    --good: #5fcf8c;
+    --good-bg: #16301f;
+    --warn: #f0a052;
+    --warn-bg: #36230f;
+    --bad: #f1857b;
+    --bad-bg: #3a1a16;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 24px -12px rgba(0, 0, 0, 0.7);
+    --shadow-pop: 0 10px 30px -8px rgba(0, 0, 0, 0.8);
+    --glow: #2c1f12;
+    --btn-hover: #ffd9a8;
+    color-scheme: dark;
+  }
 }
 
 * {
@@ -44,7 +102,7 @@ body {
 }
 
 body {
-  background: radial-gradient(1200px 600px at 50% -200px, #fff0d6 0%, var(--bg) 60%) fixed, var(--bg);
+  background: radial-gradient(1200px 600px at 50% -200px, var(--glow) 0%, var(--bg) 60%) fixed, var(--bg);
   color: var(--ink);
   font-family: var(--font-ui);
   font-size: 16px;
@@ -121,6 +179,56 @@ button {
   align-items: center;
   gap: 7px;
   white-space: nowrap;
+}
+
+/* botão dia/noite (app/ui/ThemeToggle.tsx) + seletor de idioma, lado a lado */
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .theme-toggle:hover {
+    color: var(--accent);
+    border-color: var(--border-strong);
+  }
+}
+
+.theme-toggle .ic-sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle .ic-sun {
+  display: block;
+}
+
+:root[data-theme="dark"] .theme-toggle .ic-moon {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle .ic-sun {
+    display: block;
+  }
+  :root:not([data-theme="light"]) .theme-toggle .ic-moon {
+    display: none;
+  }
 }
 
 /* seletor de idioma (app/ui/LanguageSwitcher.tsx) */
@@ -341,7 +449,7 @@ button {
    escurecido até se tocar em outro lugar */
 @media (hover: hover) {
   .btn:hover {
-    background: #46331e;
+    background: var(--btn-hover);
   }
 }
 
@@ -1334,7 +1442,7 @@ a.chip:hover {
   background: var(--ink);
   color: var(--card);
   border-radius: var(--radius);
-  box-shadow: 0 10px 30px -8px rgba(46, 32, 19, 0.55);
+  box-shadow: var(--shadow-pop);
   font-size: 14px;
   line-height: 1.45;
   animation: tap-tip-in 0.16s ease-out;

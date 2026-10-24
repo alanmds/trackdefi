@@ -14,6 +14,7 @@ import DonateLine from "../ui/DonateLine";
 import LanguageSwitcher from "../ui/LanguageSwitcher";
 import SiteAnalytics from "../ui/SiteAnalytics";
 import TapTips from "../ui/TapTips";
+import ThemeToggle, { THEME_SCRIPT } from "../ui/ThemeToggle";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -114,7 +115,15 @@ export default async function RootLayout({
   const to = (path: string) => localePath(lang, path);
 
   return (
-    <html lang={info.htmlLang} dir={info.rtl ? "rtl" : "ltr"} className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang={info.htmlLang} dir={info.rtl ? "rtl" : "ltr"} className={`${inter.variable} ${fraunces.variable}`}
+      // o THEME_SCRIPT põe data-theme no <html> antes do React chegar
+      suppressHydrationWarning
+    >
+      <head>
+        {/* tema dia/noite salvo, aplicado antes da pintura (app/ui/ThemeToggle.tsx) */}
+        {/* eslint-disable-next-line react/no-danger */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body>
         <script
           type="application/ld+json"
@@ -132,7 +141,10 @@ export default async function RootLayout({
                 <span className="dot-live" aria-hidden />
                 {ui.header.readOnly}
               </span>
-              <LanguageSwitcher />
+              <div className="header-tools">
+                <ThemeToggle />
+                <LanguageSwitcher />
+              </div>
             </div>
           </header>
           {children}

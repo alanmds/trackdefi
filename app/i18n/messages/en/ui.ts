@@ -23,6 +23,7 @@ const ui = {
   header: {
     readOnly: "Read-only · we never ask for keys",
     language: "Language",
+    theme: "Switch between day and night theme",
   },
 
   costbar: {

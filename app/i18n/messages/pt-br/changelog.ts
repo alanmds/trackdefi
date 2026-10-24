@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "night-theme": {
+    title: "Tema noturno",
+    body: "O trackdefi agora tem um visual escuro, para a noite. Ele segue sozinho a configuração do seu aparelho, e o botão de lua/sol no topo troca entre dia e noite quando você quiser — a escolha fica guardada neste navegador.",
+  },
   "aero-launch": {
     title: "Aerodrome e Velodrome depois do lançamento do Aero",
     body: "A Aerodrome e a Velodrome se fundiram no Aero. As posições em stake agora mostram as emissões como encerradas, e as carteiras com posições lá ganham um aviso explicando o que mudou. As posições no próprio Aero ainda não são lidas.",

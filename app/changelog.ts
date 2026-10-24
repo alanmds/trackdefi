@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "night-theme",
+    date: "2026-10-24",
+    kind: "improvement",
+    title: "Night theme",
+    body: "trackdefi now has a dark, night-time look. It follows your device's setting on its own, and the moon/sun button at the top switches between day and night whenever you like — your choice is remembered on this browser.",
+  },
+  {
     id: "aero-launch",
     date: "2026-10-23",
     kind: "improvement",
