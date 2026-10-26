@@ -1718,5 +1718,43 @@ a.chip:hover {
   .netlogos-panel,
   .protologo-name {
     transition: none;
+/* espaço de anúncio (app/ui/AdSlot.tsx): rótulo visível e altura FIXA — o
+   iframe carrega depois da página e, sem a altura reservada, empurraria o
+   conteúdo. Formatos do mapa de banners: 728 × 90 no desktop; no celular,
+   300 × 250 (home, fim da carteira, how-it-works) e o baixinho 320 × 100 na
+   varredura, que precisa caber na 1ª tela. */
+.ad-slot {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin: 8px auto 40px;
+  max-width: 728px;
+}
+
+.ad-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.ad-frame {
+  display: block;
+  width: 100%;
+  height: 90px;
+  border: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+@media (max-width: 560px) {
+  .ad-frame {
+    max-width: 300px;
+    height: 250px;
+  }
+
+  .ad-wallet-scan .ad-frame {
+    max-width: 320px;
+    height: 100px;
   }
 }

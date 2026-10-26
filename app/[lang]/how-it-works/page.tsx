@@ -5,6 +5,7 @@ import { getMessages } from "../../i18n/get";
 import { basicTags, rich } from "../../i18n/rich";
 import { localeFrom, type LangParams } from "../../i18n/server";
 import { pageMetadata } from "../../i18n/seo";
+import AdSlot from "../../ui/AdSlot";
 import { coverageSentence } from "../../site";
 
 export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: LangParams): Promise<Metadata
 
 export default async function HowItWorks({ params }: LangParams) {
   const lang = await localeFrom(params);
-  const { pages } = getMessages(lang);
+  const { pages, ui } = getMessages(lang);
   const m = pages.howItWorks;
 
   return (
@@ -56,6 +57,10 @@ export default async function HowItWorks({ params }: LangParams) {
           { coverage: coverageSentence(lang) },
         )}
       </p>
+
+      {/* no fim, separado do texto de segurança: anúncio cripto duvidoso
+          colado a "nunca entregue sua seed phrase" desmentiria a página */}
+      <AdSlot placement="how-it-works" label={ui.ads.label} />
 
       <p className="prose-back">
         <Link href={localePath(lang, "/")} className="btn">

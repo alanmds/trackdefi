@@ -27,6 +27,10 @@ const changelog: ChangelogTranslations = {
     title: "Solana, com a Orca",
     body: "O trackdefi agora lê a Solana — cole um endereço Solana na mesma caixa de busca. As posições da Orca mostram quantidades, faixa de preço, status dentro da faixa, taxas pendentes e recompensas do pool. O que uma posição rende agora é uma estimativa a partir da média do pool e da fatia da posição na liquidez ativa, porque as medições de 24 horas e 15 minutos feitas nas outras redes ainda não existem na Solana.",
   },
+  "ads-keep-it-free": {
+    title: "Anúncios discretos agora ajudam a manter o trackdefi grátis",
+    body: "Alguns espaços de anúncio, sempre identificados, agora ajudam a pagar servidores e nós de blockchain, para o trackdefi continuar grátis, somente leitura e sem cadastro. Gorjetas continuam bem-vindas e sempre opcionais.",
+  },
   "pancake-v3-ethereum-base-arbitrum": {
     title: "PancakeSwap v3 na Ethereum, Base e Arbitrum",
     body: "O trackdefi agora lê a PancakeSwap v3 também na Ethereum, Base e Arbitrum One, com a mesma profundidade da BNB Chain: posições concentradas com quantidades, faixa de preço e taxas pendentes. As posições em stake nas farms da PancakeSwap também aparecem, com o CAKE a resgatar e o que cada uma está rendendo em CAKE agora. O contrato da farm e o token CAKE não são os mesmos em todas as redes, e cada um é lido onde mora.",

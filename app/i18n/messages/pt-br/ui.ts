@@ -78,6 +78,10 @@ const ui: UiMessages = {
     ],
   },
 
+  ads: {
+    label: "Publicidade",
+  },
+
   footer: {
     safety:
       "O <b>{name}</b> lê apenas dados públicos da blockchain. Nunca pede chaves privadas nem frases de recuperação, e não consegue mover fundos. <link>Como funciona e por que é seguro →</link>",

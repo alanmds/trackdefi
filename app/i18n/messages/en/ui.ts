@@ -48,6 +48,10 @@ const ui = {
     phrases: [...DONATION_PHRASES] as string[],
   },
 
+  ads: {
+    label: "Advertisement",
+  },
+
   footer: {
     safety:
       "<b>{name}</b> reads public blockchain data only. It never asks for private keys or seed phrases, and cannot move funds. <link>How it works & why it's safe →</link>",

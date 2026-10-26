@@ -9,6 +9,7 @@ import { GRAMMAR, localePath } from "../i18n/config";
 import { fill, pl } from "../i18n/rich";
 import { useI18n } from "../i18n/provider";
 import { networksDotted, networksSentence } from "../site";
+import AdSlot from "./AdSlot";
 import { fmtDecimal, fmtInt, fmtUsd, shortAddress } from "./format";
 import LockCard from "./LockCard";
 import PositionCard from "./PositionCard";
@@ -133,6 +134,9 @@ export default function PositionsView({ address }: { address: string }) {
             <p>{fill(w.scanningBody, { networks })}</p>
             <Elapsed />
           </div>
+          {/* o melhor espaço do site: o visitante só espera, não há número
+              nenhum na tela. Some junto com a tela de espera. */}
+          <AdSlot placement="wallet-scan" label={ui.ads.label} />
           <div className="skeleton-grid" aria-hidden>
             <div className="skeleton" />
             <div className="skeleton" />
@@ -159,6 +163,11 @@ export default function PositionsView({ address }: { address: string }) {
             {w.empty.another}
           </Link>
         </div>
+      )}
+
+      {/* carteira vazia: abaixo do aviso. Com erro: nunca. */}
+      {state.phase === "done" && state.data.positions.length === 0 && (state.data.locks ?? []).length === 0 && (
+        <AdSlot placement="wallet-end" label={ui.ads.label} />
       )}
 
       {state.phase === "done" && (state.data.positions.length > 0 || (state.data.locks ?? []).length > 0) && (
@@ -278,6 +287,11 @@ export default function PositionsView({ address }: { address: string }) {
               />
             ))}
           </div>
+
+          {/* só DEPOIS da última posição: nunca entre os totais e a lista, nem
+              card de anúncio no meio das posições — numa página de dinheiro,
+              anúncio com cara de posição é engano */}
+          <AdSlot placement="wallet-end" label={ui.ads.label} />
         </>
       )}
     </main>

@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "ads-keep-it-free",
+    date: "2026-10-26",
+    kind: "project",
+    title: "Small ads now help keep trackdefi free",
+    body: "A few clearly labeled ad spaces now help pay for servers and blockchain nodes, so trackdefi stays free, read-only and without accounts. Tips remain welcome and always optional.",
+  },
+  {
     id: "night-theme",
     date: "2026-10-24",
     kind: "improvement",
