@@ -160,6 +160,10 @@ const pages = {
     liveTitle: "Live today",
     live: [
       {
+        title: "Pair finder",
+        body: "filter pools on the exchanges trackdefi reads by APR, 24-hour volume, TVL and the market cap of the smaller token. In the <b>Tools</b> section.",
+      },
+      {
         title: "APR simulator",
         body: "pick a pool, an amount and a price range to see what it would earn while in range, from fees measured on the pool itself, and how much of the last week the price spent inside it. In the <b>Tools</b> section, next to the logo.",
       },
@@ -302,7 +306,7 @@ const pages = {
       },
       {
         title: "More calculators",
-        body: "after the APR simulator: impermanent loss compared with simply holding the tokens, and finding pairs by APR, volume and market cap. Calculators only — they never touch a wallet.",
+        body: "after the APR simulator and the pair finder: impermanent loss compared with simply holding the tokens. Calculators only — they never touch a wallet.",
       },
     ] as RoadmapItem[],
     neverTitle: "What will never change",

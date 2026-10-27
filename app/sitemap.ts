@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { CHANGELOG } from "./changelog";
 import { DEFAULT_LOCALE, LOCALES, localePath, type Locale } from "./i18n/config";
-import { SITE_URL, TOOLS_INDEXED } from "./site";
+import { PAIRS_LISTED, SITE_URL, TOOLS_INDEXED } from "./site";
 import { EDITADA_EM } from "./sitemap-datas";
 
 /**
@@ -34,6 +34,9 @@ const PAGINAS: Pagina[] = [
         { path: "/tools", data: EDITADA_EM.tools, changeFrequency: "monthly" as const, priority: 0.6 },
         { path: "/tools/apr-simulator", data: EDITADA_EM.simulator, changeFrequency: "monthly" as const, priority: 0.7 },
       ]
+    : []),
+  ...(TOOLS_INDEXED && PAIRS_LISTED
+    ? [{ path: "/tools/pairs", data: EDITADA_EM.pairs, changeFrequency: "weekly" as const, priority: 0.7 }]
     : []),
   // a data da última entrada do log — é exatamente quando a página mudou
   { path: "/changelog", data: CHANGELOG[0].date, changeFrequency: "weekly", priority: 0.6 },

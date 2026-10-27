@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "pair-finder",
+    date: "2026-10-26",
+    kind: "feature",
+    title: "New: pair finder",
+    body: "The second tool in the Tools section. Filter thousands of pools on the exchanges trackdefi reads by APR, 24-hour volume, TVL and the market cap of the smaller token, then sort by any of them. The APR there is the pool average reported by DefiLlama — the page says so — and the APR simulator shows what a specific range would earn.",
+  },
+  {
     id: "apr-simulator",
     date: "2026-10-26",
     kind: "feature",

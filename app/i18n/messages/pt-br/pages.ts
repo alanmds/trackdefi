@@ -126,6 +126,10 @@ const pages: PagesMessages = {
     liveTitle: "No ar hoje",
     live: [
       {
+        title: "Descoberta de pares",
+        body: "filtre os pools das corretoras que o trackdefi lê por APR, volume de 24 horas, TVL e market cap do token menor. Na seção <b>Ferramentas</b>.",
+      },
+      {
         title: "Simulador de APR",
         body: "escolha um pool, um valor e uma faixa de preço para ver quanto renderia dentro da faixa, a partir das taxas medidas no próprio pool, e quanto da última semana o preço passou nela. Na seção <b>Ferramentas</b>, ao lado da logo.",
       },
@@ -268,7 +272,7 @@ const pages: PagesMessages = {
       },
       {
         title: "Mais calculadoras",
-        body: "depois do simulador de APR: a perda impermanente comparada a simplesmente segurar os tokens, e a descoberta de pares por APR, volume e valor de mercado. São só calculadoras — nunca tocam numa carteira.",
+        body: "depois do simulador de APR e da descoberta de pares: a perda impermanente comparada a simplesmente segurar os tokens. São só calculadoras — nunca tocam numa carteira.",
       },
     ],
     neverTitle: "O que nunca vai mudar",

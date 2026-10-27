@@ -22,10 +22,11 @@ import { EDITADA_EM } from "../app/sitemap-datas";
 const IMPRESSAO: Record<keyof typeof EDITADA_EM, { data: string; hash: string }> = {
   home: { data: "2026-10-20", hash: "b611e0448bb84a61" },
   howItWorks: { data: "2026-10-02", hash: "70213f1268a272af" },
-  roadmap: { data: "2026-10-26", hash: "f7abe1e027f31d28" },
+  roadmap: { data: "2026-10-26", hash: "2f9c57996f65852d" },
   glossary: { data: "2026-10-23", hash: "98777894f901f861" },
   tools: { data: "2026-10-26", hash: "e9fefbb4702909c6" },
   simulator: { data: "2026-10-26", hash: "7411f964679a6c04" },
+  pairs: { data: "2026-10-26", hash: "0402b19b9dd876a7" },
 };
 
 /** texto da página em todos os idiomas → 16 caracteres de sha256 */

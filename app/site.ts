@@ -19,10 +19,10 @@ export const TOOLS_INDEXED = true;
 
 /**
  * Descoberta de pares (/tools/pairs). false = no ar, mas fora da lista de
- * ferramentas, do sitemap e com `noindex` — o Alan testa antes (mesmo caminho
- * do simulador). Virar para true = lançamento: changelog, roadmap, llms, README.
+ * ferramentas, do sitemap e com `noindex`. Estreou escondida e foi lançada no
+ * mesmo dia (26/10/2026), depois do teste do Alan.
  */
-export const PAIRS_LISTED = false;
+export const PAIRS_LISTED = true;
 
 /**
  * Carteira do botão "Try a demo wallet" da home — a VITRINE do site.

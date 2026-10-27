@@ -49,7 +49,9 @@ range.
 It also has an [APR simulator](https://trackdefi.app/tools/apr-simulator): pick a
 pool, an amount and a price range to see what it would earn while in range (fees
 measured on the pool itself, plus emissions) and how much of the last 7 days the
-price spent inside the range.
+price spent inside the range. The [pair finder](https://trackdefi.app/tools/pairs)
+filters pools on the same exchanges by APR (the pool average, from DefiLlama),
+24-hour volume, TVL and the market cap of the smaller token.
 
 What it doesn't do: no profit and loss or impermanent loss since a position was
 opened, no alerts, and no transactions of any kind. The [roadmap](https://trackdefi.app/roadmap) tracks what's next;

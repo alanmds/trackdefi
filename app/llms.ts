@@ -69,6 +69,7 @@ Networks (${NETWORK_COUNT}): ${humanList(NETWORK_NAMES)}. Classic and concentrat
 - [How it works & why it's safe](${SITE_URL}/how-it-works)
 - [Glossary — what every number means](${SITE_URL}/glossary)
 - [APR simulator — what a pool and price range would earn](${SITE_URL}/tools/apr-simulator)
+- [Pair finder — pools by APR, volume, TVL and market cap](${SITE_URL}/tools/pairs)
 - [Roadmap](${SITE_URL}/roadmap)
 - [Changelog](${SITE_URL}/changelog)
 
