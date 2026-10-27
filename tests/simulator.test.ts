@@ -119,6 +119,45 @@ describe("simulate (pool real congelado)", () => {
   });
 });
 
+describe("simulate — pool clássico (v2), congelado do vAMM-USDC/AERO", () => {
+  const V2 = load("pool-aerodrome-v2-base.json");
+  const sim = (extra: Partial<Parameters<typeof simulate>[1]> = {}) =>
+    simulate(V2, { depositUsd: 1000, priceLower: 0, priceUpper: Infinity, staked: false, ...extra })!;
+
+  it("é clássico: sem faixa, sempre rendendo, e o depósito vale o depósito", () => {
+    const r = sim();
+    expect(V2.classic).toBeDefined();
+    expect(r.classic).toBe(true);
+    expect(r.timeInRange).toBe(1);
+    expect(r.repeatPct).toBe(r.inRangePct);
+    const valor = r.amount0 * V2.price0Usd! + r.amount1 * V2.price1Usd!;
+    expect(valor).toBeGreaterThan(999);
+    expect(valor).toBeLessThanOrEqual(1000.01);
+  });
+
+  it("taxas = Δindex × LP ÷ 1e18, com diluição — e a faixa pedida é ignorada", () => {
+    const r = sim();
+    expect(r.fees[0].pct!).toBeGreaterThan(0);
+    // faixa nenhuma muda nada num clássico
+    expect(sim({ priceLower: 1, priceUpper: 2 }).fees[0].pct).toBe(r.fees[0].pct);
+    // depósito enorme dilui
+    expect(sim({ depositUsd: 5_000_000 }).fees[0].pct!).toBeLessThan(r.fees[0].pct!);
+  });
+
+  it("em stake com gauge pagando, as taxas vão aos votantes", () => {
+    const pagando: SimPoolDTO = {
+      ...V2,
+      emission: { ...V2.emission!, ratePerSec: "1000000000000000000", endedAt: undefined, priceUsd: 1 },
+    };
+    const r = simulate(pagando, { depositUsd: 1000, priceLower: 0, priceUpper: Infinity, staked: true })!;
+    expect(r.feesToVoters).toBe(true);
+    expect(r.fees.every((f) => f.pct === 0)).toBe(true);
+    expect(r.emissionPct!).toBeGreaterThan(0);
+    // gauge parado (o caso real desde o Aero): stake não tira taxa de ninguém
+    expect(sim({ staked: true }).feesToVoters).toBe(false);
+  });
+});
+
 describe("lookup", () => {
   it("tira o endereço de link de DEX, explorer ou texto puro", () => {
     const a = "0xd0b53D9277642d899DF5C87A3966A349A798F224";

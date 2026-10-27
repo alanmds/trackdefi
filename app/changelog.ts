@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "simulator-classic-pools",
+    date: "2026-10-27",
+    kind: "improvement",
+    title: "APR simulator now covers classic pools",
+    body: "The APR simulator now also handles the classic (stable and volatile) pools of Aerodrome and Velodrome. They have no price range, so it shows what the pool paid in fees over the last 24 hours and 15 minutes, scaled to your amount. In the pair finder, those pools now have a Simulate button too; pools the simulator doesn't handle yet show “Soon”.",
+  },
+  {
     id: "pair-finder",
     date: "2026-10-26",
     kind: "feature",

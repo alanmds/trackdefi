@@ -6,7 +6,7 @@
 
 import { describe, expect, it } from "vitest";
 import { buildAdapters } from "../core/adapters/registry";
-import { buildPairs, DISCOVERY_PROJECTS, mcapKey, poolQueryOf, type PairDTO } from "../core/discovery/pairs";
+import { buildPairs, DISCOVERY_PROJECTS, mcapKey, pickByTvl, poolQueryOf, type PairDTO } from "../core/discovery/pairs";
 import type { LlamaRowFull } from "../core/yields/defillama";
 import { filterPairs } from "../app/ui/PairFinder";
 
@@ -84,17 +84,32 @@ describe("botão Simular: forma do pool e endereço", () => {
   const t = [WETH_BASE, USDC_BASE];
 
   it("fee tier vira milionésimos; CL vira tick spacing", () => {
-    expect(poolQueryOf("uniswap-v3", "0.05%", t)).toEqual({ token0: WETH_BASE, token1: USDC_BASE, fee: 500, tickSpacing: null });
-    expect(poolQueryOf("pancakeswap-amm-v3", "0.01%", t)?.fee).toBe(100);
-    expect(poolQueryOf("sushiswap-v3", "1%", t)?.fee).toBe(10_000);
-    expect(poolQueryOf("aerodrome-slipstream", "CL100 - 0.0217%", t)).toEqual({ token0: WETH_BASE, token1: USDC_BASE, fee: null, tickSpacing: 100 });
+    expect(poolQueryOf("uniswap-v3", "0.05%", t)).toEqual([{ token0: WETH_BASE, token1: USDC_BASE, fee: 500, tickSpacing: null }]);
+    expect(poolQueryOf("pancakeswap-amm-v3", "0.01%", t)[0].fee).toBe(100);
+    expect(poolQueryOf("sushiswap-v3", "1%", t)[0].fee).toBe(10_000);
+    expect(poolQueryOf("aerodrome-slipstream", "CL100 - 0.0217%", t)).toEqual([
+      { token0: WETH_BASE, token1: USDC_BASE, fee: null, tickSpacing: 100 },
+    ]);
   });
 
-  it("o que o simulador não atende fica sem consulta", () => {
-    expect(poolQueryOf("aerodrome-v1", "stable", t)).toBeNull();
-    expect(poolQueryOf("uniswap-v4", "0.05%", t)).toBeNull();
-    expect(poolQueryOf("orca-dex", null, t)).toBeNull();
-    expect(poolQueryOf("uniswap-v3", "0.05%", [WETH_BASE])).toBeNull();
+  it("clássico: Velodrome diz stable/volatile; Aerodrome não diz, e vão as duas candidatas", () => {
+    expect(poolQueryOf("velodrome-v2", "stable - 0.05%", t).map((q) => q.stable)).toEqual([true]);
+    expect(poolQueryOf("velodrome-v2", "volatile - 1%", t).map((q) => q.stable)).toEqual([false]);
+    expect(poolQueryOf("aerodrome-v1", null, t).map((q) => q.stable)).toEqual([true, false]);
+  });
+
+  it("o que o simulador ainda não atende fica sem consulta", () => {
+    expect(poolQueryOf("uniswap-v4", "0.05%", t)).toEqual([]);
+    expect(poolQueryOf("orca-dex", null, t)).toEqual([]);
+    expect(poolQueryOf("uniswap-v3", "0.05%", [WETH_BASE])).toEqual([]);
+  });
+
+  it("empate stable × volatile: fica o único cujo TVL bate com o da DefiLlama", () => {
+    expect(pickByTvl(1_000_000, [{ addr: "a", tvl: 1_100_000 }, { addr: "b", tvl: 20_000 }])).toBe("a");
+    // os dois batem, ou nenhum, ou sem TVL lido → sem botão
+    expect(pickByTvl(1_000_000, [{ addr: "a", tvl: 900_000 }, { addr: "b", tvl: 1_200_000 }])).toBeNull();
+    expect(pickByTvl(1_000_000, [{ addr: "a", tvl: 10 }, { addr: "b", tvl: 20 }])).toBeNull();
+    expect(pickByTvl(1_000_000, [{ addr: "a", tvl: null }, { addr: "b", tvl: null }])).toBeNull();
   });
 
   it("o endereço achado vai na linha; sem ele, null", () => {

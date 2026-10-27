@@ -56,6 +56,13 @@ export interface SimPoolDTO {
   } | null;
   /** preço do par (token1 por 1 token0), de hora em hora; null = sem histórico */
   history: { t: number; price: number }[] | null;
+  /** saldo dos dois tokens no contrato (unidades cruas); null = ilegível */
+  reserves?: { amount0: string; amount1: string } | null;
+  /**
+   * Pool CLÁSSICO (v2): sem faixa — a posição é uma fatia do LP token. Aqui
+   * `feeWindows` é o Δ index0/index1 (taxa por 1e18 de LP), não feeGrowth.
+   */
+  classic?: { stable: boolean; totalSupply: string };
   /** unix (s) da leitura */
   readAt: number;
 }
@@ -107,6 +114,10 @@ export interface SimResult {
   inRangePct: number | null;
   /** inRangePct × timeInRange — "se os últimos 7 dias se repetissem" */
   repeatPct: number | null;
+  /** pool clássico: sem faixa, sempre rendendo */
+  classic: boolean;
+  /** em stake num clássico, as taxas vão aos votantes (a posição só recebe emissões) */
+  feesToVoters: boolean;
 }
 
 /** Preço (token1 por token0) → tick, sem alinhar. */
@@ -156,6 +167,7 @@ const L_REF = 10n ** 24n;
 export function simulate(pool: SimPoolDTO, input: SimInput): SimResult | null {
   const { price0Usd: p0, price1Usd: p1 } = pool;
   if (p0 === null || p1 === null || !(input.depositUsd > 0)) return null;
+  if (pool.classic) return simulateClassic(pool, pool.classic, p0, p1, input);
   const d0 = pool.token0.decimals;
   const d1 = pool.token1.decimals;
 
@@ -265,6 +277,94 @@ export function simulate(pool: SimPoolDTO, input: SimInput): SimResult | null {
     historyHigh,
     inRangePct: inRangeBase,
     repeatPct,
+    classic: false,
+    feesToVoters: false,
+  };
+}
+
+const E18 = 10n ** 18n;
+
+/**
+ * Pool clássico (v2, Solidly): o depósito compra uma fatia do LP token, na
+ * proporção do TVL. Taxas = Δindex × LP ÷ 1e18 (o mesmo que o contrato paga),
+ * com a diluição do próprio depósito. Em stake, o gauge recolhe as taxas para
+ * os votantes e a posição recebe só as emissões — regra da Aerodrome/Velodrome.
+ * Sem faixa: rende sempre que há negociação, então "tempo na faixa" = 100%.
+ */
+function simulateClassic(
+  pool: SimPoolDTO,
+  classic: NonNullable<SimPoolDTO["classic"]>,
+  p0: number,
+  p1: number,
+  input: SimInput,
+): SimResult | null {
+  const d0 = pool.token0.decimals;
+  const d1 = pool.token1.decimals;
+  const supply = BigInt(classic.totalSupply);
+  if (!pool.reserves || supply <= 0n) return null;
+  const r0 = BigInt(pool.reserves.amount0);
+  const r1 = BigInt(pool.reserves.amount1);
+  const tvl = human(r0, d0) * p0 + human(r1, d1) * p1;
+  if (!(tvl > 0)) return null;
+
+  const lpFloat = Math.floor((Number(supply) * input.depositUsd) / tvl);
+  if (!Number.isFinite(lpFloat) || lpFloat <= 0) return null;
+  const lp = BigInt(lpFloat);
+  const dilution = Number(supply) / Number(supply + lp);
+
+  const e = pool.emission;
+  const emissionEnded = e !== null && (e.endedAt !== undefined || BigInt(e.ratePerSec) === 0n);
+  // stake só muda algo com o gauge pagando; parado, ninguém deixa de ganhar taxa por ele
+  const feesToVoters = e !== null && e.requiresStake && !emissionEnded && input.staked;
+
+  const fees: FeeWindowResult[] = pool.feeWindows.map((w) => {
+    if (feesToVoters) return { windowSec: w.windowSec, pct: 0 };
+    const usd =
+      human((BigInt(w.delta0) * lp) / E18, d0) * p0 + human((BigInt(w.delta1) * lp) / E18, d1) * p1;
+    const pct = ((usd / w.windowSec) * YEAR_SEC * 100 * dilution) / input.depositUsd;
+    return { windowSec: w.windowSec, pct: Number.isFinite(pct) && pct >= 0 && pct <= ABSURD_APR_PCT ? pct : null };
+  });
+
+  let emissionPct: number | null = null;
+  if (e) {
+    if (emissionEnded || (e.requiresStake && !input.staked)) emissionPct = 0;
+    else if (e.priceUsd !== null) {
+      const shared = BigInt(e.sharedLiquidity) + lp;
+      const perSec = human(BigInt(e.ratePerSec), e.token.decimals) * (Number(lp) / Number(shared));
+      const pct = ((perSec * YEAR_SEC * e.priceUsd) / input.depositUsd) * 100;
+      emissionPct = Number.isFinite(pct) && pct >= 0 && pct <= ABSURD_APR_PCT ? pct : null;
+    }
+  }
+
+  const feeMain = fees[0]?.pct ?? null;
+  const inRangePct =
+    feeMain === null && (emissionPct === null || emissionPct === 0) ? null : (feeMain ?? 0) + (emissionPct ?? 0);
+
+  return {
+    tickLower: 0,
+    tickUpper: 0,
+    priceLower: 0,
+    priceUpper: Infinity,
+    priceCurrent: p0 / p1,
+    inRangeNow: true,
+    fullRange: true,
+    amount0: human((r0 * lp) / supply, d0),
+    amount1: human((r1 * lp) / supply, d1),
+    atLower: { amount0: 0, amount1: 0 },
+    atUpper: { amount0: 0, amount1: 0 },
+    concentration: 1,
+    shareOfActive: Number(lp) / Number(supply + lp),
+    fees,
+    emissionPct,
+    emissionEnded,
+    emissionNeedsStake: e?.requiresStake ?? false,
+    timeInRange: 1,
+    historyLow: null,
+    historyHigh: null,
+    inRangePct,
+    repeatPct: inRangePct,
+    classic: true,
+    feesToVoters,
   };
 }
 
@@ -278,3 +378,6 @@ export function usdPer(pct: number, depositUsd: number, days: number): number {
  * cita esta lista; um teste prova que ela bate com o registry.
  */
 export const SIMULATOR_PROTOCOLS = ["uniswap-v3", "pancakeswap-v3", "sushiswap-v3", "aerodrome", "velodrome", "ramses-v3"];
+
+/** Pools CLÁSSICOS (v2) que o simulador atende — os do ecossistema Solidly. */
+export const SIMULATOR_CLASSIC_PROTOCOLS = ["aerodrome", "velodrome"];

@@ -1,0 +1,62 @@
+{
+ "pools": [
+  {
+   "protocol": "aerodrome",
+   "chainId": 8453,
+   "poolAddress": "0x6cDcb1C4A4D1C3C6d054b27AC5B77e89eAFb971d",
+   "poolSymbol": "vAMM-USDC/AERO",
+   "token0": {
+    "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "symbol": "USDC",
+    "decimals": 6
+   },
+   "token1": {
+    "address": "0x940181a94A35A4569E4529A3CDfB74e38FD98631",
+    "symbol": "AERO",
+    "decimals": 18
+   },
+   "feePips": null,
+   "tickSpacing": 0,
+   "tick": 0,
+   "sqrtPriceX96": "0",
+   "activeLiquidity": "0",
+   "price0Usd": 0.9993540660623667,
+   "price1Usd": 0.6692503504110958,
+   "tvlUsd": 6991960.931615382,
+   "feeWindows": [
+    {
+     "delta0": "14118454131",
+     "delta1": "20864582722455043046093",
+     "windowSec": 86400
+    },
+    {
+     "delta0": "49361",
+     "delta1": "288008862131941932211",
+     "windowSec": 900
+    }
+   ],
+   "emission": {
+    "token": {
+     "address": "0x940181a94A35A4569E4529A3CDfB74e38FD98631",
+     "symbol": "AERO",
+     "decimals": 18
+    },
+    "ratePerSec": "0",
+    "sharedLiquidity": "65559627449358783",
+    "requiresStake": true,
+    "endedAt": 1792627200,
+    "priceUsd": 0.6692503504110958
+   },
+   "history": null,
+   "reserves": {
+    "amount0": "3497716526857",
+    "amount1": "5224507833906292412377425"
+   },
+   "classic": {
+    "stable": false,
+    "totalSupply": "77510407421571461"
+   },
+   "readAt": 1793070999
+  }
+ ]
+}

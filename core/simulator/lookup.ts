@@ -17,7 +17,7 @@ import { fetchUsdPriceHistory, fetchUsdPrices } from "../prices/defillama";
 import { dexscreenerPrices } from "../prices/dexscreener";
 import { tickToPrice0In1 } from "../math/ticks";
 import type { PoolSnapshot, ProtocolAdapter } from "../types";
-import { readPoolFeeGrowthWindows } from "../yields/onchain";
+import { readClassicFeeWindows, readPoolFeeGrowthWindows } from "../yields/onchain";
 import type { SimPoolDTO } from "./math";
 
 /** dias de histórico para o "tempo na faixa" */
@@ -63,19 +63,25 @@ async function enrich(s: PoolSnapshot, onWarn: (msg: string) => void): Promise<S
     (async () => {
       try {
         const bloco = await reader.getBlockNumber?.();
-        return bloco === undefined ? [] : await readPoolFeeGrowthWindows(reader, s.protocol, s.poolAddress, bloco, info.secPerBlock);
+        if (bloco === undefined) return [];
+        return s.classic
+          ? await readClassicFeeWindows(reader, s.poolAddress, bloco, info.secPerBlock)
+          : await readPoolFeeGrowthWindows(reader, s.protocol, s.poolAddress, bloco, info.secPerBlock);
       } catch (e) {
         onWarn(`janelas de taxa ilegíveis: ${(e as Error).message.split("\n")[0].slice(0, 60)}`);
         return [];
       }
     })(),
-    pairHistoryWithRetry(info.priceSlug, s.token0.address, s.token1.address, onWarn),
+    // clássico não tem faixa: está sempre "dentro", e o histórico não diz nada
+    s.classic ? Promise.resolve(null) : pairHistoryWithRetry(info.priceSlug, s.token0.address, s.token1.address, onWarn),
   ]);
 
   let p0 = prices.get(s.token0.address.toLowerCase()) ?? null;
   let p1 = prices.get(s.token1.address.toLowerCase()) ?? null;
-  // último recurso, como na carteira: um preço conhecido + o preço do próprio pool
-  const poolPrice = tickToPrice0In1(s.tick, s.token0.decimals, s.token1.decimals);
+  /* último recurso, como na carteira: um preço conhecido + o preço do próprio
+     pool. Só nos concentrados — no clássico stable a razão das reservas não é
+     o preço (a curva não é x·y), então ali não se deduz. */
+  const poolPrice = s.classic ? 0 : tickToPrice0In1(s.tick, s.token0.decimals, s.token1.decimals);
   if (p0 === null && p1 !== null && poolPrice > 0) p0 = p1 * poolPrice;
   if (p1 === null && p0 !== null && poolPrice > 0) p1 = p0 / poolPrice;
 
@@ -112,6 +118,8 @@ async function enrich(s: PoolSnapshot, onWarn: (msg: string) => void): Promise<S
         }
       : null,
     history,
+    reserves: s.reserves ? { amount0: s.reserves.amount0Raw.toString(), amount1: s.reserves.amount1Raw.toString() } : null,
+    ...(s.classic ? { classic: { stable: s.classic.stable, totalSupply: s.classic.totalSupply.toString() } } : {}),
     readAt: Math.floor(Date.now() / 1000),
   };
 }

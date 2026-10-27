@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CHAINS } from "../../core/chains";
-import { SIMULATOR_PROTOCOLS, simulate, usdPer, type SimPoolDTO } from "../../core/simulator/math";
+import { SIMULATOR_CLASSIC_PROTOCOLS, SIMULATOR_PROTOCOLS, simulate, usdPer, type SimPoolDTO } from "../../core/simulator/math";
 import { tickToPrice0In1 } from "../../core/math/ticks";
 import { basicTags, fill, rich } from "../i18n/rich";
 import { useI18n } from "../i18n/provider";
@@ -51,8 +51,14 @@ export default function AprSimulator() {
   const [full, setFull] = useState(false);
   const [staked, setStaked] = useState(true);
 
-  // preço atual na direção da tela
-  const cur0in1 = pool ? tickToPrice0In1(pool.tick, pool.token0.decimals, pool.token1.decimals) : NaN;
+  // preço atual na direção da tela (clássico: pela razão dos preços em US$ — a curva stable não é x·y)
+  const cur0in1 = !pool
+    ? NaN
+    : pool.classic
+      ? pool.price0Usd !== null && pool.price1Usd !== null
+        ? pool.price0Usd / pool.price1Usd
+        : NaN
+      : tickToPrice0In1(pool.tick, pool.token0.decimals, pool.token1.decimals);
   const show = useCallback((p0in1: number) => (inverted ? 1 / p0in1 : p0in1), [inverted]);
   const base = pool ? (inverted ? pool.token1 : pool.token0) : null;
   const quote = pool ? (inverted ? pool.token0 : pool.token1) : null;
@@ -82,7 +88,9 @@ export default function AprSimulator() {
         setIdx(0);
         const p = body.pools[0];
         // mesma regra do card da carteira: preço fracionário aparece invertido
-        const c = tickToPrice0In1(p.tick, p.token0.decimals, p.token1.decimals);
+        const c = p.classic
+          ? (p.price0Usd ?? 0) / (p.price1Usd ?? 1)
+          : tickToPrice0In1(p.tick, p.token0.decimals, p.token1.decimals);
         const inv = c > 0 && c < 1;
         setInverted(inv);
         applyPreset(5, inv ? 1 / c : c);
@@ -132,7 +140,7 @@ export default function AprSimulator() {
     const dep = parseNum(amount, decimalComma);
     let lo: number;
     let hi: number;
-    if (full) {
+    if (full || pool.classic) {
       lo = 0;
       hi = Infinity;
     } else {
@@ -142,7 +150,10 @@ export default function AprSimulator() {
       // a tela fala na direção escolhida; a conta, sempre em token1 por token0
       [lo, hi] = inverted ? [1 / Math.max(a, b), 1 / Math.min(a, b)] : [Math.min(a, b), Math.max(a, b)];
     }
-    return simulate(pool, { depositUsd: dep, priceLower: lo, priceUpper: hi, staked });
+    // com o gauge parado a caixa de stake some — e aí a posição não está em stake
+    const em = pool.emission;
+    const stakeConta = em !== null && em.requiresStake && em.endedAt === undefined && em.ratePerSec !== "0";
+    return simulate(pool, { depositUsd: dep, priceLower: lo, priceUpper: hi, staked: stakeConta && staked });
   }, [pool, amount, minStr, maxStr, full, inverted, staked, decimalComma]);
 
   const usd = (n: number | null | undefined) => fmtUsd(n, locale);
@@ -181,7 +192,10 @@ export default function AprSimulator() {
         {error}
       </p>
       <p className="sim-supported">
-        {fill(t.supported, { protocols: humanList([...new Set(SIMULATOR_PROTOCOLS.map(protocolLabel))], "and", locale) })}
+        {fill(t.supported, {
+          protocols: humanList([...new Set(SIMULATOR_PROTOCOLS.map(protocolLabel))], "and", locale),
+          classic: humanList(SIMULATOR_CLASSIC_PROTOCOLS.map(protocolLabel), "and", locale),
+        })}
       </p>
 
       {pools.length > 1 && (
@@ -238,46 +252,52 @@ export default function AprSimulator() {
               <span>{t.amountLabel}</span>
               <input type="text" inputMode="decimal" value={amount} onChange={(ev) => setAmount(ev.target.value)} />
             </label>
-            <fieldset className="sim-range">
-              <legend>{t.rangeLabel}</legend>
-              <label className="sim-field">
-                <span>{t.minLabel}</span>
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={full ? "0" : minStr}
-                  // sair da faixa inteira volta para a faixa que estava antes
-                  onFocus={() => setFull(false)}
-                  onChange={(ev) => {
-                    setFull(false);
-                    setMinStr(ev.target.value);
-                  }}
-                />
-              </label>
-              <label className="sim-field">
-                <span>{t.maxLabel}</span>
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={full ? "∞" : maxStr}
-                  onFocus={() => setFull(false)}
-                  onChange={(ev) => {
-                    setFull(false);
-                    setMaxStr(ev.target.value);
-                  }}
-                />
-              </label>
-              <div className="sim-presets" role="group" aria-label={t.presetsAria}>
-                {PRESETS.map((p) => (
-                  <button key={p} type="button" className="chip" onClick={() => applyPreset(p, show(cur0in1))}>
-                    ±{p}%
+            {pool.classic ? (
+              <p className="sim-note">
+                {fill(t.classicNote, { kind: pool.classic.stable ? t.kindStable : t.kindVolatile })}
+              </p>
+            ) : (
+              <fieldset className="sim-range">
+                <legend>{t.rangeLabel}</legend>
+                <label className="sim-field">
+                  <span>{t.minLabel}</span>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={full ? "0" : minStr}
+                    // sair da faixa inteira volta para a faixa que estava antes
+                    onFocus={() => setFull(false)}
+                    onChange={(ev) => {
+                      setFull(false);
+                      setMinStr(ev.target.value);
+                    }}
+                  />
+                </label>
+                <label className="sim-field">
+                  <span>{t.maxLabel}</span>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={full ? "∞" : maxStr}
+                    onFocus={() => setFull(false)}
+                    onChange={(ev) => {
+                      setFull(false);
+                      setMaxStr(ev.target.value);
+                    }}
+                  />
+                </label>
+                <div className="sim-presets" role="group" aria-label={t.presetsAria}>
+                  {PRESETS.map((p) => (
+                    <button key={p} type="button" className="chip" onClick={() => applyPreset(p, show(cur0in1))}>
+                      ±{p}%
+                    </button>
+                  ))}
+                  <button type="button" className={`chip${full ? " chip-on" : ""}`} aria-pressed={full} onClick={() => setFull(true)}>
+                    {t.fullRange}
                   </button>
-                ))}
-                <button type="button" className={`chip${full ? " chip-on" : ""}`} aria-pressed={full} onClick={() => setFull(true)}>
-                  {t.fullRange}
-                </button>
-              </div>
-            </fieldset>
+                </div>
+              </fieldset>
+            )}
             {e?.requiresStake && emissionActive && (
               <label className="sim-check">
                 <input type="checkbox" checked={staked} onChange={(ev) => setStaked(ev.target.checked)} />
@@ -293,7 +313,7 @@ export default function AprSimulator() {
 
           {result && (
             <>
-              {!full && (
+              {!full && !result.classic && (
                 <p className="sim-note">
                   {fill(t.adjusted, {
                     min: price(inverted ? result.priceUpper : result.priceLower),
@@ -305,7 +325,7 @@ export default function AprSimulator() {
 
               {result.inRangeNow && (
                 <div className="sim-headline">
-                  <span className="sim-label">{t.headline}</span>
+                  <span className="sim-label">{result.classic ? t.headlineClassic : t.headline}</span>
                   <strong>{fill(t.perYear, { pct: pct(result.inRangePct) })}</strong>
                   {result.inRangePct !== null && dep > 0 && (
                     <span className="sim-unit">
@@ -317,6 +337,8 @@ export default function AprSimulator() {
                   )}
                 </div>
               )}
+
+              {result.feesToVoters && <p className="sim-note">{t.feesToVoters}</p>}
 
               <dl className="sim-rows">
                 {result.fees.length === 0 ? (
@@ -349,7 +371,9 @@ export default function AprSimulator() {
                 <div className="sim-row">
                   <dt>{t.timeRow}</dt>
                   <dd>
-                    {result.timeInRange === null ? (
+                    {result.classic ? (
+                      t.timeAlways
+                    ) : result.timeInRange === null ? (
                       <span className="sim-muted">{t.timeNone}</span>
                     ) : (
                       <>
@@ -366,7 +390,7 @@ export default function AprSimulator() {
                     )}
                   </dd>
                 </div>
-                {result.repeatPct !== null && (
+                {result.repeatPct !== null && !result.classic && (
                   <div className="sim-row">
                     <dt>{t.repeatRow}</dt>
                     <dd>

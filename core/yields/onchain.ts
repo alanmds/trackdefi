@@ -541,3 +541,69 @@ export async function readPoolFeeGrowthWindows(
   }
   return out;
 }
+
+// --------------------------------------- pool clássico (v2, Solidly) — simulador
+
+const classicIndexAbi = parseAbi([
+  "function index0() view returns (uint256)",
+  "function index1() view returns (uint256)",
+]);
+
+/**
+ * Δ `index0/index1` de um pool CLÁSSICO da Aerodrome/Velodrome em cada janela
+ * de `MEASURED_WINDOWS_HOURS`. O pool soma `taxa × 1e18 ÷ totalSupply` a cada
+ * swap, então o delta é a taxa que UM LP token (1e18 cru) ganhou na janela —
+ * o equivalente clássico do feeGrowthGlobal. Provado em
+ * `poc/probe-classico.ts` (27/10/2026: 11,45% em 24 h no vAMM-USDC/AERO).
+ *
+ * Mesma prova de bloco das medições concentradas: RPC que ignora o bloco
+ * pedido devolveria 0% falso.
+ */
+export async function readClassicFeeWindows(
+  reader: ChainReader,
+  pool: Address,
+  currentBlock: bigint,
+  secPerBlock: number,
+): Promise<FeeGrowthWindow[]> {
+  const ler = async (blockNumber?: bigint) => {
+    const res = await reader.multicall({
+      contracts: [
+        { address: pool, abi: classicIndexAbi, functionName: "index0" },
+        { address: pool, abi: classicIndexAbi, functionName: "index1" },
+        {
+          address: reader.chain?.contracts?.multicall3?.address ?? MULTICALL3,
+          abi: multicall3TimestampAbi,
+          functionName: "getCurrentBlockTimestamp",
+        },
+      ],
+      allowFailure: true,
+      ...(blockNumber === undefined ? {} : { blockNumber }),
+    });
+    if (res[0].status !== "success" || res[1].status !== "success") return null;
+    return {
+      i0: res[0].result as bigint,
+      i1: res[1].result as bigint,
+      ts: res[2].status === "success" ? (res[2].result as bigint) : null,
+    };
+  };
+  const agora = await ler();
+  if (!agora) return [];
+
+  const out: FeeGrowthWindow[] = [];
+  for (const horas of MEASURED_WINDOWS_HOURS) {
+    const blocos = BigInt(Math.max(1, Math.round((horas * 3600) / secPerBlock)));
+    if (currentBlock <= blocos) continue;
+    try {
+      const antes = await ler(currentBlock - blocos);
+      if (!antes) continue;
+      const provado = agora.ts !== null && antes.ts !== null ? Number(agora.ts - antes.ts) : null;
+      if (provado !== null && provado < (horas * 3600) / 2) continue; // RPC ignorou o bloco
+      // o índice só cresce (sem wrap: é uint256 que nunca chega perto do teto)
+      if (agora.i0 < antes.i0 || agora.i1 < antes.i1) continue;
+      out.push({ delta0: agora.i0 - antes.i0, delta1: agora.i1 - antes.i1, windowSec: provado ?? Number(blocos) * secPerBlock });
+    } catch {
+      continue;
+    }
+  }
+  return out;
+}

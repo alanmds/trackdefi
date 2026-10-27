@@ -29,6 +29,28 @@ export const clFactoryAbi = parseAbi([
   "function getPool(address tokenA, address tokenB, int24 tickSpacing) view returns (address)",
 ]);
 
+/** factory clássica (v2): o pool é identificado por stable/volatile */
+export const v2FactoryAbi = parseAbi([
+  "function getPool(address tokenA, address tokenB, bool stable) view returns (address)",
+]);
+
+/**
+ * Pool clássico (v2) para o simulador. `index0/index1` = taxa acumulada por
+ * LP token × 1e18 (o pool soma `taxa × 1e18 ÷ totalSupply` a cada swap) —
+ * provado em `poc/probe-classico.ts` (27/10/2026).
+ */
+export const v2PoolAbi = parseAbi([
+  "function totalSupply() view returns (uint256)",
+  "function index0() view returns (uint256)",
+  "function index1() view returns (uint256)",
+]);
+
+/** Voter (para achar o gauge de um pool clássico) — a Sugar informa, em toda rede */
+export const sugarVoterAbi = parseAbi(["function voter() view returns (address)"]);
+export const voterGaugesAbi = parseAbi(["function gauges(address pool) view returns (address)"]);
+/** gauge clássico: LP em stake, que divide o rewardRate */
+export const v2GaugeAbi = parseAbi(["function totalSupply() view returns (uint256)"]);
+
 /** taxa de swap do pool CL, em milionésimos (o simulador mostra) */
 export const clFeeAbi = parseAbi(["function fee() view returns (uint24)"]);
 

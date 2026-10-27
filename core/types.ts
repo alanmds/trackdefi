@@ -206,6 +206,8 @@ export interface PoolQuery {
   /** taxa em milionésimos (500 = 0,05%) */
   fee: number | null;
   tickSpacing: number | null;
+  /** pool clássico (v2): true = stable, false = volatile; null = não é clássico */
+  stable?: boolean | null;
 }
 
 /** Quem paga incentivo a um pool, e em que ritmo — insumo do simulador. */
@@ -244,6 +246,16 @@ export interface PoolSnapshot {
   reserves: { amount0Raw: bigint; amount1Raw: bigint } | null;
   /** null = o pool não tem incentivo (ou o protocolo não paga) */
   emission: PoolEmission | null;
+  /**
+   * Pool CLÁSSICO (v2, Solidly — Aerodrome/Velodrome): sem faixa, a
+   * liquidez é um LP token. Ausente = concentrado. Num clássico, tick,
+   * tickSpacing, sqrtPriceX96 e activeLiquidity não se aplicam e vêm 0.
+   */
+  classic?: {
+    stable: boolean;
+    /** LP tokens em circulação (unidades cruas) */
+    totalSupply: bigint;
+  };
 }
 
 /**

@@ -15,7 +15,21 @@ import { erc20Abi, type Address } from "viem";
 import type { ChainReader, LockPosition, LpPosition, PoolQuery, PoolSnapshot, PositionKind, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { mapLimit } from "../../util";
-import { clFactoryAbi, clFeeAbi, factoryAbi, gaugeAbi, poolProbeAbi, sugarAbi, SUGAR_MAX_POSITIONS, type SugarPosition } from "./abi";
+import {
+  clFactoryAbi,
+  clFeeAbi,
+  factoryAbi,
+  gaugeAbi,
+  poolProbeAbi,
+  sugarAbi,
+  sugarVoterAbi,
+  SUGAR_MAX_POSITIONS,
+  v2FactoryAbi,
+  v2GaugeAbi,
+  v2PoolAbi,
+  voterGaugesAbi,
+  type SugarPosition,
+} from "./abi";
 import { AERODROME_BASE, CHAIN_ID, type SugarChainConfig } from "./config";
 import { buildLocks, rewardsSugarAbi, veSugarAbi, type RawLock, type RawVoteReward } from "./ve";
 
@@ -295,7 +309,11 @@ export class AerodromeAdapter implements ProtocolAdapter {
       ],
       allowFailure: true,
     });
-    if (res.slice(0, 5).some((r) => r.status !== "success")) return null;
+    if (res[0].status !== "success" || res[1].status !== "success") return null;
+    // sem tickSpacing/slot0 = pool clássico (v2), ou nem é pool nosso
+    if (res.slice(2, 5).some((r) => r.status !== "success")) {
+      return this.describeClassicPool(pool, res[0].result as Address, res[1].result as Address);
+    }
     const token0 = res[0].result as Address;
     const token1 = res[1].result as Address;
     const tickSpacing = Number(res[2].result);
@@ -366,21 +384,118 @@ export class AerodromeAdapter implements ProtocolAdapter {
   }
 
   /**
+   * Foto de um pool CLÁSSICO (v2): sem faixa, a liquidez é o LP token. Prova
+   * de origem: a factory clássica devolve o endereço para o par e o
+   * stable/volatile. Gauge pelo Voter que a própria Sugar informa — só a
+   * liquidez EM STAKE recebe emissões, e as taxas dela vão aos votantes.
+   */
+  private async describeClassicPool(pool: Address, token0: Address, token1: Address): Promise<PoolSnapshot | null> {
+    const res = await this.reader.multicall({
+      contracts: [
+        { address: pool, abi: poolProbeAbi, functionName: "stable" },
+        { address: pool, abi: v2PoolAbi, functionName: "totalSupply" },
+        { address: pool, abi: v2PoolAbi, functionName: "index0" },
+        { address: this.sugar, abi: sugarVoterAbi, functionName: "voter" },
+      ],
+      allowFailure: true,
+    });
+    if (res.slice(0, 3).some((r) => r.status !== "success")) return null;
+    const stable = res[0].result as boolean;
+    const totalSupply = res[1].result as bigint;
+
+    const prova = await this.reader.multicall({
+      contracts: this.factories.map((f) => ({
+        address: f,
+        abi: v2FactoryAbi,
+        functionName: "getPool",
+        args: [token0, token1, stable],
+      })),
+      allowFailure: true,
+    });
+    if (!prova.some((r) => r.status === "success" && (r.result as string).toLowerCase() === pool.toLowerCase())) return null;
+
+    const voter = res[3].status === "success" ? (res[3].result as Address) : null;
+    const gauge =
+      voter && voter !== ZERO
+        ? ((await this.reader
+            .readContract({ address: voter, abi: voterGaugesAbi, functionName: "gauges", args: [pool] })
+            .catch(() => null)) as Address | null)
+        : null;
+    const comGauge = gauge && gauge !== ZERO ? gauge : null;
+
+    const [tokens, bal, g] = await Promise.all([
+      this.loadTokens([token0, token1, ...(comGauge ? [this.emissionsToken] : [])]),
+      this.reader.multicall({
+        contracts: [token0, token1].map((t) => ({ address: t, abi: erc20Abi, functionName: "balanceOf", args: [pool] })),
+        allowFailure: true,
+      }),
+      comGauge
+        ? this.reader.multicall({
+            contracts: [
+              { address: comGauge, abi: gaugeAbi, functionName: "rewardRate" },
+              { address: comGauge, abi: gaugeAbi, functionName: "periodFinish" },
+              { address: comGauge, abi: v2GaugeAbi, functionName: "totalSupply" },
+            ],
+            allowFailure: true,
+          })
+        : Promise.resolve(null),
+    ]);
+    const t0 = tokens.get(token0)!;
+    const t1 = tokens.get(token1)!;
+
+    let emission: PoolSnapshot["emission"] = null;
+    if (comGauge && g && g.every((r) => r.status === "success")) {
+      const end = Number(g[1].result as bigint);
+      const ended = end <= Math.floor(Date.now() / 1000);
+      emission = {
+        token: tokens.get(this.emissionsToken)!,
+        ratePerSec: ended ? 0n : (g[0].result as bigint),
+        sharedLiquidity: g[2].result as bigint,
+        requiresStake: true,
+        ...(ended ? { endedAt: end } : {}),
+      };
+    }
+
+    return {
+      protocol: this.protocol,
+      chainId: this.chainId,
+      poolAddress: pool,
+      // o formato do symbol() dos próprios pools clássicos ("vAMM-USDC/AERO")
+      poolSymbol: `${stable ? "sAMM" : "vAMM"}-${t0.symbol}/${t1.symbol}`,
+      token0: t0,
+      token1: t1,
+      feePips: null,
+      tickSpacing: 0,
+      tick: 0,
+      sqrtPriceX96: 0n,
+      activeLiquidity: 0n,
+      reserves:
+        bal[0].status === "success" && bal[1].status === "success"
+          ? { amount0Raw: bal[0].result as bigint, amount1Raw: bal[1].result as bigint }
+          : null,
+      emission,
+      classic: { stable, totalSupply },
+    };
+  }
+
+  /**
    * Endereços CL pelas factories da config (descoberta de pares → simulador).
    * A factory clássica tem outro `getPool` e só falha; o primeiro endereço
    * não-zero vence.
    */
   async findPools(queries: PoolQuery[]): Promise<(Address | null)[]> {
-    const validas = queries.map((q, i) => ({ q, i })).filter(({ q }) => q.tickSpacing !== null && q.tickSpacing > 0);
+    // CL pelo tick spacing; clássico (v2) pelo stable/volatile
+    const validas = queries
+      .map((q, i) => ({ q, i }))
+      .filter(({ q }) => (q.tickSpacing !== null && q.tickSpacing > 0) || typeof q.stable === "boolean");
     if (validas.length === 0) return queries.map(() => null);
     const res = await this.reader.multicall({
       contracts: validas.flatMap(({ q }) =>
-        this.factories.map((f) => ({
-          address: f,
-          abi: clFactoryAbi,
-          functionName: "getPool",
-          args: [q.token0, q.token1, q.tickSpacing],
-        })),
+        this.factories.map((f) =>
+          typeof q.stable === "boolean"
+            ? { address: f, abi: v2FactoryAbi, functionName: "getPool", args: [q.token0, q.token1, q.stable] }
+            : { address: f, abi: clFactoryAbi, functionName: "getPool", args: [q.token0, q.token1, q.tickSpacing] },
+        ),
       ),
       allowFailure: true,
       batchSize: 16_384,

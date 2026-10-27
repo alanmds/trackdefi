@@ -2210,3 +2210,8 @@ button.chip {
 .pairs-page {
   max-width: 1040px;
 }
+
+.pairs-soon {
+  font-size: 13px;
+  color: var(--ink-3);
+}

@@ -215,7 +215,7 @@ export default function PairFinder() {
                       {usd(p.mcapMin)}
                     </td>
                     <td className="pairs-open">
-                      {p.pool && (
+                      {p.pool ? (
                         <Link
                           href={localePath(locale, `/tools/apr-simulator?pool=${p.pool}`)}
                           className="btn btn-ghost btn-sm"
@@ -223,6 +223,10 @@ export default function PairFinder() {
                         >
                           {t.simulate}
                         </Link>
+                      ) : (
+                        <span className="pairs-soon" title={t.soonTitle}>
+                          {t.soon}
+                        </span>
                       )}
                     </td>
                   </tr>
