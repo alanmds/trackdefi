@@ -305,6 +305,15 @@ const pages: PagesMessages = {
     lede: "Calculadoras feitas com os mesmos números on-chain das páginas de carteira. Sem conectar carteira, nada para assinar.",
     simulatorTitle: "Simulador de APR",
     simulatorBody: "Escolha um pool, um valor e uma faixa de preço: veja quanto renderia dentro da faixa, quanto da última semana o preço passou nela e em que o seu depósito se transforma em cada borda.",
+    pairsTitle: "Descoberta de pares",
+    pairsBody: "Filtre milhares de pools das corretoras que o trackdefi lê por APR, volume de 24 horas, TVL e market cap do token menor.",
+  },
+
+  pairs: {
+    title: "Descoberta de pares: pools por APR, volume e market cap",
+    description: "Encontre pools de liquidez da Uniswap, Aerodrome, Velodrome, PancakeSwap, SushiSwap e Orca por APR, volume 24 h, TVL e market cap. Grátis, sem carteira.",
+    heading: "Descoberta de pares",
+    lede: "Milhares de pools das corretoras que o trackdefi lê, filtrados pelo que importa a quem provê liquidez.",
   },
 
   simulator: {

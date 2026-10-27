@@ -18,6 +18,13 @@ export const SITE_NAME = "trackdefi";
 export const TOOLS_INDEXED = true;
 
 /**
+ * Descoberta de pares (/tools/pairs). false = no ar, mas fora da lista de
+ * ferramentas, do sitemap e com `noindex` — o Alan testa antes (mesmo caminho
+ * do simulador). Virar para true = lançamento: changelog, roadmap, llms, README.
+ */
+export const PAIRS_LISTED = false;
+
+/**
  * Carteira do botão "Try a demo wallet" da home — a VITRINE do site.
  *
  * Trocada em 26/09/2026. A anterior (a de teste do repo `sugar`) mostrava

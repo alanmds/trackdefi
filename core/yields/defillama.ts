@@ -170,7 +170,37 @@ export class YieldsIndex {
 const YIELDS_URL = "https://yields.llama.fi/pools";
 const TTL_MS = 60 * 60 * 1000; // dataset atualiza ~1x/hora
 
+/** a linha como vem do dataset, com os campos que só a descoberta de pares usa */
+export interface LlamaRowFull extends LlamaRow {
+  /** id do pool NA DefiLlama (uuid) — não é endereço on-chain */
+  pool: string;
+  symbol: string;
+  volumeUsd1d: number | null;
+  volumeUsd7d: number | null;
+}
+
+let cachedRows: { at: number; rows: LlamaRowFull[] } | null = null;
 let cached: { at: number; index: YieldsIndex } | null = null;
+
+/**
+ * Linhas do dataset nas NOSSAS redes, com cache de 1 h por instância — a
+ * mesma baixada serve o APR da carteira e a descoberta de pares. Falha de
+ * rede devolve as linhas velhas se houver; senão lança.
+ */
+export async function getYieldsRows(): Promise<LlamaRowFull[]> {
+  if (cachedRows && Date.now() - cachedRows.at < TTL_MS) return cachedRows.rows;
+  try {
+    const res = await fetch(YIELDS_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const body = (await res.json()) as { data?: LlamaRowFull[] };
+    const ourChains = new Set(Object.values(CHAINS).map((c) => c.yieldsLabel));
+    cachedRows = { at: Date.now(), rows: (body.data ?? []).filter((r) => ourChains.has(r.chain)) };
+    return cachedRows.rows;
+  } catch (e) {
+    if (cachedRows) return cachedRows.rows;
+    throw e;
+  }
+}
 
 /**
  * Índice com cache de 1 h por instância. Falha de rede degrada com aviso:
@@ -179,13 +209,7 @@ let cached: { at: number; index: YieldsIndex } | null = null;
 export async function getYieldsIndex(onWarn: (msg: string) => void = () => {}): Promise<YieldsIndex | null> {
   if (cached && Date.now() - cached.at < TTL_MS) return cached.index;
   try {
-    const res = await fetch(YIELDS_URL);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const body = (await res.json()) as { data?: LlamaRow[] };
-    const ourChains = new Set(Object.values(CHAINS).map((c) => c.yieldsLabel));
-    const rows = (body.data ?? []).filter(
-      (r) => ourChains.has(r.chain) && PROJECT_TO_PROTOCOL[r.project] !== undefined,
-    );
+    const rows = (await getYieldsRows()).filter((r) => PROJECT_TO_PROTOCOL[r.project] !== undefined);
     cached = { at: Date.now(), index: new YieldsIndex(rows) };
     return cached.index;
   } catch (e) {

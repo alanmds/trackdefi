@@ -4,7 +4,7 @@ import { localePath } from "../../i18n/config";
 import { getMessages } from "../../i18n/get";
 import { localeFrom, type LangParams } from "../../i18n/server";
 import { pageMetadata } from "../../i18n/seo";
-import { TOOLS_INDEXED } from "../../site";
+import { PAIRS_LISTED, TOOLS_INDEXED } from "../../site";
 
 export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
   const locale = await localeFrom(params);
@@ -32,6 +32,14 @@ export default async function ToolsPage({ params }: LangParams) {
             <span>{m.simulatorBody}</span>
           </Link>
         </li>
+        {PAIRS_LISTED && (
+          <li>
+            <Link href={localePath(lang, "/tools/pairs")} className="tools-item">
+              <strong>{m.pairsTitle}</strong>
+              <span>{m.pairsBody}</span>
+            </Link>
+          </li>
+        )}
       </ul>
 
       <p className="prose-back">

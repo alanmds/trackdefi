@@ -75,3 +75,42 @@ export async function fetchUsdPriceHistory(
   }
   return out;
 }
+
+/** Limite do POST de market cap: 100 tokens passam, 500 voltam HTTP 400
+ *  (medido em 26/10/2026, `poc/probe-descoberta.ts`). */
+const MCAP_CHUNK = 100;
+
+/**
+ * Market cap em US$ (coins.llama.fi/mcaps). Chaves no formato da DefiLlama,
+ * `<rede>:<endereço>`; o Map devolvido usa a chave em minúsculas. Token sem
+ * market cap não entra — nunca vira 0.
+ */
+export async function fetchMarketCaps(
+  keys: readonly string[],
+  onWarn: (msg: string) => void = () => {},
+): Promise<Map<string, number>> {
+  const out = new Map<string, number>();
+  const lotes = chunks([...new Set(keys)], MCAP_CHUNK);
+  // poucos de cada vez: são dezenas de lotes, e a API é grátis
+  for (const grupo of chunks(lotes, 4)) {
+    await Promise.all(
+      grupo.map(async (lote) => {
+        try {
+          const res = await fetch("https://coins.llama.fi/mcaps", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ coins: lote }),
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const body = (await res.json()) as Record<string, { mcap?: number }>;
+          for (const [k, v] of Object.entries(body)) {
+            if (typeof v?.mcap === "number" && Number.isFinite(v.mcap) && v.mcap > 0) out.set(k.toLowerCase(), v.mcap);
+          }
+        } catch (e) {
+          onWarn(`market cap indisponível para um lote de ${lote.length} tokens: ${(e as Error).message}`);
+        }
+      }),
+    );
+  }
+  return out;
+}

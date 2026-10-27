@@ -371,7 +371,46 @@ const ui: UiMessages = {
       "É uma estimativa do ritmo de agora, não uma promessa: volume, liquidez e preços mudam. Não inclui perda impermanente nem taxas de rede. Não é recomendação de investimento.",
   },
 
-  dates:{
+  pairs: {
+    loading: "Carregando os pools…",
+    error: "Não deu para carregar a lista de pools agora. Tente de novo daqui a pouco.",
+    aprNotice:
+      "<b>O APR aqui é a média do pool</b>, como a DefiLlama informa — taxas e recompensas somadas, divididas por tudo o que está depositado. Não é o que uma posição rende: uma faixa concentrada estreita pode render várias vezes mais enquanto o preço fica dentro dela, e nada quando sai. Para ver uma faixa específica, use o <link>simulador de APR</link>.",
+    search: "Token",
+    searchPlaceholder: "ex.: WETH, USDC",
+    network: "Rede",
+    protocol: "Corretora",
+    all: "Todas",
+    minApr: "APR mínimo (%)",
+    minVolume: "Volume mínimo (24 h)",
+    minMcap: "Market cap mínimo (token menor)",
+    minTvl: "TVL mínimo",
+    any: "Qualquer",
+    sortBy: "Ordenar por",
+    sort: {
+      apr: "APR",
+      volume1d: "Volume em 24 h",
+      tvlUsd: "TVL",
+      mcapMin: "Market cap (token menor)",
+    } as Record<string, string>,
+    count: { one: "{n} pool encontrado", other: "{n} pools encontrados" } as Plural,
+    showing: "mostrando os {n} primeiros",
+    colPair: "Par",
+    colWhere: "Corretora · rede",
+    colApr: "APR",
+    colVolume: "Volume 24 h",
+    colTvl: "TVL",
+    colMcap: "Market cap (token menor)",
+    aprSplit: "taxas {base} · recompensas {reward}",
+    open: "DefiLlama",
+    openTitle: "Abrir este pool na DefiLlama",
+    none: "Nenhum pool com esses filtros.",
+    source:
+      "Pools das corretoras e redes que o trackdefi lê. Dados: DefiLlama, atualizados mais ou menos de hora em hora. O market cap é o do menor dos dois tokens; ETH, BNB e SOL embrulhados contam como a própria moeda. “—” quer dizer que a DefiLlama não tem o número — nunca um palpite.",
+    caveat: "Uma lista para começar a pesquisa, não uma recomendação. Não é recomendação de investimento.",
+  },
+
+  dates: {
     months: ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
     format: "{d} {m} {y}",
     minutes: "{n} min",

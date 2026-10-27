@@ -32,6 +32,17 @@ export function fmtUsd(n: number | null | undefined, locale: Locale = DEFAULT_LO
   }).format(n);
 }
 
+/** Dólar compacto para tabelas: "$1.2M" / "US$ 1,2 mi"; null → "—". */
+export function fmtUsdCompact(n: number | null | undefined, locale: Locale = DEFAULT_LOCALE): string {
+  if (n === null || n === undefined || !Number.isFinite(n)) return "—";
+  return nf(locale, "usd-compact", {
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    maximumFractionDigits: Math.abs(n) >= 1000 ? 1 : 0,
+  }).format(n);
+}
+
 /** Quantidade de token: compacta bilhões de meme coins, preserva 4 casas úteis. */
 export function fmtAmount(n: number, locale: Locale = DEFAULT_LOCALE): string {
   if (!Number.isFinite(n)) return "—";

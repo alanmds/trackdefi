@@ -339,6 +339,15 @@ const pages = {
     lede: "Calculators built on the same on-chain numbers as the wallet pages. No wallet connection, nothing to sign.",
     simulatorTitle: "APR simulator",
     simulatorBody: "Pick a pool, an amount and a price range: see what it would earn while in range, how much of the last week the price spent inside it, and what your deposit turns into at each edge.",
+    pairsTitle: "Pair finder",
+    pairsBody: "Filter thousands of pools on the exchanges trackdefi reads by APR, 24-hour volume, TVL and the market cap of the smaller token.",
+  },
+
+  pairs: {
+    title: "Pair finder: liquidity pools by APR, volume & market cap",
+    description: "Find liquidity pools on Uniswap, Aerodrome, Velodrome, PancakeSwap, SushiSwap and Orca by APR, 24 h volume, TVL and token market cap. Free, no wallet.",
+    heading: "Pair finder",
+    lede: "Thousands of pools on the exchanges trackdefi reads, filtered by what matters to a liquidity provider.",
   },
 
   simulator: {

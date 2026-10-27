@@ -2065,6 +2065,125 @@ button.chip {
   gap: 4px;
 }
 
+/* descoberta de pares: filtros em grade; a tabela vira cartões no celular */
+.pairs-notice {
+  margin: 18px 0;
+}
+
+.pairs-notice a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.pairs-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(170px, 100%), 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: end;
+}
+
+.pairs-search {
+  grid-column: 1 / -1;
+}
+
+.sim-field select {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--ink);
+  width: 100%;
+}
+
+.pairs-count {
+  font-weight: 600;
+  margin: 8px 0;
+}
+
+.pairs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pairs-table th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+  padding: 8px 8px 8px 0;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.pairs-table td {
+  padding: 10px 8px 10px 0;
+  border-bottom: 1px dashed var(--border);
+  vertical-align: top;
+}
+
+.pairs-table .num {
+  text-align: right;
+}
+
+.pairs-open {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.pairs-source {
+  margin-top: 16px;
+}
+
+@media (max-width: 720px) {
+  .pairs-table thead {
+    display: none;
+  }
+
+  .pairs-table,
+  .pairs-table tbody,
+  .pairs-table tr,
+  .pairs-table td {
+    display: block;
+  }
+
+  .pairs-table tr {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 10px;
+  }
+
+  .pairs-table td {
+    border: none;
+    padding: 3px 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: right;
+  }
+
+  .pairs-table td[data-label]::before {
+    content: attr(data-label);
+    color: var(--ink-3);
+    text-align: left;
+  }
+
+  .pairs-table td:first-child {
+    display: block;
+    text-align: left;
+    font-size: 16px;
+  }
+
+  .pairs-table td:first-child::before {
+    content: none;
+  }
+}
+
 .sim-how h2 {
   font-size: 19px;
 }
@@ -2086,4 +2205,8 @@ button.chip {
   .sim-row dd {
     text-align: left;
   }
+}
+
+.pairs-page {
+  max-width: 1040px;
 }

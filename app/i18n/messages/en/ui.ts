@@ -345,6 +345,46 @@ const ui = {
       "This is an estimate of the current pace, not a promise: volume, liquidity and prices change. It does not include impermanent loss or network fees. Not financial advice.",
   },
 
+  /** descoberta de pares (`/tools/pairs`) */
+  pairs: {
+    loading: "Loading pools…",
+    error: "Couldn't load the pool list right now. Please try again in a moment.",
+    aprNotice:
+      "<b>APR here is the pool average</b>, as reported by DefiLlama — total fees and rewards divided by everything deposited. It is not what one position earns: a narrow concentrated range can earn several times more while the price stays inside it, and nothing while it's out. To see a specific range, use the <link>APR simulator</link>.",
+    search: "Token",
+    searchPlaceholder: "e.g. WETH, USDC",
+    network: "Network",
+    protocol: "Exchange",
+    all: "All",
+    minApr: "Min APR (%)",
+    minVolume: "Min volume (24 h)",
+    minMcap: "Min market cap (smaller token)",
+    minTvl: "Min TVL",
+    any: "Any",
+    sortBy: "Sort by",
+    sort: {
+      apr: "APR",
+      volume1d: "Volume (24 h)",
+      tvlUsd: "TVL",
+      mcapMin: "Market cap (smaller token)",
+    } as Record<string, string>,
+    count: { one: "{n} pool matches", other: "{n} pools match" } as Plural,
+    showing: "showing the first {n}",
+    colPair: "Pair",
+    colWhere: "Exchange · network",
+    colApr: "APR",
+    colVolume: "Volume 24 h",
+    colTvl: "TVL",
+    colMcap: "Market cap (smaller token)",
+    aprSplit: "fees {base} · rewards {reward}",
+    open: "DefiLlama",
+    openTitle: "Open this pool on DefiLlama",
+    none: "No pool matches these filters.",
+    source:
+      "Pools from the exchanges and networks trackdefi reads. Data: DefiLlama, refreshed about once an hour. Market cap is the smaller of the two tokens; wrapped ETH, BNB and SOL count as the coin itself. “—” means DefiLlama has no figure for it — never a guess.",
+    caveat: "A list to start research, not a recommendation. Not financial advice.",
+  },
+
   /** datas à mão (ver `fmtDate`) — o `Intl` varia entre servidor e navegador */
   dates: EN_DATE_LABELS,
 };
