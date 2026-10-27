@@ -328,6 +328,23 @@ const pages = {
     } as Record<ChangeKind, string>,
   },
 
+  tools: {
+    title: "Tools",
+    description: "Free, read-only calculators for liquidity providers, built on the same on-chain data as the trackdefi wallet pages.",
+    heading: "Tools",
+    lede: "Calculators built on the same on-chain numbers as the wallet pages. No wallet connection, nothing to sign.",
+    simulatorTitle: "APR simulator",
+    simulatorBody: "Pick a pool, an amount and a price range: see what it would earn while in range, how much of the last week the price spent inside it, and what your deposit turns into at each edge.",
+  },
+
+  simulator: {
+    title: "APR simulator for concentrated liquidity",
+    description: "Estimate what a Uniswap v3-style position would earn: fees measured on-chain, emissions, time in range over the last 7 days. Read-only, no wallet.",
+    heading: "APR simulator",
+    lede: "Paste a pool, choose how much and in which price range. The numbers come from the pool contract itself, at the current pace.",
+    back: "← All tools",
+  },
+
   feedback: {
     title: "Feedback",
     description:

@@ -45,3 +45,33 @@ export const defillamaPrices: PriceProvider = {
   name: "DefiLlama",
   fetchUsdPrices: (chainSlug, addresses, onWarn) => fetchUsdPrices(chainSlug, addresses, onWarn),
 };
+
+/**
+ * Histórico de preço em US$ (coins.llama.fi/chart), um ponto por hora — é
+ * de onde o simulador tira o "tempo na faixa" dos últimos dias. Mesma regra
+ * do preço atual: token sem histórico simplesmente não entra no mapa.
+ */
+export async function fetchUsdPriceHistory(
+  chainSlug: string,
+  addresses: readonly Address[],
+  hours: number,
+  onWarn: (msg: string) => void = () => {},
+): Promise<Map<string, { t: number; price: number }[]>> {
+  const out = new Map<string, { t: number; price: number }[]>();
+  if (addresses.length === 0) return out;
+  const start = Math.floor(Date.now() / 1000) - hours * 3600;
+  const keys = addresses.map((a) => `${chainSlug}:${a}`).join(",");
+  try {
+    const res = await fetch(`https://coins.llama.fi/chart/${keys}?start=${start}&span=${hours + 1}&period=1h`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const body = (await res.json()) as { coins?: Record<string, { prices?: { timestamp: number; price: number }[] }> };
+    for (const [key, coin] of Object.entries(body.coins ?? {})) {
+      const addr = key.split(":")[1]?.toLowerCase();
+      const pts = (coin.prices ?? []).filter((p) => Number.isFinite(p.price) && p.price > 0);
+      if (addr && pts.length > 0) out.set(addr, pts.map((p) => ({ t: p.timestamp, price: p.price })));
+    }
+  } catch (e) {
+    onWarn(`histórico de preço indisponível: ${(e as Error).message}`);
+  }
+  return out;
+}

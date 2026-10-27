@@ -10,6 +10,15 @@ import { DEFAULT_LOCALE, GRAMMAR, type Locale } from "./i18n/config";
 export const SITE_NAME = "trackdefi";
 
 /**
+ * Seção "Ferramentas" (/tools). Enquanto false, as páginas existem no ar mas
+ * ficam escondidas: sem link no cabeçalho, fora do sitemap e com `noindex`.
+ * Decisão do Alan em 26/10/2026: o simulador vai ao ar, ele testa, e só
+ * depois o link entra ao lado da logo. Virar para true = lançamento (ver
+ * privado/CHECKLIST_ATUALIZACAO.md: changelog, roadmap, sitemap, robots).
+ */
+export const TOOLS_INDEXED = false;
+
+/**
  * Carteira do botão "Try a demo wallet" da home — a VITRINE do site.
  *
  * Trocada em 26/09/2026. A anterior (a de teste do repo `sugar`) mostrava

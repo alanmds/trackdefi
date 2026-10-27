@@ -26,6 +26,15 @@ export const uniPoolAbi = parseAbi([
   "function liquidity() view returns (uint128)",
 ]);
 
+/** o que o simulador lê de um pool pelo endereço (iguais em todos os forks v3) */
+export const uniPoolProbeAbi = parseAbi([
+  "function token0() view returns (address)",
+  "function token1() view returns (address)",
+  "function fee() view returns (uint24)",
+  "function tickSpacing() view returns (int24)",
+  "function liquidity() view returns (uint128)",
+]);
+
 /** posição crua do NFPM (na ordem do retorno de positions()) */
 export type UniRawPosition = {
   tokenId: bigint;

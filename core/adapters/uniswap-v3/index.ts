@@ -20,13 +20,13 @@
  */
 
 import { erc20Abi, type Address } from "viem";
-import type { ChainReader, LpPosition, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
+import type { ChainReader, LpPosition, PoolEmission, PoolSnapshot, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
 import { amountsForLiquidity } from "../../math/liquidity";
 import { getSqrtRatioAtTick } from "../../math/tickmath";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { mapLimit } from "../../util";
 import { cleanSymbol } from "../aerodrome/index";
-import { MAX_UINT128, nfpmAbi, uniFactoryAbi, uniPoolAbi, uniSlot0Abi, type UniRawPosition } from "./abi";
+import { MAX_UINT128, nfpmAbi, uniFactoryAbi, uniPoolAbi, uniPoolProbeAbi, uniSlot0Abi, type UniRawPosition } from "./abi";
 import { MAX_NFTS, UNISWAP_V3_BASE, type UniV3ChainConfig } from "./config";
 
 export interface UniswapV3Options {
@@ -130,6 +130,99 @@ export class UniswapV3Adapter implements ProtocolAdapter {
       });
     }
     return this.afterPositions(out);
+  }
+
+  /**
+   * Foto do pool para o simulador. A prova de que o endereço é DESTE
+   * protocolo é a factory devolver o mesmo endereço para o par — um fork com
+   * ABI parecida responderia `token0()` igual, mas não está na nossa factory.
+   */
+  async describePool(pool: Address): Promise<PoolSnapshot | null> {
+    const res = await this.reader.multicall({
+      contracts: [
+        ...(["token0", "token1", "fee", "tickSpacing", "liquidity"] as const).map((fn) => ({
+          address: pool,
+          abi: uniPoolProbeAbi,
+          functionName: fn,
+        })),
+        { address: pool, abi: this.slot0Abi, functionName: "slot0" },
+      ],
+      allowFailure: true,
+    });
+    if (res.some((r) => r.status !== "success")) return null;
+    const [token0, token1] = [res[0].result as Address, res[1].result as Address];
+    const fee = Number(res[2].result);
+    const tickSpacing = Number(res[3].result);
+    const slot0 = res[5].result as readonly unknown[];
+
+    const raw: UniRawPosition = {
+      tokenId: 0n,
+      token0,
+      token1,
+      fee: this.poolKeyOf(fee, tickSpacing),
+      tickLower: 0,
+      tickUpper: 0,
+      liquidity: 0n,
+      feeGrowthInside0LastX128: 0n,
+      tokensOwed0: 0n,
+      tokensOwed1: 0n,
+      staked: false,
+    };
+    let found: Address;
+    try {
+      found = (await this.reader.readContract({
+        address: this.factory,
+        ...this.getPoolCall(raw),
+        functionName: "getPool",
+      })) as Address;
+    } catch {
+      return null;
+    }
+    if (found.toLowerCase() !== pool.toLowerCase()) return null;
+
+    const [tokens, bal] = await Promise.all([
+      this.loadTokens([raw]),
+      this.reader.multicall({
+        contracts: [token0, token1].map((t) => ({ address: t, abi: erc20Abi, functionName: "balanceOf", args: [pool] })),
+        allowFailure: true,
+      }),
+    ]);
+    const t0 = tokens.get(token0) ?? fallbackToken(token0);
+    const t1 = tokens.get(token1) ?? fallbackToken(token1);
+    const snap: PoolSnapshot = {
+      protocol: this.protocol,
+      chainId: this.chainId,
+      poolAddress: pool,
+      poolSymbol: this.poolSymbol(t0.symbol, t1.symbol, raw),
+      token0: t0,
+      token1: t1,
+      feePips: fee,
+      tickSpacing,
+      tick: Number(slot0[1]),
+      sqrtPriceX96: slot0[0] as bigint,
+      activeLiquidity: res[4].result as bigint,
+      reserves:
+        bal[0].status === "success" && bal[1].status === "success"
+          ? { amount0Raw: bal[0].result as bigint, amount1Raw: bal[1].result as bigint }
+          : null,
+      emission: null,
+    };
+    try {
+      snap.emission = await this.poolEmission(snap);
+    } catch (e) {
+      this.warn(`${this.protocol}: incentivo do pool ilegível: ${(e as Error).message.split("\n")[0].slice(0, 60)}`);
+    }
+    return snap;
+  }
+
+  /** O 3º argumento do `getPool` a partir do pool: o fee tier (Uniswap/Pancake). */
+  protected poolKeyOf(fee: number, _tickSpacing: number): number {
+    return fee;
+  }
+
+  /** Gancho: quem paga incentivo ao pool (default: ninguém — a Uniswap não tem gauge). */
+  protected async poolEmission(_pool: PoolSnapshot): Promise<PoolEmission | null> {
+    return null;
   }
 
   /** Nome do pool na tela: "WETH/USDC 0.05%" (fee tier da Uniswap). */

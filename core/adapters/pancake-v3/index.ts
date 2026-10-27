@@ -14,7 +14,7 @@
  */
 
 import type { Address } from "viem";
-import type { ChainReader, LpPosition, WarnSink } from "../../types";
+import type { ChainReader, LpPosition, PoolEmission, PoolSnapshot, WarnSink } from "../../types";
 import type { UniRawPosition } from "../uniswap-v3/abi";
 import { UniswapV3Adapter } from "../uniswap-v3/index";
 import { lmPoolAbi, masterChefV3Abi, pancakePoolLmAbi, pancakeSlot0Abi } from "./abi";
@@ -53,6 +53,33 @@ export class PancakeV3Adapter extends UniswapV3Adapter {
 
   protected override collectTarget(p: UniRawPosition): Address {
     return p.staked ? this.masterChef : this.nfpm;
+  }
+
+  /** Simulador: CAKE/s do pool, dividido pela liquidez EM STAKE ativa (LMPool). */
+  protected override async poolEmission(pool: PoolSnapshot): Promise<PoolEmission | null> {
+    const [periodo, lm] = await this.reader.multicall({
+      contracts: [
+        { address: this.masterChef, abi: masterChefV3Abi, functionName: "getLatestPeriodInfo", args: [pool.poolAddress] },
+        { address: pool.poolAddress, abi: pancakePoolLmAbi, functionName: "lmPool" },
+      ],
+      allowFailure: true,
+    });
+    if (periodo.status !== "success" || lm.status !== "success") return null;
+    const [cakePerSecond, endTime] = periodo.result as readonly [bigint, bigint];
+    if (cakePerSecond === 0n && endTime === 0n) return null; // pool sem farm
+    const lmLiquidity = (await this.reader.readContract({
+      address: lm.result as Address,
+      abi: lmPoolAbi,
+      functionName: "lmLiquidity",
+    })) as bigint;
+    const ended = Number(endTime) <= this.nowSec();
+    return {
+      token: this.cfg.cake,
+      ratePerSec: ended ? 0n : cakePerSecond / CAKE_PER_SECOND_PRECISION,
+      sharedLiquidity: lmLiquidity,
+      requiresStake: true,
+      ...(ended ? { endedAt: Number(endTime) } : {}),
+    };
   }
 
   /** CAKE a receber + insumos de emissão das posições em stake. */

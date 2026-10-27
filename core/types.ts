@@ -183,6 +183,51 @@ export interface ProtocolAdapter {
    * só nas redes onde a governança mora (as redes-folha da Superchain não).
    */
   getLocks?(account: string): Promise<LockPosition[]>;
+  /**
+   * Foto de um pool concentrado pelo endereço — é o que alimenta o simulador
+   * de APR (`core/simulator/`). OPCIONAL: só os pools no estilo v3.
+   * null = o endereço não é um pool DESTE protocolo nesta rede (o adapter
+   * prova pela própria factory, nunca por formato de resposta parecido).
+   */
+  describePool?(pool: Address): Promise<PoolSnapshot | null>;
+}
+
+/** Quem paga incentivo a um pool, e em que ritmo — insumo do simulador. */
+export interface PoolEmission {
+  token: TokenInfo;
+  /** token por segundo (unidades cruas) para o pool inteiro; 0 = parado */
+  ratePerSec: bigint;
+  /**
+   * A liquidez que divide esse ritmo: a em stake (Aerodrome/Velodrome,
+   * Pancake) ou a ativa inteira (Ramses paga sem stake).
+   */
+  sharedLiquidity: bigint;
+  /** true = só a liquidez em stake recebe */
+  requiresStake: boolean;
+  /** unix (s) em que o gauge parou, quando parou */
+  endedAt?: number;
+}
+
+/** Estado de um pool concentrado agora — ver `ProtocolAdapter.describePool`. */
+export interface PoolSnapshot {
+  protocol: string;
+  chainId: number;
+  poolAddress: Address;
+  /** mesmo nome que o card da carteira mostra ("WETH/USDC 0.05%", "CL100-WETH/USDC") */
+  poolSymbol: string;
+  token0: TokenInfo;
+  token1: TokenInfo;
+  /** taxa de swap em milionésimos (500 = 0,05%); null = o pool não expõe */
+  feePips: number | null;
+  tickSpacing: number;
+  tick: number;
+  sqrtPriceX96: bigint;
+  /** pool.liquidity(): liquidez ativa no tick corrente */
+  activeLiquidity: bigint;
+  /** saldo dos dois tokens no contrato do pool (dá o TVL); null = ilegível */
+  reserves: { amount0Raw: bigint; amount1Raw: bigint } | null;
+  /** null = o pool não tem incentivo (ou o protocolo não paga) */
+  emission: PoolEmission | null;
 }
 
 /**

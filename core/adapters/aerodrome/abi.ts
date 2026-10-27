@@ -23,6 +23,15 @@ export const factoryAbi = parseAbi([
   "function allPoolsLength() view returns (uint256)",
 ]);
 
+/** factory CL (Slipstream): o pool é identificado pelo tick spacing. A factory
+ *  clássica tem `getPool(a, b, bool)` — outro seletor, e a chamada só falha. */
+export const clFactoryAbi = parseAbi([
+  "function getPool(address tokenA, address tokenB, int24 tickSpacing) view returns (address)",
+]);
+
+/** taxa de swap do pool CL, em milionésimos (o simulador mostra) */
+export const clFeeAbi = parseAbi(["function fee() view returns (uint24)"]);
+
 /** sondas de metadados — cada pool responde só às funções do seu tipo.
  * liquidity/stakedLiquidity/gauge só existem nos pools CL (Slipstream) →
  * pool clássico falha nelas (allowFailure) e vira null. */

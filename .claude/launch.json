@@ -8,6 +8,12 @@
       "port": 3000
     },
     {
+      "name": "trackdefi-sim",
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": ["/c", "set", "TRACKDEFI_POOL_FIXTURE=tests/fixtures/pool-uniswap-v3-base.json", "&&", "npm", "run", "dev", "--", "-p", "3002"],
+      "port": 3002
+    },
+    {
       "name": "trackdefi-build",
       "runtimeExecutable": "cmd.exe",
       "runtimeArgs": ["/c", "npx", "next", "start", "-p", "3001"],

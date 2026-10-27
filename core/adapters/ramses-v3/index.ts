@@ -15,7 +15,7 @@
  */
 
 import { erc20Abi, type Address } from "viem";
-import type { ChainReader, LpPosition, TokenInfo, WarnSink } from "../../types";
+import type { ChainReader, LpPosition, PoolEmission, PoolSnapshot, TokenInfo, WarnSink } from "../../types";
 import type { UniRawPosition } from "../uniswap-v3/abi";
 import { UniswapV3Adapter } from "../uniswap-v3/index";
 import { cleanSymbol } from "../aerodrome/index";
@@ -66,6 +66,45 @@ export class RamsesV3Adapter extends UniswapV3Adapter {
 
   protected override poolSymbol(sym0: string, sym1: string, p: UniRawPosition): string {
     return `CL${p.fee}-${sym0}/${sym1}`;
+  }
+
+  protected override poolKeyOf(_fee: number, tickSpacing: number): number {
+    return tickSpacing;
+  }
+
+  /** Simulador: o gauge paga a liquidez ATIVA inteira, sem stake (ver o topo). */
+  protected override async poolEmission(pool: PoolSnapshot): Promise<PoolEmission | null> {
+    const voter = (await this.reader.readContract({
+      address: this.feeCollector,
+      abi: feeCollectorAbi,
+      functionName: "voter",
+    })) as Address;
+    if (voter.toLowerCase() === ZERO) return null; // rede sem gauges
+    const gauge = (await this.reader.readContract({
+      address: voter,
+      abi: ramsesVoterAbi,
+      functionName: "gaugeForPool",
+      args: [pool.poolAddress],
+    })) as Address;
+    if (gauge.toLowerCase() === ZERO) return null;
+    const tokens = (await this.reader.readContract({ address: gauge, abi: gaugeV3Abi, functionName: "getRewardTokens" })) as Address[];
+    if (tokens.length === 0) return null;
+    const rates = await this.reader.multicall({
+      contracts: tokens.map((t) => ({ address: gauge, abi: gaugeV3Abi, functionName: "rewardRate", args: [t] })),
+      allowFailure: true,
+    });
+    // o token que paga mais rápido — mesma escolha do "Earning now" da carteira
+    let melhor: { t: Address; r: bigint } | null = null;
+    tokens.forEach((t, i) => {
+      const r = rates[i].status === "success" ? (rates[i].result as bigint) : null;
+      if (r !== null && (!melhor || r > melhor.r)) melhor = { t, r };
+    });
+    if (!melhor) return null;
+    const { t, r } = melhor as { t: Address; r: bigint };
+    const meta = await this.loadRewardTokens([t]);
+    const token = meta.get(t.toLowerCase());
+    if (!token) return null;
+    return { token, ratePerSec: r, sharedLiquidity: pool.activeLiquidity, requiresStake: false };
   }
 
   /** Recompensas do gauge (a receber) e insumos do "Earning now" de emissões. */

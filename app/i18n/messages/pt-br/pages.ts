@@ -294,6 +294,23 @@ const pages: PagesMessages = {
     },
   },
 
+  tools: {
+    title: "Ferramentas",
+    description: "Calculadoras grátis e somente leitura para quem provê liquidez, com os mesmos dados on-chain das páginas de carteira do trackdefi.",
+    heading: "Ferramentas",
+    lede: "Calculadoras feitas com os mesmos números on-chain das páginas de carteira. Sem conectar carteira, nada para assinar.",
+    simulatorTitle: "Simulador de APR",
+    simulatorBody: "Escolha um pool, um valor e uma faixa de preço: veja quanto renderia dentro da faixa, quanto da última semana o preço passou nela e em que o seu depósito se transforma em cada borda.",
+  },
+
+  simulator: {
+    title: "Simulador de APR para liquidez concentrada",
+    description: "Estime quanto uma posição no estilo Uniswap v3 renderia: taxas medidas on-chain, emissões e tempo na faixa nos últimos 7 dias. Somente leitura, sem carteira.",
+    heading: "Simulador de APR",
+    lede: "Cole um pool, escolha quanto e em que faixa de preço. Os números vêm do próprio contrato do pool, no ritmo de agora.",
+    back: "← Todas as ferramentas",
+  },
+
   feedback: {
     title: "Feedback",
     description:

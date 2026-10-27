@@ -12,10 +12,10 @@
  */
 
 import { erc20Abi, type Address } from "viem";
-import type { ChainReader, LockPosition, LpPosition, PositionKind, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
+import type { ChainReader, LockPosition, LpPosition, PoolSnapshot, PositionKind, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { mapLimit } from "../../util";
-import { factoryAbi, gaugeAbi, poolProbeAbi, sugarAbi, SUGAR_MAX_POSITIONS, type SugarPosition } from "./abi";
+import { clFactoryAbi, clFeeAbi, factoryAbi, gaugeAbi, poolProbeAbi, sugarAbi, SUGAR_MAX_POSITIONS, type SugarPosition } from "./abi";
 import { AERODROME_BASE, CHAIN_ID, type SugarChainConfig } from "./config";
 import { buildLocks, rewardsSugarAbi, veSugarAbi, type RawLock, type RawVoteReward } from "./ve";
 
@@ -279,6 +279,90 @@ export class AerodromeAdapter implements ProtocolAdapter {
       offset += BigInt(SUGAR_MAX_POSITIONS);
     }
     return out;
+  }
+
+  /**
+   * Foto de um pool CL (Slipstream) para o simulador. Prova de origem: uma
+   * das factories da config devolve este endereço para o par e o tick
+   * spacing. Pool clássico (v2) não responde `tickSpacing()` → null.
+   */
+  async describePool(pool: Address): Promise<PoolSnapshot | null> {
+    const FNS = ["token0", "token1", "tickSpacing", "slot0", "liquidity", "stakedLiquidity", "gauge"] as const;
+    const res = await this.reader.multicall({
+      contracts: [
+        ...FNS.map((fn) => ({ address: pool, abi: poolProbeAbi, functionName: fn })),
+        { address: pool, abi: clFeeAbi, functionName: "fee" },
+      ],
+      allowFailure: true,
+    });
+    if (res.slice(0, 5).some((r) => r.status !== "success")) return null;
+    const token0 = res[0].result as Address;
+    const token1 = res[1].result as Address;
+    const tickSpacing = Number(res[2].result);
+    const slot0 = res[3].result as readonly unknown[];
+
+    const prova = await this.reader.multicall({
+      contracts: this.factories.map((f) => ({
+        address: f,
+        abi: clFactoryAbi,
+        functionName: "getPool",
+        args: [token0, token1, tickSpacing],
+      })),
+      allowFailure: true,
+    });
+    if (!prova.some((r) => r.status === "success" && (r.result as string).toLowerCase() === pool.toLowerCase())) return null;
+
+    const gaugeRes = res[6];
+    const gauge = gaugeRes.status === "success" && gaugeRes.result !== ZERO ? (gaugeRes.result as Address) : null;
+    const [tokens, bal, rates] = await Promise.all([
+      this.loadTokens([token0, token1, ...(gauge ? [this.emissionsToken] : [])]),
+      this.reader.multicall({
+        contracts: [token0, token1].map((t) => ({ address: t, abi: erc20Abi, functionName: "balanceOf", args: [pool] })),
+        allowFailure: true,
+      }),
+      gauge
+        ? this.reader.multicall({
+            contracts: (["rewardRate", "periodFinish"] as const).map((fn) => ({ address: gauge, abi: gaugeAbi, functionName: fn })),
+            allowFailure: true,
+          })
+        : Promise.resolve(null),
+    ]);
+    const t0 = tokens.get(token0)!;
+    const t1 = tokens.get(token1)!;
+
+    let emission: PoolSnapshot["emission"] = null;
+    const staked = res[5];
+    if (gauge && rates && rates.every((r) => r.status === "success") && staked.status === "success") {
+      // mesma regra da carteira: depois do periodFinish o gauge não paga
+      const end = Number(rates[1].result as bigint);
+      const ended = end <= Math.floor(Date.now() / 1000);
+      emission = {
+        token: tokens.get(this.emissionsToken)!,
+        ratePerSec: ended ? 0n : (rates[0].result as bigint),
+        sharedLiquidity: staked.result as bigint,
+        requiresStake: true,
+        ...(ended ? { endedAt: end } : {}),
+      };
+    }
+
+    return {
+      protocol: this.protocol,
+      chainId: this.chainId,
+      poolAddress: pool,
+      poolSymbol: `CL${tickSpacing}-${t0.symbol}/${t1.symbol}`,
+      token0: t0,
+      token1: t1,
+      feePips: res[7].status === "success" ? Number(res[7].result) : null,
+      tickSpacing,
+      tick: Number(slot0[1]),
+      sqrtPriceX96: slot0[0] as bigint,
+      activeLiquidity: res[4].result as bigint,
+      reserves:
+        bal[0].status === "success" && bal[1].status === "success"
+          ? { amount0Raw: bal[0].result as bigint, amount1Raw: bal[1].result as bigint }
+          : null,
+      emission,
+    };
   }
 
   // ------------------------------------------------------------- metadados

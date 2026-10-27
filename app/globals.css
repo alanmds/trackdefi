@@ -1718,6 +1718,9 @@ a.chip:hover {
   .netlogos-panel,
   .protologo-name {
     transition: none;
+  }
+}
+
 /* espaço de anúncio (app/ui/AdSlot.tsx): rótulo visível e altura FIXA — o
    iframe carrega depois da página e, sem a altura reservada, empurraria o
    conteúdo. Formatos do mapa de banners: 728 × 90 no desktop; no celular,
@@ -1756,5 +1759,285 @@ a.chip:hover {
   .ad-wallet-scan .ad-frame {
     max-width: 320px;
     height: 100px;
+  }
+}
+
+/* ------------------------------------------------ ferramentas (/tools)
+   Mesma família dos cards da carteira; o simulador reaproveita o campo de
+   busca, os chips e o card de posição. */
+.prose ul.tools-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 22px;
+}
+
+.tools-item {
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.tools-item strong {
+  color: var(--accent);
+  font-size: 17px;
+}
+
+.tools-item span {
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+@media (hover: hover) {
+  .tools-item:hover {
+    border-color: var(--border-strong);
+  }
+}
+
+.sim-page {
+  max-width: 760px;
+}
+
+.sim-form {
+  max-width: none;
+  margin-top: 22px;
+}
+
+.sim-supported,
+.sim-muted {
+  color: var(--ink-3);
+  font-size: 14px;
+}
+
+.sim-supported {
+  margin: 0 0 18px;
+}
+
+.sim-block {
+  display: block;
+}
+
+.sim-chains {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+button.chip {
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+
+.chip-on {
+  background: var(--ink);
+  color: var(--card-2);
+  border-color: var(--ink);
+}
+
+.sim-card {
+  display: grid;
+  gap: 16px;
+}
+
+.sim-pool {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+
+.sim-pool h2.pos-title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.sim-sub {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.sim-price,
+.sim-headline {
+  display: grid;
+  gap: 2px;
+}
+
+.sim-price {
+  text-align: right;
+}
+
+.sim-label {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.sim-price strong {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sim-unit {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.sim-flip {
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  padding: 3px 8px;
+  margin-left: 2px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.sim-inputs {
+  display: grid;
+  gap: 14px;
+}
+
+.sim-range {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px 14px;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.sim-range legend {
+  font-weight: 600;
+  padding: 0 4px;
+}
+
+.sim-field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.sim-field > span {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sim-field input {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--ink);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sim-presets {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sim-check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 14px;
+}
+
+.sim-note {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.sim-warn {
+  color: var(--warn);
+  background: var(--warn-bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+.sim-headline {
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+
+.sim-headline strong {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+  color: var(--good);
+}
+
+.sim-rows {
+  margin: 0;
+  display: grid;
+}
+
+.sim-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.sim-row dt {
+  color: var(--ink-2);
+}
+
+.sim-row dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.prose ul.sim-edges {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-2);
+  gap: 4px;
+}
+
+.sim-how h2 {
+  font-size: 19px;
+}
+
+@media (max-width: 560px) {
+  .sim-price {
+    text-align: left;
+  }
+
+  .sim-range {
+    grid-template-columns: 1fr;
+  }
+
+  .sim-row {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sim-row dd {
+    text-align: left;
   }
 }

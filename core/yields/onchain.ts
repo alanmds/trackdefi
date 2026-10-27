@@ -489,3 +489,55 @@ export async function readPositionFeeWindows(
   // alvo que nem o estado ATUAL devolveu também ficou sem medição
   return { byTarget, tooNew, unmeasured: targets.length - legiveis.length + semNada };
 }
+
+// ------------------------------------------------- pool inteiro (simulador)
+
+/**
+ * Δ feeGrowthGlobal do POOL em cada janela de `MEASURED_WINDOWS_HOURS` — o
+ * que o simulador de APR usa (`core/simulator.ts`).
+ *
+ * O acumulador global sobe `taxa ÷ L_ativa` a cada swap, então o delta é a
+ * taxa que UMA unidade de liquidez ganhou estando ativa a janela toda. Para
+ * uma faixa que o usuário ainda não abriu, é a resposta honesta a "quanto
+ * ela teria rendido enquanto em faixa" — o tempo fora da faixa é outra
+ * pergunta, e o simulador mostra separado.
+ *
+ * Mesma prova de bloco da medição por posição (RPC que ignora o bloco pedido
+ * seria um 0% falso). A duração da janela sai dos HORÁRIOS dos blocos quando
+ * o Multicall3 responde — blocos × secPerBlock só na falta.
+ */
+export async function readPoolFeeGrowthWindows(
+  reader: ChainReader,
+  protocol: string,
+  pool: Address,
+  currentBlock: bigint,
+  secPerBlock: number,
+): Promise<FeeGrowthWindow[]> {
+  if (!poolLayout(protocol)) return [];
+  // os ticks não importam aqui: só os acumuladores globais são lidos
+  const alvo: FeeWindowTarget = { key: "pool", protocol, pool, tickLower: 0, tickUpper: 0, inside0Last: null };
+  const agora = await readSnapshots(reader, [alvo]);
+  const a = agora.snaps.get("pool");
+  if (!a) return [];
+
+  const out: FeeGrowthWindow[] = [];
+  for (const horas of MEASURED_WINDOWS_HOURS) {
+    const blocos = BigInt(Math.max(1, Math.round((horas * 3600) / secPerBlock)));
+    if (currentBlock <= blocos) continue;
+    try {
+      const antes = await readSnapshots(reader, [alvo], currentBlock - blocos);
+      const b = antes.snaps.get("pool");
+      if (!b) continue;
+      const provado = agora.ts !== null && antes.ts !== null ? Number(agora.ts - antes.ts) : null;
+      if (provado !== null && provado < (horas * 3600) / 2) continue; // RPC ignorou o bloco
+      out.push({
+        delta0: wrapSub(a.global0, b.global0),
+        delta1: wrapSub(a.global1, b.global1),
+        windowSec: provado ?? Number(blocos) * secPerBlock,
+      });
+    } catch {
+      continue; // nó sem arquivo para esta janela; a outra pode passar
+    }
+  }
+  return out;
+}

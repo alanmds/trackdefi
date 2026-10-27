@@ -71,7 +71,7 @@ describe("rotas e idiomas", () => {
   });
 
   it("nenhum código de idioma colide com uma rota do site", () => {
-    const rotas = ["api", "w", "glossary", "roadmap", "changelog", "feedback", "how-it-works", "opengraph-image", "apple-icon"];
+    const rotas = ["api", "w", "glossary", "roadmap", "changelog", "feedback", "how-it-works", "tools", "opengraph-image", "apple-icon"];
     for (const l of LOCALES) expect(rotas).not.toContain(l.code);
   });
 });
