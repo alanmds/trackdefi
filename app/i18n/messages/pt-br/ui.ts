@@ -23,6 +23,7 @@ const ui: UiMessages = {
     readOnly: "Somente leitura · nunca pedimos chaves",
     language: "Idioma",
     theme: "Alternar entre tema diurno e noturno",
+    tools: "Ferramentas",
   },
 
   costbar: {

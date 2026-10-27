@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "apr-simulator": {
+    title: "Novidade: simulador de APR",
+    body: "Uma seção nova, Ferramentas, ao lado da logo. A primeira ferramenta, o simulador de APR, recebe um pool, um valor e uma faixa de preço e mostra quanto a posição renderia dentro da faixa — taxas medidas no próprio pool nas últimas 24 horas e 15 minutos, mais as emissões —, quanto dos últimos 7 dias o preço passou dentro da faixa e em que o seu depósito se transforma em cada borda.",
+  },
   "night-theme": {
     title: "Tema noturno",
     body: "O trackdefi agora tem um visual escuro, para a noite. Ele segue sozinho a configuração do seu aparelho, e o botão de lua/sol no topo troca entre dia e noite quando você quiser — a escolha fica guardada neste navegador.",

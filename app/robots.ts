@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { LOCALES, localePath } from "./i18n/config";
-import { SITE_URL } from "./site";
+import { SITE_URL, TOOLS_INDEXED } from "./site";
 
 /**
  * Permite indexar a landing e as páginas institucionais; bloqueia a varredura
@@ -8,7 +8,7 @@ import { SITE_URL } from "./site";
  * Vale para todos os idiomas: `/pt-br/w/` bloqueado junto com `/w/`.
  */
 export default function robots(): MetadataRoute.Robots {
-  const pages = ["/", "/how-it-works", "/roadmap", "/glossary"];
+  const pages = ["/", "/how-it-works", "/roadmap", "/glossary", ...(TOOLS_INDEXED ? ["/tools"] : [])];
   return {
     rules: {
       userAgent: "*",

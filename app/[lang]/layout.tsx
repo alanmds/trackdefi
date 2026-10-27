@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Fraunces, Inter } from "next/font/google";
-import { COVERAGE, humanList, SITE_NAME, SITE_URL } from "../site";
+import { COVERAGE, humanList, SITE_NAME, SITE_URL, TOOLS_INDEXED } from "../site";
 import { isLocale, localeInfo, LOCALE_CODES, localePath, type Locale } from "../i18n/config";
 import { getMessages } from "../i18n/get";
 import { I18nProvider } from "../i18n/provider";
@@ -141,9 +141,16 @@ export default async function RootLayout({
           <CostBar />
           <header className="site-header">
             <div className="container">
-              <Link href={to("/")} className="brand">
-                track<span className="tld">defi</span>
-              </Link>
+              <div className="header-left">
+                <Link href={to("/")} className="brand">
+                  track<span className="tld">defi</span>
+                </Link>
+                {TOOLS_INDEXED && (
+                  <Link href={to("/tools")} className="header-link">
+                    {ui.header.tools}
+                  </Link>
+                )}
+              </div>
               <span className="header-note">
                 <span className="dot-live" aria-hidden />
                 {ui.header.readOnly}

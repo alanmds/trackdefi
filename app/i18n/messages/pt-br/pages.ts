@@ -126,6 +126,10 @@ const pages: PagesMessages = {
     liveTitle: "No ar hoje",
     live: [
       {
+        title: "Simulador de APR",
+        body: "escolha um pool, um valor e uma faixa de preço para ver quanto renderia dentro da faixa, a partir das taxas medidas no próprio pool, e quanto da última semana o preço passou nela. Na seção <b>Ferramentas</b>, ao lado da logo.",
+      },
+      {
         title: "APR por posição — “Rendendo agora”",
         body: "o que <em>a sua</em> posição rende agora, não a média do pool: taxas de swap e emissões contadas separadamente, e um 0% honesto quando uma posição concentrada está fora da faixa e não rende nada.",
       },
@@ -263,8 +267,8 @@ const pages: PagesMessages = {
         body: "há quanto tempo o pool existe, mostrado ao lado do APR. Um pool novinho com APR alto é um sinal diferente de um pool antigo com o mesmo número.",
       },
       {
-        title: "Simulações e calculadoras",
-        body: "ferramentas para testar uma posição antes de abri-la ou mudá-la: o que uma faixa de preço teria em mãos a um dado preço, a perda impermanente comparada a simplesmente segurar os tokens, e o que um APR significa em dólares por dia. São só calculadoras — nunca tocam numa carteira.",
+        title: "Mais calculadoras",
+        body: "depois do simulador de APR: a perda impermanente comparada a simplesmente segurar os tokens, e a descoberta de pares por APR, volume e valor de mercado. São só calculadoras — nunca tocam numa carteira.",
       },
     ],
     neverTitle: "O que nunca vai mudar",

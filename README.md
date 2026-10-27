@@ -46,6 +46,11 @@ and emissions, plus veAERO / veVELO governance locks. For each position it also
 shows what that position itself is earning now — `0%` in fees when it is out of
 range.
 
+It also has an [APR simulator](https://trackdefi.app/tools/apr-simulator): pick a
+pool, an amount and a price range to see what it would earn while in range (fees
+measured on the pool itself, plus emissions) and how much of the last 7 days the
+price spent inside the range.
+
 What it doesn't do: no profit and loss or impermanent loss since a position was
 opened, no alerts, and no transactions of any kind. The [roadmap](https://trackdefi.app/roadmap) tracks what's next;
 [how it works](https://trackdefi.app/how-it-works) explains where every number

@@ -168,6 +168,52 @@ button {
   text-decoration: none;
 }
 
+/* logo + "Ferramentas" à esquerda */
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  flex: none;
+}
+
+.header-link {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+@media (hover: hover) {
+  .header-link:hover {
+    color: var(--accent);
+    text-decoration: none;
+  }
+}
+
+/* celular: tudo numa linha até ~360 px; abaixo disso os botões descem em
+   vez de empurrar a página para o lado */
+@media (max-width: 420px) {
+  .site-header .container {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    font-size: 21px;
+  }
+
+  .header-left {
+    gap: 12px;
+  }
+
+  .header-link {
+    font-size: 14px;
+  }
+
+  .header-tools {
+    margin-left: auto;
+  }
+}
+
 .brand .tld {
   color: var(--accent);
 }

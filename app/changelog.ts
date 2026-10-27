@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "apr-simulator",
+    date: "2026-10-26",
+    kind: "feature",
+    title: "New: APR simulator",
+    body: "A new Tools section, next to the logo. Its first tool, the APR simulator, takes a pool, an amount and a price range and shows what the position would earn while in range — fees measured on the pool itself over the last 24 hours and 15 minutes, plus emissions — how much of the last 7 days the price spent inside the range, and what your deposit turns into at each edge.",
+  },
+  {
     id: "ads-keep-it-free",
     date: "2026-10-26",
     kind: "project",
