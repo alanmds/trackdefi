@@ -12,7 +12,7 @@
  */
 
 import { erc20Abi, type Address } from "viem";
-import type { ChainReader, LockPosition, LpPosition, PoolSnapshot, PositionKind, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
+import type { ChainReader, LockPosition, LpPosition, PoolQuery, PoolSnapshot, PositionKind, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { mapLimit } from "../../util";
 import { clFactoryAbi, clFeeAbi, factoryAbi, gaugeAbi, poolProbeAbi, sugarAbi, SUGAR_MAX_POSITIONS, type SugarPosition } from "./abi";
@@ -363,6 +363,39 @@ export class AerodromeAdapter implements ProtocolAdapter {
           : null,
       emission,
     };
+  }
+
+  /**
+   * Endereços CL pelas factories da config (descoberta de pares → simulador).
+   * A factory clássica tem outro `getPool` e só falha; o primeiro endereço
+   * não-zero vence.
+   */
+  async findPools(queries: PoolQuery[]): Promise<(Address | null)[]> {
+    const validas = queries.map((q, i) => ({ q, i })).filter(({ q }) => q.tickSpacing !== null && q.tickSpacing > 0);
+    if (validas.length === 0) return queries.map(() => null);
+    const res = await this.reader.multicall({
+      contracts: validas.flatMap(({ q }) =>
+        this.factories.map((f) => ({
+          address: f,
+          abi: clFactoryAbi,
+          functionName: "getPool",
+          args: [q.token0, q.token1, q.tickSpacing],
+        })),
+      ),
+      allowFailure: true,
+      batchSize: 16_384,
+    });
+    const out: (Address | null)[] = queries.map(() => null);
+    validas.forEach(({ i }, k) => {
+      for (let j = 0; j < this.factories.length; j++) {
+        const r = res[k * this.factories.length + j];
+        if (r.status === "success" && r.result !== ZERO) {
+          out[i] = r.result as Address;
+          break;
+        }
+      }
+    });
+    return out;
   }
 
   // ------------------------------------------------------------- metadados

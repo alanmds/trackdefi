@@ -59,7 +59,7 @@ export const CHANGELOG: ChangeEntry[] = [
     date: "2026-10-26",
     kind: "feature",
     title: "New: pair finder",
-    body: "The second tool in the Tools section. Filter thousands of pools on the exchanges trackdefi reads by APR, 24-hour volume, TVL and the market cap of the smaller token, then sort by any of them. The APR there is the pool average reported by DefiLlama — the page says so — and the APR simulator shows what a specific range would earn.",
+    body: "The second tool in the Tools section. Filter thousands of pools on the exchanges trackdefi reads by APR, 24-hour volume, TVL and the market cap of the smaller token, then sort by any of them. The APR there is the pool average reported by DefiLlama — the page says so — and the Simulate button on each concentrated pool opens it in the APR simulator, to see what a specific range would earn.",
   },
   {
     id: "apr-simulator",

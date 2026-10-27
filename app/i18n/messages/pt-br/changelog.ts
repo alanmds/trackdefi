@@ -9,7 +9,7 @@ import type { ChangelogTranslations } from "../../get";
 const changelog: ChangelogTranslations = {
   "pair-finder": {
     title: "Novidade: descoberta de pares",
-    body: "A segunda ferramenta da seção Ferramentas. Filtre milhares de pools das corretoras que o trackdefi lê por APR, volume de 24 horas, TVL e market cap do token menor, e ordene por qualquer um deles. O APR ali é a média do pool informada pela DefiLlama — a página avisa —, e o simulador de APR mostra quanto uma faixa específica renderia.",
+    body: "A segunda ferramenta da seção Ferramentas. Filtre milhares de pools das corretoras que o trackdefi lê por APR, volume de 24 horas, TVL e market cap do token menor, e ordene por qualquer um deles. O APR ali é a média do pool informada pela DefiLlama — a página avisa —, e o botão Simular em cada pool concentrado abre o pool no simulador de APR, para ver quanto uma faixa específica renderia.",
   },
   "apr-simulator": {
     title: "Novidade: simulador de APR",

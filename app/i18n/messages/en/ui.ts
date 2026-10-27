@@ -377,11 +377,11 @@ const ui = {
     colTvl: "TVL",
     colMcap: "Market cap (smaller token)",
     aprSplit: "fees {base} · rewards {reward}",
-    open: "DefiLlama",
-    openTitle: "Open this pool on DefiLlama",
+    simulate: "Simulate",
+    simulateTitle: "Open this pool in the APR simulator",
     none: "No pool matches these filters.",
     source:
-      "Pools from the exchanges and networks trackdefi reads. Data: DefiLlama, refreshed about once an hour. Market cap is the smaller of the two tokens; wrapped ETH, BNB and SOL count as the coin itself. “—” means DefiLlama has no figure for it — never a guess.",
+      "Pools from the exchanges and networks trackdefi reads. Data: DefiLlama, refreshed about once an hour. Market cap is the smaller of the two tokens; wrapped ETH, BNB and SOL count as the coin itself. “—” means DefiLlama has no figure for it — never a guess. The Simulate button appears on the pools the APR simulator handles (Uniswap v3-style and CL pools).",
     caveat: "A list to start research, not a recommendation. Not financial advice.",
   },
 

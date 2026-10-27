@@ -402,11 +402,11 @@ const ui: UiMessages = {
     colTvl: "TVL",
     colMcap: "Market cap (token menor)",
     aprSplit: "taxas {base} · recompensas {reward}",
-    open: "DefiLlama",
-    openTitle: "Abrir este pool na DefiLlama",
+    simulate: "Simular",
+    simulateTitle: "Abrir este pool no simulador de APR",
     none: "Nenhum pool com esses filtros.",
     source:
-      "Pools das corretoras e redes que o trackdefi lê. Dados: DefiLlama, atualizados mais ou menos de hora em hora. O market cap é o do menor dos dois tokens; ETH, BNB e SOL embrulhados contam como a própria moeda. “—” quer dizer que a DefiLlama não tem o número — nunca um palpite.",
+      "Pools das corretoras e redes que o trackdefi lê. Dados: DefiLlama, atualizados mais ou menos de hora em hora. O market cap é o do menor dos dois tokens; ETH, BNB e SOL embrulhados contam como a própria moeda. “—” quer dizer que a DefiLlama não tem o número — nunca um palpite. O botão Simular aparece nos pools que o simulador de APR atende (os do estilo Uniswap v3 e os CL).",
     caveat: "Uma lista para começar a pesquisa, não uma recomendação. Não é recomendação de investimento.",
   },
 

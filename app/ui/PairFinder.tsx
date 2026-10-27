@@ -215,14 +215,15 @@ export default function PairFinder() {
                       {usd(p.mcapMin)}
                     </td>
                     <td className="pairs-open">
-                      <a
-                        href={`https://defillama.com/yields/pool/${p.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={t.openTitle}
-                      >
-                        {t.open} ↗
-                      </a>
+                      {p.pool && (
+                        <Link
+                          href={localePath(locale, `/tools/apr-simulator?pool=${p.pool}`)}
+                          className="btn btn-ghost btn-sm"
+                          title={t.simulateTitle}
+                        >
+                          {t.simulate}
+                        </Link>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -12,10 +12,12 @@
  * pares; 2.103 de 2.247 com volume; mcaps em lotes de 100.
  */
 
+import type { Address } from "viem";
 import { buildAdapters } from "../adapters/registry";
 import { cleanSymbol } from "../adapters/aerodrome/index";
 import { CHAINS } from "../chains";
 import { fetchMarketCaps } from "../prices/defillama";
+import type { PoolQuery, ProtocolAdapter } from "../types";
 import { getYieldsRows, MAX_SANE_APR, type LlamaRowFull } from "../yields/defillama";
 
 /**
@@ -56,6 +58,9 @@ export interface PairDTO {
   volume7d: number | null;
   /** market cap do token MENOR do par; null se faltar o de qualquer um */
   mcapMin: number | null;
+  /** endereço on-chain do pool (para o botão "Simular"); null = o simulador
+   *  não atende o pool, ou a factory não confirmou */
+  pool: string | null;
 }
 
 export interface PairsDTO {
@@ -108,7 +113,13 @@ const usd0 = (v: number | null) => (v === null ? null : Math.round(v));
  * PURA: linhas do dataset + market caps → tabela. `covered` = "protocolo@rede"
  * que o site lê. Linha sem dois tokens fica de fora (não é par).
  */
-export function buildPairs(rows: LlamaRowFull[], covered: Set<string>, mcaps: Map<string, number>): PairDTO[] {
+export function buildPairs(
+  rows: LlamaRowFull[],
+  covered: Set<string>,
+  mcaps: Map<string, number>,
+  /** id da DefiLlama → endereço do pool, achado pela factory */
+  addresses: Map<string, string> = new Map(),
+): PairDTO[] {
   const porLabel = new Map(Object.entries(CHAINS).map(([id, c]) => [c.yieldsLabel, Number(id)]));
   const out: PairDTO[] = [];
   for (const r of rows) {
@@ -135,19 +146,85 @@ export function buildPairs(rows: LlamaRowFull[], covered: Set<string>, mcaps: Ma
       volume1d: usd0(num(r.volumeUsd1d)),
       volume7d: usd0(num(r.volumeUsd7d)),
       mcapMin: caps.every((c) => c !== undefined) ? Math.round(Math.min(...(caps as number[]))) : null,
+      pool: addresses.get(r.pool) ?? null,
     });
   }
   return out;
 }
 
-/** quais "protocolo@rede" o site lê — do registry, a fonte única */
-export function coveredPairs(): Set<string> {
-  return new Set(buildAdapters().map((a) => `${a.protocol}@${a.chainId}`));
+// ------------------------------------------- endereço do pool (botão Simular)
+
+const FEE_META = /^(\d+(?:\.\d+)?)%$/; // "0.05%" — Uniswap, Sushi, Pancake
+const CL_META = /^CL(\d+)\b/; // "CL100 - 0.0217%" — Aerodrome/Velodrome CL
+
+/**
+ * PURA: a "forma" do pool tirada do poolMeta da DefiLlama, nos projetos que o
+ * simulador atende (CL/v3). Formatos conferidos no dataset em 26/10/2026: os
+ * 1.962 pools de Uniswap/Sushi/Pancake v3 são "N%", e os 285 CL de
+ * Aerodrome/Velodrome são "CLN - N%". Pool clássico, v4 e Orca → null.
+ */
+export function poolQueryOf(project: string, meta: string | null, tokens: string[]): PoolQuery | null {
+  if (tokens.length !== 2 || !meta) return null;
+  const [token0, token1] = tokens as [Address, Address];
+  if (project === "uniswap-v3" || project === "sushiswap-v3" || project === "pancakeswap-amm-v3") {
+    const m = meta.match(FEE_META);
+    return m ? { token0, token1, fee: Math.round(parseFloat(m[1]) * 10_000), tickSpacing: null } : null;
+  }
+  if (project === "aerodrome-slipstream" || project === "velodrome-v3") {
+    const m = meta.match(CL_META);
+    return m ? { token0, token1, fee: null, tickSpacing: Number(m[1]) } : null;
+  }
+  return null;
+}
+
+/** Endereço não muda: guarda por 24 h, e só o pool novo vai à rede. */
+const ADDR_TTL_MS = 24 * 60 * 60 * 1000;
+let enderecos: { at: number; map: Map<string, string | null> } = { at: 0, map: new Map() };
+
+/**
+ * id da DefiLlama → endereço, perguntando à factory de cada protocolo (um
+ * multicall grande por adapter). Falha numa rede só deixa aquelas linhas sem
+ * botão — nunca derruba a tabela.
+ */
+async function resolveAddresses(
+  rows: LlamaRowFull[],
+  adapters: ProtocolAdapter[],
+  onWarn: (msg: string) => void,
+): Promise<Map<string, string>> {
+  if (Date.now() - enderecos.at > ADDR_TTL_MS) enderecos = { at: Date.now(), map: new Map() };
+  const porLabel = new Map(Object.entries(CHAINS).map(([id, c]) => [c.yieldsLabel, Number(id)]));
+  const porAdapter = new Map<ProtocolAdapter, { id: string; q: PoolQuery }[]>();
+  for (const r of rows) {
+    if (enderecos.map.has(r.pool)) continue;
+    const protocol = DISCOVERY_PROJECTS[r.project];
+    const chainId = porLabel.get(r.chain);
+    const q = poolQueryOf(r.project, r.poolMeta, r.underlyingTokens ?? []);
+    if (!protocol || chainId === undefined || !q) continue;
+    const a = adapters.find((x) => x.protocol === protocol && x.chainId === chainId && x.findPools);
+    if (!a) continue;
+    const lista = porAdapter.get(a) ?? [];
+    lista.push({ id: r.pool, q });
+    porAdapter.set(a, lista);
+  }
+  await Promise.all(
+    [...porAdapter.entries()].map(async ([a, lista]) => {
+      try {
+        const achados = await a.findPools!(lista.map((x) => x.q));
+        lista.forEach((x, i) => enderecos.map.set(x.id, achados[i]));
+      } catch (e) {
+        onWarn(`endereços de ${a.protocol}@${a.chainId} indisponíveis: ${(e as Error).message.split("\n")[0].slice(0, 60)}`);
+      }
+    }),
+  );
+  const out = new Map<string, string>();
+  for (const [id, addr] of enderecos.map) if (addr) out.set(id, addr);
+  return out;
 }
 
 /** Servidor: baixa (com o cache de 1 h das linhas) e monta a tabela. */
 export async function loadPairs(onWarn: (msg: string) => void = () => {}): Promise<PairsDTO> {
-  const covered = coveredPairs();
+  const adapters = buildAdapters();
+  const covered = new Set(adapters.map((a) => `${a.protocol}@${a.chainId}`));
   const rows = await getYieldsRows();
   const porLabel = new Map(Object.entries(CHAINS).map(([id, c]) => [c.yieldsLabel, Number(id)]));
   const keys: string[] = [];
@@ -157,6 +234,6 @@ export async function loadPairs(onWarn: (msg: string) => void = () => {}): Promi
     if (!protocol || chainId === undefined || !covered.has(`${protocol}@${chainId}`)) continue;
     for (const t of r.underlyingTokens ?? []) if (t) keys.push(mcapKey(chainId, t));
   }
-  const mcaps = await fetchMarketCaps(keys, onWarn);
-  return { pairs: buildPairs(rows, covered, mcaps), readAt: Math.floor(Date.now() / 1000) };
+  const [mcaps, addresses] = await Promise.all([fetchMarketCaps(keys, onWarn), resolveAddresses(rows, adapters, onWarn)]);
+  return { pairs: buildPairs(rows, covered, mcaps, addresses), readAt: Math.floor(Date.now() / 1000) };
 }

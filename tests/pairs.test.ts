@@ -6,7 +6,7 @@
 
 import { describe, expect, it } from "vitest";
 import { buildAdapters } from "../core/adapters/registry";
-import { buildPairs, DISCOVERY_PROJECTS, mcapKey, type PairDTO } from "../core/discovery/pairs";
+import { buildPairs, DISCOVERY_PROJECTS, mcapKey, poolQueryOf, type PairDTO } from "../core/discovery/pairs";
 import type { LlamaRowFull } from "../core/yields/defillama";
 import { filterPairs } from "../app/ui/PairFinder";
 
@@ -80,6 +80,32 @@ describe("buildPairs", () => {
   });
 });
 
+describe("botão Simular: forma do pool e endereço", () => {
+  const t = [WETH_BASE, USDC_BASE];
+
+  it("fee tier vira milionésimos; CL vira tick spacing", () => {
+    expect(poolQueryOf("uniswap-v3", "0.05%", t)).toEqual({ token0: WETH_BASE, token1: USDC_BASE, fee: 500, tickSpacing: null });
+    expect(poolQueryOf("pancakeswap-amm-v3", "0.01%", t)?.fee).toBe(100);
+    expect(poolQueryOf("sushiswap-v3", "1%", t)?.fee).toBe(10_000);
+    expect(poolQueryOf("aerodrome-slipstream", "CL100 - 0.0217%", t)).toEqual({ token0: WETH_BASE, token1: USDC_BASE, fee: null, tickSpacing: 100 });
+  });
+
+  it("o que o simulador não atende fica sem consulta", () => {
+    expect(poolQueryOf("aerodrome-v1", "stable", t)).toBeNull();
+    expect(poolQueryOf("uniswap-v4", "0.05%", t)).toBeNull();
+    expect(poolQueryOf("orca-dex", null, t)).toBeNull();
+    expect(poolQueryOf("uniswap-v3", "0.05%", [WETH_BASE])).toBeNull();
+  });
+
+  it("o endereço achado vai na linha; sem ele, null", () => {
+    const addr = "0xd0b53D9277642d899DF5C87A3966A349A798F224";
+    const [com] = buildPairs([row({})], covered, caps, new Map([[UUID, addr]]));
+    const [sem] = buildPairs([row({})], covered, caps);
+    expect(com.pool).toBe(addr);
+    expect(sem.pool).toBeNull();
+  });
+});
+
 describe("filterPairs", () => {
   const base: PairDTO = {
     id: UUID,
@@ -94,6 +120,7 @@ describe("filterPairs", () => {
     volume1d: 1e5,
     volume7d: null,
     mcapMin: 1e9,
+    pool: null,
   };
   const pares: PairDTO[] = [
     base,

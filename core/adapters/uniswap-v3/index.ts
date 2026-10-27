@@ -20,7 +20,7 @@
  */
 
 import { erc20Abi, type Address } from "viem";
-import type { ChainReader, LpPosition, PoolEmission, PoolSnapshot, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
+import type { ChainReader, LpPosition, PoolEmission, PoolQuery, PoolSnapshot, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
 import { amountsForLiquidity } from "../../math/liquidity";
 import { getSqrtRatioAtTick } from "../../math/tickmath";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
@@ -213,6 +213,28 @@ export class UniswapV3Adapter implements ProtocolAdapter {
       this.warn(`${this.protocol}: incentivo do pool ilegível: ${(e as Error).message.split("\n")[0].slice(0, 60)}`);
     }
     return snap;
+  }
+
+  /** Endereços pela factory (descoberta de pares → simulador). */
+  async findPools(queries: PoolQuery[]): Promise<(Address | null)[]> {
+    const chaves = queries.map((q) => (q.fee === null && q.tickSpacing === null ? null : this.poolKeyOf(q.fee ?? 0, q.tickSpacing ?? 0)));
+    const validas = queries.map((q, i) => ({ q, k: chaves[i] })).filter((x) => x.k !== null && x.k > 0);
+    if (validas.length === 0) return queries.map(() => null);
+    const res = await this.reader.multicall({
+      contracts: validas.map(({ q, k }) => ({
+        address: this.factory,
+        ...this.getPoolCall({ ...EMPTY_RAW, token0: q.token0, token1: q.token1, fee: k! }),
+        functionName: "getPool",
+      })),
+      allowFailure: true,
+      batchSize: 16_384,
+    });
+    const achado = new Map<PoolQuery, Address>();
+    validas.forEach(({ q }, i) => {
+      const r = res[i];
+      if (r.status === "success" && (r.result as string).toLowerCase() !== ZERO_ADDRESS) achado.set(q, r.result as Address);
+    });
+    return queries.map((q) => achado.get(q) ?? null);
   }
 
   /** O 3º argumento do `getPool` a partir do pool: o fee tier (Uniswap/Pancake). */
@@ -433,6 +455,23 @@ export class UniswapV3Adapter implements ProtocolAdapter {
     return out;
   }
 }
+
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
+/** posição vazia — só o par e a chave importam para `getPoolCall` */
+const EMPTY_RAW: UniRawPosition = {
+  tokenId: 0n,
+  token0: ZERO_ADDRESS,
+  token1: ZERO_ADDRESS,
+  fee: 0,
+  tickLower: 0,
+  tickUpper: 0,
+  liquidity: 0n,
+  feeGrowthInside0LastX128: 0n,
+  tokensOwed0: 0n,
+  tokensOwed1: 0n,
+  staked: false,
+};
 
 function poolKey(p: UniRawPosition): string {
   return `${p.token0}-${p.token1}-${p.fee}`.toLowerCase();

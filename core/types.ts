@@ -190,6 +190,22 @@ export interface ProtocolAdapter {
    * prova pela própria factory, nunca por formato de resposta parecido).
    */
   describePool?(pool: Address): Promise<PoolSnapshot | null>;
+  /**
+   * Endereço do pool a partir do par e da "forma" dele, pela PRÓPRIA factory
+   * — é o que liga uma linha da descoberta de pares (que vem da DefiLlama,
+   * sem endereço) ao simulador. OPCIONAL: só os pools no estilo v3. Uma
+   * resposta por consulta, na mesma ordem; null = a factory não tem esse pool.
+   */
+  findPools?(queries: PoolQuery[]): Promise<(Address | null)[]>;
+}
+
+/** Par + forma do pool: fee tier (Uniswap/Pancake/Sushi) ou tick spacing (CL). */
+export interface PoolQuery {
+  token0: Address;
+  token1: Address;
+  /** taxa em milionésimos (500 = 0,05%) */
+  fee: number | null;
+  tickSpacing: number | null;
 }
 
 /** Quem paga incentivo a um pool, e em que ritmo — insumo do simulador. */
@@ -252,6 +268,9 @@ export type ChainReader = {
       args?: readonly unknown[];
     }[];
     allowFailure: true;
+    /** bytes de calldata por eth_call (viem; padrão 1.024). Lote grande de
+     *  consultas baratas sobe isto para não virar centenas de chamadas. */
+    batchSize?: number;
     /** lê tudo num bloco PASSADO — mesma exigência de arquivo do readContract */
     blockNumber?: bigint;
   }): Promise<{ status: "success" | "failure"; result?: unknown; error?: Error }[]>;
