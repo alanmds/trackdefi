@@ -56,7 +56,7 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 export const CHANGELOG: ChangeEntry[] = [
   {
     id: "classic-pools-v2",
-    date: "2026-10-27",
+    date: "2026-10-28",
     kind: "exchange",
     title: "Classic pools on Uniswap, SushiSwap and PancakeSwap",
     body: "trackdefi now reads the classic (v2) pools of three more exchanges: Uniswap v2 on Ethereum, Base, Arbitrum, Optimism, BNB Chain, Unichain and Robinhood Chain; SushiSwap v2 on Ethereum, Base, Arbitrum, Optimism and BNB Chain; PancakeSwap v2 on BNB Chain, Ethereum and Base. A classic position is a token in your wallet, so it shows its amounts and value, plus the pool average APR when DefiLlama has one. Swap fees are already inside the amounts, so nothing is pending to collect. LP tokens deposited in a farm aren't shown.",
