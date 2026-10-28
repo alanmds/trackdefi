@@ -163,7 +163,13 @@ export interface LockPosition {
  * - `capped` / `hooks`: limite conhecido — recarregar NÃO muda nada;
  * - `null`: só log interno, o visitante não tem o que fazer com isso.
  */
-export type AdapterNotice = { kind: "capped"; checked: number } | { kind: "hooks"; positions: number };
+export type AdapterNotice =
+  | { kind: "capped"; checked: number }
+  /** carteira com tokens demais para a lista de LPs clássicos (v2): só os primeiros foram vistos */
+  | { kind: "tokensCapped"; checked: number }
+  /** mais LPs clássicos (v2) do que o teto por protocolo e rede: só os primeiros foram lidos */
+  | { kind: "pairsCapped"; checked: number }
+  | { kind: "hooks"; positions: number };
 
 export type WarnSink = (msg: string, notice?: AdapterNotice | null) => void;
 

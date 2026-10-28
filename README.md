@@ -34,9 +34,12 @@ When a token has no reliable price, trackdefi shows `—` instead of guessing.
 |---|---|
 | Aerodrome | Base |
 | Velodrome | Optimism, Unichain, Ink, Mode, Soneium, Fraxtal, Lisk, Swell, Metal L2, Superseed, Celo |
+| Uniswap v2 | Base, Optimism, Ethereum, Arbitrum, Robinhood Chain, Unichain, BNB Chain |
 | Uniswap v3 | Base, Optimism, Ethereum, Arbitrum, Robinhood Chain, Unichain, BNB Chain |
 | Uniswap v4 | Robinhood Chain, BNB Chain |
+| PancakeSwap v2 | BNB Chain, Ethereum, Base |
 | PancakeSwap v3 | BNB Chain, Ethereum, Base, Arbitrum |
+| SushiSwap v2 | Ethereum, Optimism, BNB Chain, Base, Arbitrum |
 | SushiSwap v3 | Ethereum, Optimism, BNB Chain, Base, Arbitrum |
 | Ramses | Robinhood Chain, HyperEVM |
 | Orca | Solana |
@@ -66,7 +69,9 @@ comes from.
   PositionManager and StateView for Uniswap v4; the same NonfungiblePositionManager
   plus the MasterChef v3 for PancakeSwap v3; SushiSwap v3's own
   NonfungiblePositionManager, which has the Uniswap v3 layout; Ramses' own position manager and
-  its gauges, which pay emissions without staking)
+  its gauges, which pay emissions without staking; for the classic v2 pools of
+  Uniswap, PancakeSwap and SushiSwap, the pair contracts, found through the
+  token list of Alchemy's Token API since an LP token has no NFT to enumerate)
 - **@solana/kit + Orca's official Whirlpools SDK** — read-only access to
   Solana, which sits outside the Ethereum family
 - **DefiLlama**, then **DexScreener** — USD prices (free, no key); when neither

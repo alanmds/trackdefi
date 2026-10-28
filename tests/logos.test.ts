@@ -24,9 +24,9 @@ describe("logos da home", () => {
 
   it("um logo por família, com as versões juntas no nome", () => {
     expect(protocolsOn("BNB Chain")).toEqual([
-      { family: "Uniswap", name: "Uniswap v3 & v4" },
-      { family: "PancakeSwap", name: "PancakeSwap v3" },
-      { family: "SushiSwap", name: "SushiSwap v3" },
+      { family: "Uniswap", name: "Uniswap v2 & v3 & v4" },
+      { family: "PancakeSwap", name: "PancakeSwap v2 & v3" },
+      { family: "SushiSwap", name: "SushiSwap v2 & v3" },
     ]);
     expect(protocolsOn("Solana")).toEqual([{ family: "Orca", name: "Orca" }]);
   });

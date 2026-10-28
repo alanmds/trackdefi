@@ -239,6 +239,10 @@ const pages = {
         title: "Ethereum, Optimism, BNB Chain, Base & Arbitrum · SushiSwap v3",
         body: "concentrated positions, amounts, price ranges and pending fees on five networks at once. SushiSwap v3 is built like Uniswap v3, so it is read the same way, straight from the blockchain. Extra SushiSwap rewards paid outside the blockchain (through Merkl) are not shown — only the swap fees the position earns.",
       },
+      {
+        title: "Classic pools · Uniswap v2, SushiSwap v2 & PancakeSwap v2",
+        body: "the older 50/50 pools, on seven, five and three networks. A classic position is a token, not an NFT, so trackdefi finds it through the list of tokens in the wallet and checks each one against the exchange's own factory. The amounts include the swap fees, so there is nothing pending to show; LP tokens deposited in a farm are not read.",
+      },
     ] as RoadmapItem[],
     nextTitle: "Next",
     next: [
@@ -266,8 +270,8 @@ const pages = {
         body: "on Polygon, Arbitrum and BNB Chain. These exchanges run on Algebra, a different concentrated-liquidity engine, so they need their own reader.",
       },
       {
-        title: "Classic pools (v2)",
-        body: "the older 50/50 pools of Uniswap, PancakeSwap, SushiSwap, QuickSwap and Camelot, on every network where they run. A classic position is a token, not an NFT, so it needs a different way to be found.",
+        title: "Classic pools · QuickSwap v2 & Camelot v2",
+        body: "the remaining classic exchanges, on Polygon and Arbitrum. QuickSwap waits for Polygon; Camelot's pools report their reserves in a slightly different format and need their own check.",
       },
       {
         title: "Arc · Aerodrome & Uniswap",

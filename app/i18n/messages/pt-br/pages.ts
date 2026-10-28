@@ -205,6 +205,10 @@ const pages: PagesMessages = {
         title: "Ethereum, Optimism, BNB Chain, Base e Arbitrum · SushiSwap v3",
         body: "posições concentradas, quantidades, faixas de preço e taxas pendentes em cinco redes de uma vez. A SushiSwap v3 é construída como a Uniswap v3, então é lida do mesmo jeito, direto da blockchain. As recompensas extras da SushiSwap pagas fora da blockchain (pelo Merkl) não aparecem — só as taxas de swap que a posição rende.",
       },
+      {
+        title: "Pools clássicos · Uniswap v2, SushiSwap v2 e PancakeSwap v2",
+        body: "os pools 50/50 mais antigos, em sete, cinco e três redes. Uma posição clássica é um token, não um NFT, então o trackdefi a encontra pela lista de tokens da carteira e confere cada um na factory da própria corretora. As quantidades já incluem as taxas de swap, então não há nada pendente para mostrar; tokens de LP depositados numa fazenda (farm) não são lidos.",
+      },
     ],
     nextTitle: "Próximo",
     next: [
@@ -232,8 +236,8 @@ const pages: PagesMessages = {
         body: "na Polygon, Arbitrum e BNB Chain. Essas corretoras rodam no Algebra, um motor de liquidez concentrada diferente, então precisam de um leitor próprio.",
       },
       {
-        title: "Pools clássicos (v2)",
-        body: "os pools 50/50 mais antigos da Uniswap, PancakeSwap, SushiSwap, QuickSwap e Camelot, em todas as redes onde existem. Uma posição clássica é um token, não um NFT, então precisa de outro jeito de ser encontrada.",
+        title: "Pools clássicos · QuickSwap v2 e Camelot v2",
+        body: "as corretoras clássicas que faltam, na Polygon e na Arbitrum. A QuickSwap espera a Polygon; os pools da Camelot informam as reservas num formato um pouco diferente e pedem uma conferência própria.",
       },
       {
         title: "Arc · Aerodrome e Uniswap",

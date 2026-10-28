@@ -66,6 +66,10 @@ const PROJECT_TO_PROTOCOL: Record<string, string> = {
   "uniswap-v3": "uniswap-v3",
   // 20/10/2026: Ethereum, Base, Arbitrum e BSC (OP ainda não); poolMeta "0.3%"
   "sushiswap-v3": "sushiswap-v3",
+  // clássicos (v2): sem poolMeta; a regra de dominância do `match` decide ou anula
+  "uniswap-v2": "uniswap-v2",
+  sushiswap: "sushiswap-v2",
+  "pancakeswap-amm": "pancakeswap-v2",
   // Solana (14/10/2026): 759 pools no dataset, todos com poolMeta null
   "orca-dex": "orca",
 };

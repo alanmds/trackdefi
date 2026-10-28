@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "classic-pools-v2": {
+    title: "Pools clássicos na Uniswap, SushiSwap e PancakeSwap",
+    body: "O trackdefi agora lê os pools clássicos (v2) de mais três corretoras: Uniswap v2 na Ethereum, Base, Arbitrum, Optimism, BNB Chain, Unichain e Robinhood Chain; SushiSwap v2 na Ethereum, Base, Arbitrum, Optimism e BNB Chain; PancakeSwap v2 na BNB Chain, Ethereum e Base. Uma posição clássica é um token na sua carteira, então aparece com quantidades e valor, mais o APR médio do pool quando a DefiLlama tem um. As taxas de swap já estão dentro das quantidades, então não há nada pendente para coletar. Tokens de LP depositados numa fazenda (farm) não aparecem.",
+  },
   "simulator-uniswap-v4": {
     title: "Simulador de APR agora aceita pools da Uniswap v4",
     body: "Cole o ID de um pool da Uniswap v4 na BNB Chain ou na Robinhood Chain — o código 0x comprido no link do pool no app da Uniswap — e o simulador de APR mede as taxas na blockchain como em qualquer outro pool. Pools com hook ganham um aviso: um hook pode cobrar ou pagar valores que a estimativa não vê.",

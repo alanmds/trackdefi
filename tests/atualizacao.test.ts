@@ -18,9 +18,11 @@ import { getMessages } from "../app/i18n/get";
 const protocolos = [...new Set(buildAdapters().map((a) => a.protocol))];
 
 /** sem medição de fee APR em janela: Uniswap v4 (singleton, sem contrato de pool
- *  próprio) e Orca (Solana — a leitura de estado passado não existe pronta lá;
- *  "Earning now" sai só por estimativa, decisão do Alan em 14/10/2026) */
-const SEM_POOL_PROPRIO = new Set(["uniswap-v4", "orca"]);
+ *  próprio), Orca (Solana — a leitura de estado passado não existe pronta lá;
+ *  "Earning now" sai só por estimativa, decisão do Alan em 14/10/2026) e os
+ *  clássicos v2 (a taxa já está dentro das reservas: não há acumulador nem
+ *  "Earning now" de posição, só o APR do pool vindo da DefiLlama) */
+const SEM_POOL_PROPRIO = new Set(["uniswap-v4", "orca", "uniswap-v2", "sushiswap-v2", "pancakeswap-v2"]);
 
 describe("protocolo novo — partes de código", () => {
   it.each(protocolos)("%s tem nome legível na tela (PROTOCOL_LABELS em app/ui/format.ts)", (p) => {

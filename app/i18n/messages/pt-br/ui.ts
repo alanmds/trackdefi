@@ -255,6 +255,10 @@ const ui: UiMessages = {
     },
     capped:
       "Esta carteira tem uma quantidade enorme de NFTs de posição em {where}; só {checked} foram verificados.",
+    pairsCapped:
+      "Esta carteira tem uma quantidade enorme de posições em pools clássicos (v2) em {where}; só {checked} foram lidas.",
+    tokensCapped:
+      "Esta carteira tem uma quantidade enorme de tokens em {network}; só {checked} foram verificados em busca de posições em pools clássicos (v2).",
     hooks: {
       one: "{n} posição em {where} está num pool com hook personalizado — recompensas extras pagas pelo hook não são contadas.",
       other:

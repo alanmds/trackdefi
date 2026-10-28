@@ -19,6 +19,7 @@ import { UNISWAP_V4_CHAINS } from "../core/adapters/uniswap-v4/config";
 import { PANCAKE_V3_CHAINS } from "../core/adapters/pancake-v3/config";
 import { SUSHISWAP_V3_CHAINS } from "../core/adapters/sushiswap-v3/config";
 import { RAMSES_V3_CHAINS } from "../core/adapters/ramses-v3/config";
+import { CLASSIC_V2_PROTOCOLS } from "../core/adapters/classic-v2/config";
 import {
   COVERAGE,
   FAMILIES_BY_VOLUME,
@@ -105,6 +106,15 @@ describe("frase de cobertura", () => {
 
   it("Uniswap v3 cobre exatamente as redes do seu config", () => {
     expect(redesDe("Uniswap v3")).toEqual(UNISWAP_V3_CHAINS.map((c) => nomeDaRede(c.chainId)).sort());
+  });
+
+  it.each([
+    ["Uniswap v2", "uniswap-v2"],
+    ["SushiSwap v2", "sushiswap-v2"],
+    ["PancakeSwap v2", "pancakeswap-v2"],
+  ])("%s (clássico) cobre exatamente as redes do seu config", (nome, id) => {
+    const cfg = CLASSIC_V2_PROTOCOLS.find((p) => p.protocol === id)!;
+    expect(redesDe(nome)).toEqual(cfg.chains.map((c) => nomeDaRede(c.chainId)).sort());
   });
 
   it("Uniswap v4 cobre exatamente as redes do seu config", () => {

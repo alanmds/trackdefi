@@ -52,6 +52,19 @@ export function noticeText(n: ScanNotice, i18n: I18n): { text: string; retry: bo
         text: fill(t.capped, { where: where(i18n, n.protocol, n.chainId), checked: fmtInt(n.checked, locale) }),
         retry: false,
       };
+    case "pairsCapped":
+      return {
+        text: fill(t.pairsCapped, { where: where(i18n, n.protocol, n.chainId), checked: fmtInt(n.checked, locale) }),
+        retry: false,
+      };
+    case "tokensCapped":
+      return {
+        text: fill(t.tokensCapped, {
+          network: CHAINS[n.chainId]?.label ?? fill(i18n.ui.common.chainFallback, { id: n.chainId }),
+          checked: fmtInt(n.checked, locale),
+        }),
+        retry: false,
+      };
     case "hooks":
       return {
         text: pl(locale, t.hooks, n.positions, { where: where(i18n, n.protocol, n.chainId) }),

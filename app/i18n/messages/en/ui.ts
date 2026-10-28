@@ -228,6 +228,10 @@ const ui = {
     } as Plural,
     capped:
       "This wallet holds a very large number of position NFTs on {where}; only {checked} were checked.",
+    pairsCapped:
+      "This wallet holds a very large number of classic (v2) pool positions on {where}; only {checked} were read.",
+    tokensCapped:
+      "This wallet holds a very large number of tokens on {network}; only {checked} were checked for classic (v2) pool positions.",
     hooks: {
       one: "{n} {where} position sits in a pool with a custom hook — any extra rewards the hook pays aren't counted.",
       other:

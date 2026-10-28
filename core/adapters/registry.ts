@@ -18,7 +18,14 @@ import { SUSHISWAP_V3_CHAINS } from "./sushiswap-v3/config";
 import { RamsesV3Adapter } from "./ramses-v3/index";
 import { RAMSES_V3_CHAINS } from "./ramses-v3/config";
 import { OrcaAdapter } from "./orca/index";
+import { ClassicV2Adapter } from "./classic-v2/index";
+import { CLASSIC_V2_PROTOCOLS } from "./classic-v2/config";
 import { createSolanaReader } from "../solana";
+
+/** o protocolo clássico que fala pela rede (o primeiro da lista que a tem) */
+function firstClassicProtocolOn(chainId: number): string | undefined {
+  return CLASSIC_V2_PROTOCOLS.find((p) => p.chains.some((c) => c.chainId === chainId))?.protocol;
+}
 
 /** Recebe o aviso junto com QUEM avisou — a tela precisa dizer "Uniswap v4
  *  na Robinhood Chain", não um genérico "algo falhou". */
@@ -62,6 +69,21 @@ export function buildAdapters(opts: { onWarn?: AdapterWarn } = {}): ProtocolAdap
     ),
     ...RAMSES_V3_CHAINS.map((config) =>
       tagged((onWarn) => new RamsesV3Adapter(readerFor(config.chainId), { onWarn, config })),
+    ),
+    // Pools clássicos (v2): LP token na carteira, achado pela Token API da Alchemy.
+    // A varredura é uma por rede; só o primeiro protocolo de cada rede avisa o teto.
+    ...CLASSIC_V2_PROTOCOLS.flatMap(({ protocol, chains }) =>
+      chains.map((config) =>
+        tagged(
+          (onWarn) =>
+            new ClassicV2Adapter(readerFor(config.chainId), {
+              onWarn,
+              config,
+              protocol,
+              reportsCap: protocol === firstClassicProtocolOn(config.chainId),
+            }),
+        ),
+      ),
     ),
     // Solana: motor próprio, sem viem (core/solana.ts)
     tagged((onWarn) => new OrcaAdapter(createSolanaReader(), { onWarn })),
