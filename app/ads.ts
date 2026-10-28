@@ -56,7 +56,8 @@ export function adSrc(unitId: string): string {
 export const AD_SANDBOX = "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox";
 
 /**
- * Onde há anúncio. No máximo UM visível por página (regra do mapa): na
- * carteira, o da varredura some antes de o do fim da lista existir.
+ * Onde há anúncio. No máximo UM visível por página (regra do mapa). "page" é
+ * o do layout, em toda página menos a carteira; na carteira, o da varredura
+ * some antes de o do fim da lista existir.
  */
-export type AdPlacement = "home" | "wallet-scan" | "wallet-end" | "how-it-works";
+export type AdPlacement = "page" | "wallet-scan" | "wallet-end";

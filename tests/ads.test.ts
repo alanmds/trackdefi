@@ -83,9 +83,25 @@ describe("onde o anúncio NÃO entra", () => {
     expect(fim).toBeGreaterThan(lista);
   });
 
-  it("no máximo um por página", () => {
-    for (const f of ["app/[lang]/page.tsx", "app/[lang]/how-it-works/page.tsx"]) {
-      expect(read(f).match(/<AdSlot/g)?.length ?? 0, f).toBe(1);
-    }
+  it("o anúncio de página mora no layout, uma vez só, e nenhuma página o repete", () => {
+    expect(read("app/[lang]/layout.tsx").match(/<PageAd/g)?.length).toBe(1);
+    const paginas = [
+      "app/[lang]/page.tsx",
+      "app/[lang]/how-it-works/page.tsx",
+      "app/[lang]/changelog/page.tsx",
+      "app/[lang]/feedback/page.tsx",
+      "app/[lang]/glossary/page.tsx",
+      "app/[lang]/roadmap/page.tsx",
+      "app/[lang]/tools/page.tsx",
+      "app/[lang]/tools/apr-simulator/page.tsx",
+      "app/[lang]/tools/pairs/page.tsx",
+    ];
+    for (const f of paginas) expect(read(f), f).not.toMatch(/AdSlot|PageAd/);
+  });
+
+  it("a carteira fica fora do anúncio do layout (tem os próprios, que conhecem o erro)", () => {
+    const pageAd = read("app/ui/PageAd.tsx");
+    expect(pageAd).toContain("^\\/w(");
+    expect(pageAd).toMatch(/return null/);
   });
 });

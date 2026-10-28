@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NetworkLogos from "../ui/NetworkLogos";
-import AdSlot from "../ui/AdSlot";
 import SearchForm from "../ui/SearchForm";
 import { fmtDate } from "../ui/format";
 import { localePath } from "../i18n/config";
@@ -106,9 +105,6 @@ export default async function Home({ params }: LangParams) {
           </div>
         ))}
       </section>
-
-      {/* depois da busca e dos recursos, nunca disputando o campo de endereço */}
-      <AdSlot placement="home" label={ui.ads.label} />
 
       <section className="faq" aria-label={h.faqAria}>
         <h2>{h.faqTitle}</h2>

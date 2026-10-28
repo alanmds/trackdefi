@@ -12,6 +12,7 @@ import { siteDescription, siteKeywords, siteTitle } from "../i18n/seo";
 import CostBar from "../ui/CostBar";
 import DonateLine from "../ui/DonateLine";
 import LanguageSwitcher from "../ui/LanguageSwitcher";
+import PageAd from "../ui/PageAd";
 import SiteAnalytics from "../ui/SiteAnalytics";
 import TapTips from "../ui/TapTips";
 import ThemeToggle, { THEME_SCRIPT } from "../ui/ThemeToggle";
@@ -162,6 +163,8 @@ export default async function RootLayout({
             </div>
           </header>
           {children}
+          {/* anúncio de toda página, menos a carteira (app/ui/PageAd.tsx) */}
+          <PageAd />
           <footer className="site-footer">
             <div className="container">
               {/* apoio voluntário: frase rotativa + endereço (app/donate.ts) */}
