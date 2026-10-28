@@ -63,6 +63,8 @@ export interface SimPoolDTO {
    * `feeWindows` é o Δ index0/index1 (taxa por 1e18 de LP), não feeGrowth.
    */
   classic?: { stable: boolean; totalSupply: string };
+  /** pool da Uniswap v4: `poolAddress` é o id (bytes32); hook zero = sem hook */
+  v4?: { hooks: string; dynamicFee: boolean };
   /** unix (s) da leitura */
   readAt: number;
 }
@@ -377,7 +379,7 @@ export function usdPer(pct: number, depositUsd: number, days: number): number {
  * Protocolos que o simulador atende — os adapters com `describePool`. A tela
  * cita esta lista; um teste prova que ela bate com o registry.
  */
-export const SIMULATOR_PROTOCOLS = ["uniswap-v3", "pancakeswap-v3", "sushiswap-v3", "aerodrome", "velodrome", "ramses-v3"];
+export const SIMULATOR_PROTOCOLS = ["uniswap-v3", "uniswap-v4", "pancakeswap-v3", "sushiswap-v3", "aerodrome", "velodrome", "ramses-v3"];
 
 /** Pools CLÁSSICOS (v2) que o simulador atende — os do ecossistema Solidly. */
 export const SIMULATOR_CLASSIC_PROTOCOLS = ["aerodrome", "velodrome"];

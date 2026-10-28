@@ -184,7 +184,8 @@ export interface ProtocolAdapter {
    */
   getLocks?(account: string): Promise<LockPosition[]>;
   /**
-   * Foto de um pool concentrado pelo endereço — é o que alimenta o simulador
+   * Foto de um pool concentrado pelo endereço (na Uniswap v4, pelo id de
+   * 32 bytes, que faz o papel do endereço) — é o que alimenta o simulador
    * de APR (`core/simulator/`). OPCIONAL: só os pools no estilo v3.
    * null = o endereço não é um pool DESTE protocolo nesta rede (o adapter
    * prova pela própria factory, nunca por formato de resposta parecido).
@@ -255,6 +256,17 @@ export interface PoolSnapshot {
     stable: boolean;
     /** LP tokens em circulação (unidades cruas) */
     totalSupply: bigint;
+  };
+  /**
+   * Pool da Uniswap v4: não tem contrato próprio — `poolAddress` é o id
+   * (bytes32) e o estado se lê no StateView. Ausente = não é v4.
+   */
+  v4?: {
+    stateView: Address;
+    /** hook do pool; o endereço zero = sem hook */
+    hooks: Address;
+    /** taxa dinâmica: o hook escolhe a taxa a cada swap */
+    dynamicFee: boolean;
   };
 }
 

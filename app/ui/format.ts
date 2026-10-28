@@ -129,8 +129,12 @@ export const EN_DATE_LABELS: DateLabels = {
 export function fmtWindow(sec: number, labels: DateLabels = EN_DATE_LABELS): string {
   if (!Number.isFinite(sec) || sec <= 0) return "—";
   if (sec < 3600) return labels.minutes.replace("{n}", String(Math.round(sec / 60)));
+  /* a janela medida pelo horário dos blocos sai 86.444 s, não 86.400 — e
+     "24.0 h" diz menos que "24 h". A menos de 3 min de uma hora cheia, conta
+     como cheia. */
   const h = sec / 3600;
-  return labels.hours.replace("{n}", String(h % 1 === 0 ? h : h.toFixed(1)));
+  const cheia = Math.round(h);
+  return labels.hours.replace("{n}", String(Math.abs(h - cheia) < 0.05 ? cheia : h.toFixed(1)));
 }
 
 /**

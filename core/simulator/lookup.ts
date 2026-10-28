@@ -17,7 +17,7 @@ import { fetchUsdPriceHistory, fetchUsdPrices } from "../prices/defillama";
 import { dexscreenerPrices } from "../prices/dexscreener";
 import { tickToPrice0In1 } from "../math/ticks";
 import type { PoolSnapshot, ProtocolAdapter } from "../types";
-import { readClassicFeeWindows, readPoolFeeGrowthWindows } from "../yields/onchain";
+import { readClassicFeeWindows, readPoolFeeGrowthWindows, readV4FeeWindows } from "../yields/onchain";
 import type { SimPoolDTO } from "./math";
 
 /** dias de histórico para o "tempo na faixa" */
@@ -33,9 +33,17 @@ export const MIN_HISTORY_POINTS = 72;
 const OP_WETH = "0x4200000000000000000000000000000000000006";
 const MAINNET_WETH: Address = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
 
-/** Tira o endereço de um texto colado — endereço puro ou link de explorer/DEX. */
+/**
+ * Tira o pool de um texto colado — endereço puro ou link de explorer/DEX. O
+ * id de 32 bytes (0x + 64) é o "endereço" de um pool da Uniswap v4 e vem
+ * primeiro: um link do app da Uniswap traz só ele. Um hash de transação tem
+ * o mesmo formato; nesse caso nenhum adapter acha pool, e a tela diz isso.
+ */
 export function extractPoolAddress(text: string): Address | null {
-  const m = text.trim().match(/0x[0-9a-fA-F]{40}(?![0-9a-fA-F])/);
+  const t = text.trim();
+  const v4 = t.match(/0x[0-9a-fA-F]{64}(?![0-9a-fA-F])/);
+  if (v4) return v4[0] as Address;
+  const m = t.match(/0x[0-9a-fA-F]{40}(?![0-9a-fA-F])/);
   return m ? (m[0] as Address) : null;
 }
 
@@ -64,9 +72,9 @@ async function enrich(s: PoolSnapshot, onWarn: (msg: string) => void): Promise<S
       try {
         const bloco = await reader.getBlockNumber?.();
         if (bloco === undefined) return [];
-        return s.classic
-          ? await readClassicFeeWindows(reader, s.poolAddress, bloco, info.secPerBlock)
-          : await readPoolFeeGrowthWindows(reader, s.protocol, s.poolAddress, bloco, info.secPerBlock);
+        if (s.classic) return await readClassicFeeWindows(reader, s.poolAddress, bloco, info.secPerBlock);
+        if (s.v4) return await readV4FeeWindows(reader, s.v4.stateView, s.poolAddress, bloco, info.secPerBlock);
+        return await readPoolFeeGrowthWindows(reader, s.protocol, s.poolAddress, bloco, info.secPerBlock);
       } catch (e) {
         onWarn(`janelas de taxa ilegíveis: ${(e as Error).message.split("\n")[0].slice(0, 60)}`);
         return [];
@@ -120,6 +128,7 @@ async function enrich(s: PoolSnapshot, onWarn: (msg: string) => void): Promise<S
     history,
     reserves: s.reserves ? { amount0: s.reserves.amount0Raw.toString(), amount1: s.reserves.amount1Raw.toString() } : null,
     ...(s.classic ? { classic: { stable: s.classic.stable, totalSupply: s.classic.totalSupply.toString() } } : {}),
+    ...(s.v4 ? { v4: { hooks: s.v4.hooks, dynamicFee: s.v4.dynamicFee } } : {}),
     readAt: Math.floor(Date.now() / 1000),
   };
 }

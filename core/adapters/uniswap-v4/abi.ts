@@ -21,11 +21,15 @@ export const positionManagerAbi = parseAbi([
   "function getPositionLiquidity(uint256 tokenId) view returns (uint128)",
   "function ownerOf(uint256 tokenId) view returns (address)",
   "function balanceOf(address owner) view returns (uint256)",
+  // id do pool (os 25 primeiros bytes) → PoolKey; zerada se nenhuma posição
+  // foi criada pelo PositionManager naquele pool
+  "function poolKeys(bytes25 poolId) view returns (address currency0, address currency1, uint24 fee, int24 tickSpacing, address hooks)",
 ]);
 
 export const stateViewAbi = parseAbi([
   "function getSlot0(bytes32 poolId) view returns (uint160 sqrtPriceX96, int24 tick, uint24 protocolFee, uint24 lpFee)",
   "function getLiquidity(bytes32 poolId) view returns (uint128)",
+  "function getFeeGrowthGlobals(bytes32 poolId) view returns (uint256 feeGrowthGlobal0, uint256 feeGrowthGlobal1)",
   "function getFeeGrowthInside(bytes32 poolId, int24 tickLower, int24 tickUpper) view returns (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128)",
   "function getPositionInfo(bytes32 poolId, bytes32 positionId) view returns (uint128 liquidity, uint256 feeGrowthInside0LastX128, uint256 feeGrowthInside1LastX128)",
 ]);
@@ -36,6 +40,9 @@ export const transferEvent = parseAbiItem(
 
 /** endereço zero: no v4 significa a moeda NATIVA da rede (não um token ERC-20) */
 export const NATIVE_CURRENCY: Address = "0x0000000000000000000000000000000000000000";
+
+/** fee da PoolKey que marca taxa DINÂMICA: o hook escolhe a taxa a cada swap */
+export const DYNAMIC_FEE_FLAG = 0x800000;
 
 /** hook padrão (sem hook) — pool com hook próprio pode cobrar taxa por fora */
 export const NO_HOOK: Address = "0x0000000000000000000000000000000000000000";

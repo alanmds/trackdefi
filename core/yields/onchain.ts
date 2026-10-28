@@ -607,3 +607,59 @@ export async function readClassicFeeWindows(
   }
   return out;
 }
+
+// ----------------------------------------------- Uniswap v4 (simulador)
+
+const v4FeeGrowthAbi = parseAbi([
+  "function getFeeGrowthGlobals(bytes32 poolId) view returns (uint256 feeGrowthGlobal0, uint256 feeGrowthGlobal1)",
+]);
+
+/**
+ * Δ feeGrowthGlobal de um pool da Uniswap v4, lido no StateView pelo id —
+ * mesma conta dos pools v3 (taxa por unidade de liquidez ativa), só que o
+ * pool mora no singleton. Provado em `poc/probe-v4-simulador.ts`
+ * (27/10/2026, USDT/USDC na BNB: janelas de 24 h e 15 min provadas).
+ */
+export async function readV4FeeWindows(
+  reader: ChainReader,
+  stateView: Address,
+  poolId: `0x${string}`,
+  currentBlock: bigint,
+  secPerBlock: number,
+): Promise<FeeGrowthWindow[]> {
+  const ler = async (blockNumber?: bigint) => {
+    const res = await reader.multicall({
+      contracts: [
+        { address: stateView, abi: v4FeeGrowthAbi, functionName: "getFeeGrowthGlobals", args: [poolId] },
+        {
+          address: reader.chain?.contracts?.multicall3?.address ?? MULTICALL3,
+          abi: multicall3TimestampAbi,
+          functionName: "getCurrentBlockTimestamp",
+        },
+      ],
+      allowFailure: true,
+      ...(blockNumber === undefined ? {} : { blockNumber }),
+    });
+    if (res[0].status !== "success") return null;
+    const [g0, g1] = res[0].result as readonly [bigint, bigint];
+    return { g0, g1, ts: res[1].status === "success" ? (res[1].result as bigint) : null };
+  };
+  const agora = await ler();
+  if (!agora) return [];
+
+  const out: FeeGrowthWindow[] = [];
+  for (const horas of MEASURED_WINDOWS_HOURS) {
+    const blocos = BigInt(Math.max(1, Math.round((horas * 3600) / secPerBlock)));
+    if (currentBlock <= blocos) continue;
+    try {
+      const antes = await ler(currentBlock - blocos);
+      if (!antes) continue;
+      const provado = agora.ts !== null && antes.ts !== null ? Number(agora.ts - antes.ts) : null;
+      if (provado !== null && provado < (horas * 3600) / 2) continue; // RPC ignorou o bloco
+      out.push({ delta0: wrapSub(agora.g0, antes.g0), delta1: wrapSub(agora.g1, antes.g1), windowSec: provado ?? Number(blocos) * secPerBlock });
+    } catch {
+      continue;
+    }
+  }
+  return out;
+}

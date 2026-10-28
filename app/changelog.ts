@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "simulator-uniswap-v4",
+    date: "2026-10-27",
+    kind: "improvement",
+    title: "APR simulator now takes Uniswap v4 pools",
+    body: "Paste the pool ID of a Uniswap v4 pool on BNB Chain or Robinhood Chain — the long 0x code in the pool's link on the Uniswap app — and the APR simulator measures its fees on-chain like any other pool. Pools with a hook get a warning: a hook can charge or pay amounts the estimate doesn't see.",
+  },
+  {
     id: "simulator-classic-pools",
     date: "2026-10-27",
     kind: "improvement",

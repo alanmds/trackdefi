@@ -10,6 +10,9 @@ import { describe, expect, it } from "vitest";
 import type { Address } from "viem";
 import { buildAdapters } from "../core/adapters/registry";
 import { UniswapV3Adapter } from "../core/adapters/uniswap-v3/index";
+import { UniswapV4Adapter } from "../core/adapters/uniswap-v4/index";
+import { poolIdOf } from "../core/adapters/uniswap-v4/abi";
+import { UNISWAP_V4_BSC } from "../core/adapters/uniswap-v4/config";
 import { getSqrtRatioAtTick } from "../core/math/tickmath";
 import { tickToPrice0In1 } from "../core/math/ticks";
 import { extractPoolAddress, pairHistory } from "../core/simulator/lookup";
@@ -165,8 +168,11 @@ describe("lookup", () => {
     expect(extractPoolAddress(`https://basescan.org/address/${a}#code`)).toBe(a);
     expect(extractPoolAddress(`  ${a} `)).toBe(a);
     expect(extractPoolAddress("0x1234")).toBeNull();
-    // hash de transação (64 hex) não é endereço
-    expect(extractPoolAddress(`0x${"a".repeat(64)}`)).toBeNull();
+    // id de pool da Uniswap v4 (64 hex) vem antes — e um link do app traz só ele
+    const id = `0x${"ab".repeat(32)}`;
+    expect(extractPoolAddress(`https://app.uniswap.org/explore/pools/bnb/${id}`)).toBe(id);
+    // 65 hex não é nem um nem outro
+    expect(extractPoolAddress(`0x${"a".repeat(65)}`)).toBeNull();
   });
 
   it("histórico do par casa pela hora e descarta hora sem par", () => {
@@ -246,5 +252,56 @@ describe("describePool — prova de origem pela factory", () => {
   it("a factory devolve OUTRO endereço → não é deste protocolo", async () => {
     const outro = "0x0000000000000000000000000000000000000001" as Address;
     expect(await new UniswapV3Adapter(reader(outro)).describePool(POOL)).toBeNull();
+  });
+});
+
+describe("describePool — Uniswap v4 pelo id do pool", () => {
+  const USDT = "0x55d398326f99059fF775485246999027B3197955" as Address;
+  const USDC = "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d" as Address;
+  const NO_HOOK = "0x0000000000000000000000000000000000000000" as Address;
+  const KEY = { currency0: USDT, currency1: USDC, fee: 6, tickSpacing: 1, hooks: NO_HOOK };
+  const ID = poolIdOf(KEY);
+
+  function reader(key: typeof KEY, sqrt = getSqrtRatioAtTick(-12)): ChainReader {
+    return {
+      async readContract() {
+        throw new Error("inesperado");
+      },
+      async multicall({ contracts }) {
+        return contracts.map((c) => {
+          const ok = (result: unknown) => ({ status: "success" as const, result });
+          switch (c.functionName) {
+            case "getSlot0":
+              return ok([sqrt, -12, 0, 6]);
+            case "getLiquidity":
+              return ok(10n ** 27n);
+            case "poolKeys":
+              return ok([key.currency0, key.currency1, key.fee, key.tickSpacing, key.hooks]);
+            case "symbol":
+              return ok(c.address === USDT ? "USDT" : "USDC");
+            case "decimals":
+              return ok(18);
+            default:
+              return { status: "failure" as const, error: new Error(c.functionName) };
+          }
+        });
+      },
+    };
+  }
+  const adapter = (r: ChainReader) => new UniswapV4Adapter(r, { config: UNISWAP_V4_BSC });
+
+  it("id válido → foto do pool, com o id no lugar do endereço e sem saldo por pool", async () => {
+    const s = await adapter(reader(KEY)).describePool(ID);
+    expect(s).not.toBeNull();
+    expect(s!.poolAddress).toBe(ID);
+    expect(s!.poolSymbol).toBe("USDT/USDC 0.0006%");
+    expect(s!.reserves).toBeNull();
+    expect(s!.v4).toEqual({ stateView: UNISWAP_V4_BSC.stateView, hooks: NO_HOOK, dynamicFee: false });
+  });
+
+  it("endereço comum (40 hex), pool não inicializado ou PoolKey de outro pool → null", async () => {
+    expect(await adapter(reader(KEY)).describePool(USDT)).toBeNull();
+    expect(await adapter(reader(KEY, 0n)).describePool(ID)).toBeNull();
+    expect(await adapter(reader({ ...KEY, fee: 500 })).describePool(ID)).toBeNull();
   });
 });

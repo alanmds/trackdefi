@@ -282,14 +282,14 @@ const ui = {
 
   /** simulador de APR (`/tools/apr-simulator`) */
   simulator: {
-    poolLabel: "Pool address or link",
-    poolPlaceholder: "0x… or a link from DexScreener, GeckoTerminal or the explorer",
+    poolLabel: "Pool address, Uniswap v4 pool ID or link",
+    poolPlaceholder: "0x… address, Uniswap v4 pool ID, or a link from the explorer, DexScreener or GeckoTerminal",
     load: "Load pool",
     loading: "Reading the pool…",
     supported: "Works with concentrated-liquidity pools from {protocols}, and with the classic pools of {classic}, on the networks trackdefi covers.",
     errors: {
-      invalid: "That doesn't contain a pool address (0x followed by 40 characters).",
-      not_found: "No supported pool at this address. It may be a Uniswap v4 pool, a Solana pool, or a network or exchange trackdefi doesn't cover yet.",
+      invalid: "That doesn't contain a pool address (0x followed by 40 characters) or a Uniswap v4 pool ID (0x followed by 64).",
+      not_found: "No supported pool at this address. It may be a Solana pool, a network or exchange trackdefi doesn't cover yet, or a Uniswap v4 pool where nobody has opened a position through the official app.",
       rate_limited: "Too many simulations in a row — please wait a few seconds.",
       busy: "The server is busy right now. Try again in a few seconds.",
       timeout: "The blockchain read took too long. Please try again.",
@@ -322,6 +322,9 @@ const ui = {
     kindVolatile: "volatile",
     timeAlways: "Always — a classic pool has no range",
     feesToVoters: "Staked, the swap fees go to voters; the position earns only the emissions.",
+    v4Hook:
+      "This Uniswap v4 pool has a hook ({hook}). A hook can charge or pay amounts outside the swap fee that this estimate doesn't see.",
+    v4Dynamic: "Dynamic fee: the hook sets the fee on every swap. The fee shown is the current one; the measured fees already reflect what was actually charged.",
     perYear: "{pct}/yr",
     perDayMonth: "≈ {day} a day · {month} a month",
     feesLabel: "Fees",
@@ -390,7 +393,7 @@ const ui = {
     soonTitle: "The APR simulator doesn't handle this pool yet",
     none: "No pool matches these filters.",
     source:
-      "Pools from the exchanges and networks trackdefi reads. Data: DefiLlama, refreshed about once an hour. Market cap is the smaller of the two tokens; wrapped ETH, BNB and SOL count as the coin itself. “—” means DefiLlama has no figure for it — never a guess. “Soon” marks pools the APR simulator doesn't handle yet (Uniswap v4 and Solana), and the few whose on-chain balance doesn't match DefiLlama's figure.",
+      "Pools from the exchanges and networks trackdefi reads. Data: DefiLlama, refreshed about once an hour. Market cap is the smaller of the two tokens; wrapped ETH, BNB and SOL count as the coin itself. “—” means DefiLlama has no figure for it — never a guess. “Soon” marks pools we can't link to the simulator yet: Solana pools; Uniswap v4 pools, because DefiLlama doesn't give their pool ID (paste it in the simulator yourself); and the few whose on-chain balance doesn't match DefiLlama's figure.",
     caveat: "A list to start research, not a recommendation. Not financial advice.",
   },
 

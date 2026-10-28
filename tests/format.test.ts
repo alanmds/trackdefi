@@ -40,6 +40,8 @@ describe("fmtWindow (duração da janela)", () => {
   it("as duas janelas que a tela mostra", () => {
     expect(fmtWindow(900)).toBe("15 min");
     expect(fmtWindow(86_400)).toBe("24 h");
+    // janela medida pelo horário dos blocos (86.444 s): ainda é "24 h", não "24.0 h"
+    expect(fmtWindow(86_444)).toBe("24 h");
   });
 
   it("arredonda para minuto abaixo de uma hora e para hora acima", () => {

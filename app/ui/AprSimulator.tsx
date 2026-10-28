@@ -117,6 +117,7 @@ export default function AprSimulator() {
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
+    // endereço (40) ou id de pool v4 (64) — o de 64 também casa aqui
     if (!/0x[0-9a-fA-F]{40}/.test(input)) {
       setError(t.errors.invalid);
       return;
@@ -222,10 +223,12 @@ export default function AprSimulator() {
               <h2 className="pos-title">{pool.poolSymbol}</h2>
               <p className="sim-sub">
                 {fill(t.poolOn, { protocol: protocolLabel(pool.protocol), network: chain?.label ?? String(pool.chainId) })}
-                {pool.feePips !== null && <> · {fill(t.feeTier, { fee: fmtPct(pool.feePips / 10_000, locale) })}</>}
-                {" · "}
-                {fill(t.tvl, { usd: usd(pool.tvlUsd) })}
-                {chain && (
+                {/* 6 algarismos: há pool v4 de 0,0006% que o fmtPct arredondaria para 0% */}
+                {pool.feePips !== null && <> · {fill(t.feeTier, { fee: `${fmtRangePrice(pool.feePips / 10_000, locale)}%` })}</>}
+                {/* v4: os tokens moram no PoolManager, não há saldo por pool */}
+                {pool.tvlUsd !== null && <> · {fill(t.tvl, { usd: usd(pool.tvlUsd) })}</>}
+                {/* v4: o "endereço" é um id, e o explorer não tem página para ele */}
+                {chain && !pool.v4 && (
                   <>
                     {" · "}
                     <a href={`${chain.explorerUrl}/address/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer">
@@ -307,6 +310,10 @@ export default function AprSimulator() {
           </div>
 
           {missingPrice && <p className="sim-note sim-warn">{fill(t.noPrice, { token: missingPrice })}</p>}
+          {pool.v4 && pool.v4.hooks !== "0x0000000000000000000000000000000000000000" && (
+            <p className="sim-note sim-warn">{fill(t.v4Hook, { hook: `${pool.v4.hooks.slice(0, 6)}…${pool.v4.hooks.slice(-4)}` })}</p>
+          )}
+          {pool.v4?.dynamicFee && <p className="sim-note">{t.v4Dynamic}</p>}
           {pool.tvlUsd !== null && pool.tvlUsd < MIN_TVL_USD && (
             <p className="sim-note sim-warn">{fill(t.smallPool, { usd: usd(pool.tvlUsd) })}</p>
           )}
@@ -436,7 +443,15 @@ export default function AprSimulator() {
                     <li>{fill(t.concentration, { x: fmtAmount(Math.round(result.concentration * 10) / 10, locale) })}</li>
                   )}
                   {result.inRangeNow && (
-                    <li>{fill(t.share, { pct: pct(result.shareOfActive * 100) })}</li>
+                    <li>
+                      {fill(t.share, {
+                        // fatia ínfima (pool de US$ bilhões) não é "0%"
+                        pct:
+                          result.shareOfActive > 0 && result.shareOfActive * 100 < 0.01
+                            ? `< ${fmtPct(0.01, locale)}`
+                            : pct(result.shareOfActive * 100),
+                      })}
+                    </li>
                   )}
                 </ul>
               )}

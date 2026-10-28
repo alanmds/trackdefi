@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "simulator-uniswap-v4": {
+    title: "Simulador de APR agora aceita pools da Uniswap v4",
+    body: "Cole o ID de um pool da Uniswap v4 na BNB Chain ou na Robinhood Chain — o código 0x comprido no link do pool no app da Uniswap — e o simulador de APR mede as taxas na blockchain como em qualquer outro pool. Pools com hook ganham um aviso: um hook pode cobrar ou pagar valores que a estimativa não vê.",
+  },
   "simulator-classic-pools": {
     title: "Simulador de APR agora cobre pools clássicos",
     body: "O simulador de APR agora também atende os pools clássicos (stable e volatile) da Aerodrome e da Velodrome. Eles não têm faixa de preço, então ele mostra o que o pool pagou em taxas nas últimas 24 horas e 15 minutos, aplicado ao seu valor. Na descoberta de pares, esses pools agora também têm o botão Simular; os que o simulador ainda não atende mostram “Em breve”.",

@@ -23,13 +23,14 @@
  */
 
 import { erc20Abi, type Address, type Hex } from "viem";
-import type { ChainReader, LpPosition, ProtocolAdapter, RewardAmount, TokenInfo, WarnSink } from "../../types";
+import type { ChainReader, LpPosition, PoolSnapshot, ProtocolAdapter, RewardAmount, TokenInfo, WarnSink } from "../../types";
 import { amountsForLiquidity } from "../../math/liquidity";
 import { getSqrtRatioAtTick } from "../../math/tickmath";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { chainInfo, evmChain } from "../../chains";
 import { cleanSymbol } from "../aerodrome/index";
 import {
+  DYNAMIC_FEE_FLAG,
   NATIVE_CURRENCY,
   NO_HOOK,
   pendingFee,
@@ -475,6 +476,60 @@ export class UniswapV4Adapter implements ProtocolAdapter {
       out.set(p.tokenId, [pendingFee(gi0, last0, liq), pendingFee(gi1, last1, liq)]);
     });
     return out;
+  }
+
+  /**
+   * Foto de um pool v4 para o simulador, pelo ID (bytes32) — no v4 o pool não
+   * tem endereço. A PoolKey (tokens, taxa, tick spacing, hook) vem do
+   * PositionManager; se ninguém criou posição por ele ali, ela volta zerada e
+   * o pool fica de fora (sem tick spacing não dá para alinhar a faixa).
+   * Provado em `poc/probe-v4-simulador.ts` (27/10/2026).
+   */
+  async describePool(poolId: Address): Promise<PoolSnapshot | null> {
+    if (!/^0x[0-9a-fA-F]{64}$/.test(poolId)) return null;
+    const id = poolId as Hex;
+    const res = await this.reader.multicall({
+      contracts: [
+        { address: this.stateView, abi: stateViewAbi, functionName: "getSlot0", args: [id] },
+        { address: this.stateView, abi: stateViewAbi, functionName: "getLiquidity", args: [id] },
+        { address: this.positionManager, abi: positionManagerAbi, functionName: "poolKeys", args: [id.slice(0, 52) as Hex] },
+      ],
+      allowFailure: true,
+    });
+    if (res.some((r) => r.status !== "success")) return null;
+    const slot0 = res[0].result as readonly [bigint, number, number, number];
+    if (slot0[0] === 0n) return null; // pool não inicializado nesta rede
+    const [currency0, currency1, fee, tickSpacing, hooks] = res[2].result as readonly [Address, Address, number, number, Address];
+    if (Number(tickSpacing) <= 0) return null;
+    const key: PoolKey = { currency0, currency1, fee: Number(fee), tickSpacing: Number(tickSpacing), hooks };
+    // a chave tem de ser DESTE id — prova de que a leitura não trouxe outro pool
+    if (poolIdOf(key).toLowerCase() !== id.toLowerCase()) return null;
+
+    const tokens = await this.loadTokens([{ key } as V4RawPosition]);
+    const t0 = tokens.get(currency0)!;
+    const t1 = tokens.get(currency1)!;
+    const dynamicFee = key.fee === DYNAMIC_FEE_FLAG;
+    // taxa dinâmica: a que vale agora é a lpFee do slot0
+    const feePips = dynamicFee ? Number(slot0[3]) : key.fee;
+    // 4 casas: há pools de 6 milionésimos (0,0006%), que com 3 virariam "0.001%"
+    const feePct = (feePips / 10_000).toLocaleString("en-US", { maximumFractionDigits: 4 });
+    return {
+      protocol: this.protocol,
+      chainId: this.chainId,
+      poolAddress: id,
+      poolSymbol: `${t0.symbol}/${t1.symbol} ${feePct}%`,
+      token0: t0,
+      token1: t1,
+      feePips,
+      tickSpacing: key.tickSpacing,
+      tick: Number(slot0[1]),
+      sqrtPriceX96: slot0[0],
+      activeLiquidity: res[1].result as bigint,
+      // os tokens de TODOS os pools moram no PoolManager: não há saldo por pool
+      reserves: null,
+      emission: null,
+      v4: { stateView: this.stateView, hooks, dynamicFee },
+    };
   }
 
   /**

@@ -308,14 +308,14 @@ const ui: UiMessages = {
   },
 
   simulator: {
-    poolLabel: "Endereço ou link do pool",
-    poolPlaceholder: "0x… ou um link da DexScreener, GeckoTerminal ou do explorer",
+    poolLabel: "Endereço do pool, ID de pool da Uniswap v4 ou link",
+    poolPlaceholder: "Endereço 0x…, ID de pool da Uniswap v4, ou um link do explorer, DexScreener ou GeckoTerminal",
     load: "Carregar pool",
     loading: "Lendo o pool…",
     supported: "Funciona com pools de liquidez concentrada da {protocols}, e com os pools clássicos da {classic}, nas redes que o trackdefi cobre.",
     errors: {
-      invalid: "Isso não tem um endereço de pool (0x seguido de 40 caracteres).",
-      not_found: "Nenhum pool compatível neste endereço. Pode ser um pool da Uniswap v4, um pool da Solana, ou uma rede ou corretora que o trackdefi ainda não cobre.",
+      invalid: "Isso não tem um endereço de pool (0x seguido de 40 caracteres) nem um ID de pool da Uniswap v4 (0x seguido de 64).",
+      not_found: "Nenhum pool compatível neste endereço. Pode ser um pool da Solana, uma rede ou corretora que o trackdefi ainda não cobre, ou um pool da Uniswap v4 em que ninguém abriu posição pelo app oficial.",
       rate_limited: "Muitas simulações seguidas — espere alguns segundos.",
       busy: "O servidor está ocupado agora. Tente de novo em alguns segundos.",
       timeout: "A leitura da blockchain demorou demais. Tente de novo.",
@@ -348,6 +348,9 @@ const ui: UiMessages = {
     kindVolatile: "volatile",
     timeAlways: "Sempre — pool clássico não tem faixa",
     feesToVoters: "Em stake, as taxas de swap vão para os votantes; a posição recebe só as emissões.",
+    v4Hook:
+      "Este pool da Uniswap v4 tem um hook ({hook}). Um hook pode cobrar ou pagar valores fora da taxa de swap que esta estimativa não vê.",
+    v4Dynamic: "Taxa dinâmica: o hook define a taxa a cada swap. A taxa mostrada é a de agora; as taxas medidas já refletem o que foi cobrado de fato.",
     perYear: "{pct}/ano",
     perDayMonth: "≈ {day} por dia · {month} por mês",
     feesLabel: "Taxas",
@@ -415,7 +418,7 @@ const ui: UiMessages = {
     soonTitle: "O simulador de APR ainda não atende este pool",
     none: "Nenhum pool com esses filtros.",
     source:
-      "Pools das corretoras e redes que o trackdefi lê. Dados: DefiLlama, atualizados mais ou menos de hora em hora. O market cap é o do menor dos dois tokens; ETH, BNB e SOL embrulhados contam como a própria moeda. “—” quer dizer que a DefiLlama não tem o número — nunca um palpite. “Em breve” marca os pools que o simulador de APR ainda não atende (Uniswap v4 e Solana), e os poucos cujo saldo no contrato não bate com o número da DefiLlama.",
+      "Pools das corretoras e redes que o trackdefi lê. Dados: DefiLlama, atualizados mais ou menos de hora em hora. O market cap é o do menor dos dois tokens; ETH, BNB e SOL embrulhados contam como a própria moeda. “—” quer dizer que a DefiLlama não tem o número — nunca um palpite. “Em breve” marca os pools que ainda não conseguimos ligar ao simulador: os da Solana; os da Uniswap v4, porque a DefiLlama não informa o ID do pool (dá para colá-lo no simulador você mesmo); e os poucos cujo saldo no contrato não bate com o número da DefiLlama.",
     caveat: "Uma lista para começar a pesquisa, não uma recomendação. Não é recomendação de investimento.",
   },
 
