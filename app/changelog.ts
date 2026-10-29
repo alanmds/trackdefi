@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "uniswap-v4-more-networks",
+    date: "2026-10-28",
+    kind: "exchange",
+    title: "Uniswap v4 on nine more networks",
+    body: "trackdefi now reads Uniswap v4 positions on Ethereum, Base, Optimism, Arbitrum, Unichain, Ink, Soneium, Celo and HyperEVM, besides BNB Chain and Robinhood Chain. You see the amounts, the price range and the swap fees waiting to be collected. Positions in pools with a hook carry a warning, because a hook can pay rewards the estimate doesn't see. Closed positions stay hidden, as on Uniswap.",
+  },
+  {
     id: "classic-pools-v2",
     date: "2026-10-28",
     kind: "exchange",

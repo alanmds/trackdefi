@@ -243,6 +243,10 @@ const pages = {
         title: "Classic pools · Uniswap v2, SushiSwap v2 & PancakeSwap v2",
         body: "the older 50/50 pools, on seven, five and three networks. A classic position is a token, not an NFT, so trackdefi finds it through the list of tokens in the wallet and checks each one against the exchange's own factory. The amounts include the swap fees, so there is nothing pending to show; LP tokens deposited in a farm are not read.",
       },
+      {
+        title: "Uniswap v4 on Ethereum, Base, Optimism, Arbitrum, Unichain, Ink, Soneium, Celo & HyperEVM",
+        body: "nine more networks for v4. Positions are found through the network's own transfer index, since a v4 position can't be listed by wallet on-chain, and each one is confirmed against the position contract. Same reading as on BNB Chain: amounts, price range and pending swap fees. Closed positions stay hidden, as on Uniswap.",
+      },
     ] as RoadmapItem[],
     nextTitle: "Next",
     next: [
@@ -262,8 +266,8 @@ const pages = {
         body: "the same step on Avalanche C-Chain.",
       },
       {
-        title: "Uniswap v4 on more networks",
-        body: "Ethereum, Optimism, Polygon, Base, Arbitrum, Avalanche and Unichain. v4 positions can't be listed by wallet on-chain; the way around that is already live on BNB Chain, and it also covers the largest wallets on Robinhood Chain.",
+        title: "Polygon & Avalanche · Uniswap v4",
+        body: "the same v4 reading, as soon as the two networks above are added.",
       },
       {
         title: "QuickSwap v3, Camelot v3 & THENA",

@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "uniswap-v4-more-networks": {
+    title: "Uniswap v4 em mais nove redes",
+    body: "O trackdefi agora lê posições da Uniswap v4 na Ethereum, Base, Optimism, Arbitrum, Unichain, Ink, Soneium, Celo e HyperEVM, além da BNB Chain e da Robinhood Chain. Você vê as quantidades, a faixa de preço e as taxas de swap prontas para coletar. Posições em pools com hook levam um aviso, porque um hook pode pagar recompensas que a estimativa não enxerga. Posições encerradas ficam ocultas, como na Uniswap.",
+  },
   "classic-pools-v2": {
     title: "Pools clássicos na Uniswap, SushiSwap e PancakeSwap",
     body: "O trackdefi agora lê os pools clássicos (v2) de mais três corretoras: Uniswap v2 na Ethereum, Base, Arbitrum, Optimism, BNB Chain, Unichain e Robinhood Chain; SushiSwap v2 na Ethereum, Base, Arbitrum, Optimism e BNB Chain; PancakeSwap v2 na BNB Chain, Ethereum e Base. Uma posição clássica é um token na sua carteira, então aparece com quantidades e valor, mais o APR médio do pool quando a DefiLlama tem um. As taxas de swap já estão dentro das quantidades, então não há nada pendente para coletar. Tokens de LP depositados numa fazenda (farm) não aparecem.",
