@@ -51,6 +51,7 @@ export const UNISWAP_V4_ROBINHOOD: UniV4ChainConfig = {
   positionManager: "0x58daec3116aae6d93017baaea7749052e8a04fa7",
   stateView: "0xf3334192d15450cdd385c8b70e03f9a6bd9e673b",
   poolManager: "0x8366a39cc670b4001a1121b8f6a443a643e40951",
+  enumeration: "index",
 };
 
 /**
