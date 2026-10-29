@@ -210,8 +210,8 @@ const pages: PagesMessages = {
         body: "os pools 50/50 mais antigos, em sete, cinco e três redes. Uma posição clássica é um token, não um NFT, então o trackdefi a encontra pela lista de tokens da carteira e confere cada um na factory da própria corretora. As quantidades já incluem as taxas de swap, então não há nada pendente para mostrar; tokens de LP depositados numa fazenda (farm) não são lidos.",
       },
       {
-        title: "Uniswap v4 na Ethereum, Base, Optimism, Arbitrum, Unichain, Ink, Soneium, Celo e HyperEVM",
-        body: "nove redes a mais para a v4. As posições são achadas pelo índice de transferências da própria rede, já que uma posição v4 não pode ser listada por carteira na blockchain, e cada uma é confirmada no contrato de posições. A mesma leitura da BNB Chain: quantidades, faixa de preço e taxas de swap pendentes. Posições encerradas ficam ocultas, como na Uniswap.",
+        title: "Uniswap v4 na Ethereum, Base, Optimism e Arbitrum",
+        body: "quatro redes a mais para a v4. As posições são achadas pelo índice de transferências da própria rede, já que uma posição v4 não pode ser listada por carteira na blockchain, e cada uma é confirmada no contrato de posições. A mesma leitura da BNB Chain: quantidades, faixa de preço e taxas de swap pendentes. Posições encerradas ficam ocultas, como na Uniswap.",
       },
     ],
     nextTitle: "Próximo",
@@ -230,6 +230,10 @@ const pages: PagesMessages = {
       {
         title: "Avalanche · Uniswap v3 e SushiSwap v3",
         body: "o mesmo passo na Avalanche C-Chain.",
+      },
+      {
+        title: "Unichain, Ink, Soneium, Celo e HyperEVM · Uniswap v4",
+        body: "a leitura da v4 está pronta nestas cinco redes e espera uma configuração do servidor para entrar no ar.",
       },
       {
         title: "Polygon e Avalanche · Uniswap v4",

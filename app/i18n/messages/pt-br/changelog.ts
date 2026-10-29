@@ -8,8 +8,8 @@ import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
   "uniswap-v4-more-networks": {
-    title: "Uniswap v4 em mais nove redes",
-    body: "O trackdefi agora lê posições da Uniswap v4 na Ethereum, Base, Optimism, Arbitrum, Unichain, Ink, Soneium, Celo e HyperEVM, além da BNB Chain e da Robinhood Chain. Você vê as quantidades, a faixa de preço e as taxas de swap prontas para coletar. Posições em pools com hook levam um aviso, porque um hook pode pagar recompensas que a estimativa não enxerga. Posições encerradas ficam ocultas, como na Uniswap.",
+    title: "Uniswap v4 em mais quatro redes",
+    body: "O trackdefi agora lê posições da Uniswap v4 na Ethereum, Base, Optimism e Arbitrum, além da BNB Chain e da Robinhood Chain. Você vê as quantidades, a faixa de preço e as taxas de swap prontas para coletar. Posições em pools com hook levam um aviso, porque um hook pode pagar recompensas que a estimativa não enxerga. Posições encerradas ficam ocultas, como na Uniswap.",
   },
   "classic-pools-v2": {
     title: "Pools clássicos na Uniswap, SushiSwap e PancakeSwap",

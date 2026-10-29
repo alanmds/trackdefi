@@ -158,6 +158,16 @@ export const UNISWAP_V4_CHAINS: UniV4ChainConfig[] = [
   UNISWAP_V4_BASE,
   UNISWAP_V4_OPTIMISM,
   UNISWAP_V4_ARBITRUM,
+];
+
+/**
+ * Configuradas e provadas (poc/probe-v4-redes.ts), mas FORA da lista acima de
+ * propósito (28/10/2026): enumeram pelo índice da Alchemy e a Vercel ainda não
+ * tem `<REDE>_RPC_URLS` com Alchemy nelas — sem isso cada carteira ganhava um
+ * aviso amarelo por rede. Para ligar: pôr a Alchemy na env da rede e mover a
+ * constante para `UNISWAP_V4_CHAINS`.
+ */
+export const UNISWAP_V4_AGUARDANDO_ALCHEMY: UniV4ChainConfig[] = [
   UNISWAP_V4_UNICHAIN,
   UNISWAP_V4_INK,
   UNISWAP_V4_SONEIUM,
