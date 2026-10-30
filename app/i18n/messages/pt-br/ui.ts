@@ -257,6 +257,11 @@ const ui: UiMessages = {
       "Esta carteira tem uma quantidade enorme de NFTs de posição em {where}; só {checked} foram verificados.",
     pairsCapped:
       "Esta carteira tem uma quantidade enorme de posições em pools clássicos (v2) em {where}; só {checked} foram lidas.",
+    slow: "Esta carteira é tão grande que a leitura de {where} estourou o tempo, então as posições de lá estão faltando.",
+    slowPrices:
+      "Esta carteira é tão grande que a busca de preços estourou o tempo, então alguns valores em dólar aparecem como “—”.",
+    heavy:
+      "Esta carteira tem {n} posições. Para a página continuar rápida, as taxas ao vivo não foram medidas e os preços vêm de uma fonte só.",
     tokensCapped:
       "Esta carteira tem uma quantidade enorme de tokens em {network}; só {checked} foram verificados em busca de posições em pools clássicos (v2).",
     hooks: {

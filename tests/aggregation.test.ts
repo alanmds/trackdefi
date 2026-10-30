@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from "vitest";
 import type { Address } from "viem";
-import { getWalletPositions } from "../core/service";
+import { getWalletPositions, HEAVY_WALLET_POSITIONS } from "../core/service";
 import type { LpPosition, ProtocolAdapter } from "../core/types";
 import type { PriceProvider } from "../core/prices/types";
 
@@ -132,5 +132,54 @@ describe("cadeia de preço", () => {
     expect(pedidos).toEqual([["base", "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]]); // só o que faltou
     expect(d.positions[0].token1.priceUsd).toBe(1);
     expect(d.positions[0].token1.priceSource).toBeUndefined();
+  });
+});
+
+describe("prazo da varredura (carteira-robô)", () => {
+  const curto = { adaptersMs: 60, pricesMs: 200, extrasMs: 300 };
+
+  it("adapter que passa do prazo fica de fora com aviso `slow`; os outros entram", async () => {
+    const lento: ProtocolAdapter = {
+      protocol: "uniswap-v4",
+      chainId: 4663,
+      getPositions: () => new Promise<LpPosition[]>((r) => setTimeout(() => r([fakePosition("uniswap-v4")]), 5_000)),
+    };
+    const t = Date.now();
+    const d = await getWalletPositions(ADDR, [okAdapter("aerodrome"), lento], precosFalsos, semApr, null, curto);
+    expect(Date.now() - t).toBeLessThan(2_000); // não esperou os 5 s do adapter
+    expect(d.positions.map((p) => p.protocol)).toEqual(["aerodrome"]);
+    expect(d.notices).toContainEqual({ kind: "slow", protocol: "uniswap-v4", chainId: 4663 });
+  });
+
+  it("preço que passa do prazo: devolve o que já tem e avisa `slowPrices`", async () => {
+    const lentos: PriceProvider = {
+      name: "lento",
+      fetchUsdPrices: () => new Promise((r) => setTimeout(() => r(new Map()), 5_000)),
+    };
+    const t = Date.now();
+    const d = await getWalletPositions(ADDR, [okAdapter("aerodrome")], lentos, semApr, null, curto);
+    expect(Date.now() - t).toBeLessThan(2_000);
+    expect(d.positions).toHaveLength(1);
+    expect(d.positions[0].valueUsd).toBeNull(); // sem preço = "—", nunca inventado
+    expect(d.notices).toContainEqual({ kind: "slowPrices" });
+  });
+
+  it("carteira normal não ganha aviso de prazo", async () => {
+    const d = await getWalletPositions(ADDR, [okAdapter("aerodrome")], precosFalsos, semApr, null);
+    expect(d.notices.some((n) => n.kind === "slow" || n.kind === "slowPrices" || n.kind === "heavy")).toBe(false);
+  });
+
+  it("acima de ${HEAVY_WALLET_POSITIONS} posições: aviso `heavy` e sem 2ª fonte de preço", async () => {
+    const muitos: ProtocolAdapter = {
+      protocol: "uniswap-v2",
+      chainId: 8453,
+      getPositions: async () => Array.from({ length: HEAVY_WALLET_POSITIONS + 1 }, () => fakePosition("uniswap-v2")),
+    };
+    let chamouDex = false;
+    const dex: PriceProvider = { name: "dex", fetchUsdPrices: async () => { chamouDex = true; return new Map(); } };
+    const d = await getWalletPositions(ADDR, [muitos], precosFalsos, semApr, dex);
+    expect(d.notices).toContainEqual({ kind: "heavy", positions: HEAVY_WALLET_POSITIONS + 1 });
+    expect(chamouDex).toBe(false);
+    expect(d.totalPositions).toBe(HEAVY_WALLET_POSITIONS + 1);
   });
 });

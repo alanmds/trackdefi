@@ -230,6 +230,10 @@ const ui = {
       "This wallet holds a very large number of position NFTs on {where}; only {checked} were checked.",
     pairsCapped:
       "This wallet holds a very large number of classic (v2) pool positions on {where}; only {checked} were read.",
+    slow: "This wallet is so large that reading {where} ran out of time, so positions there are missing.",
+    slowPrices: "This wallet is so large that price lookups ran out of time, so some dollar values show “—”.",
+    heavy:
+      "This wallet has {n} positions. To keep the page fast, live fee rates were not measured and prices come from one source only.",
     tokensCapped:
       "This wallet holds a very large number of tokens on {network}; only {checked} were checked for classic (v2) pool positions.",
     hooks: {

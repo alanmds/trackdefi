@@ -210,14 +210,53 @@ export type ScanNotice =
   | { kind: "prices" }
   /** APR de pool (DefiLlama) não carregou */
   | { kind: "apr" }
+  /** o adapter estourou o prazo (carteira enorme): as posições dele faltam */
+  | { kind: "slow"; protocol: string; chainId: number }
+  /** o prazo dos preços acabou: parte dos valores em dólar sai "—" */
+  | { kind: "slowPrices" }
+  /** carteira com posições demais: as medições extras (taxa ao vivo) foram puladas */
+  | { kind: "heavy"; positions: number }
   /** taxa medida no contrato indisponível: o card mostra estimativa */
   | { kind: "fees"; positions: number }
   | ({ protocol: string; chainId: number } & AdapterNotice);
 
 /** Carteiras-lixeira acumulam dezenas de milhares de posições de spam
- * (achado da Fase 5: 0x…0001 tem 27.786). Resposta traz só as top N por
- * valor — os TOTAIS continuam calculados sobre todas. */
-const MAX_POSITIONS_IN_RESPONSE = 200;
+ * (achado da Fase 5: 0x…0001 tem 27.786), e carteira de robô não é quem o site
+ * atende. Resposta traz só as 100 de MAIOR VALOR (não as mais recentes: o corte
+ * por data esconderia a posição grande e antiga de um usuário normal) — os
+ * TOTAIS continuam calculados sobre todas, e a tela avisa ("showingTop"). */
+export const MAX_POSITIONS_IN_RESPONSE = 100;
+
+/**
+ * Orçamento de tempo de uma varredura (29/10/2026). Antes, carteira de robô
+ * levava até 144 s e o usuário recebia só um 504. Agora cada etapa tem prazo e
+ * o que já foi lido é devolvido, com aviso. A rota derruba tudo em 50 s
+ * (`SCAN_TIMEOUT_MS`), então as etapas somam menos que isso. Usuário normal
+ * termina a varredura inteira em 3–8 s e nunca chega perto.
+ */
+export interface ScanBudget {
+  /** tempo máximo, desde o início, para os adapters devolverem posições e locks */
+  adaptersMs: number;
+  /** tempo máximo, desde o início, para os preços (o que já chegou é usado) */
+  pricesMs: number;
+  /** passou disso (desde o início), as medições extras de taxa são puladas */
+  extrasMs: number;
+}
+export const DEFAULT_SCAN_BUDGET: ScanBudget = { adaptersMs: 24_000, pricesMs: 36_000, extrasMs: 38_000 };
+
+/** acima disto a carteira é tratada como robô: sem medição de taxa ao vivo nem 2ª fonte de preço */
+export const HEAVY_WALLET_POSITIONS = 1000;
+
+const SLOW = Symbol("slow");
+
+/** resolve com o valor, ou com SLOW se passar de `ms` — nunca rejeita por tempo */
+function orSlow<T>(p: Promise<T>, ms: number): Promise<T | typeof SLOW> {
+  let timer: ReturnType<typeof setTimeout>;
+  const late = new Promise<typeof SLOW>((res) => {
+    timer = setTimeout(() => res(SLOW), Math.max(0, ms));
+  });
+  return Promise.race([p, late]).finally(() => clearTimeout(timer));
+}
 
 function human(raw: bigint, decimals: number): number {
   return Number(formatUnits(raw, decimals));
@@ -598,6 +637,8 @@ export async function getWalletPositions(
   loadYields: typeof getYieldsIndex = getYieldsIndex,
   /** segunda fonte de preço, para o que a primeira não cobriu; null = nenhuma */
   fallbackPrices: PriceProvider | null = dexscreenerPrices,
+  /** prazos de cada etapa; os testes passam prazos curtos */
+  budget: ScanBudget = DEFAULT_SCAN_BUDGET,
 ): Promise<PositionsResponseDTO> {
   const warnings: string[] = [];
   const notices: ScanNotice[] = [];
@@ -622,10 +663,35 @@ export async function getWalletPositions(
     notices.push({ kind: "apr" });
   });
   // locks correm JUNTO com as posições; adapter sem getLocks devolve vazio
+  /* Cada adapter corre com o PRÓPRIO prazo: o que terminou até lá entra, o que
+     passou fica de fora com aviso `slow`. Um adapter lento não segura os outros. */
+  const left = () => budget.adaptersMs - (Date.now() - t0);
+  const slowed = new Set<number>();
   const [settled, settledLocks] = await Promise.all([
-    Promise.allSettled(adapters.map((a) => a.getPositions(address))),
-    Promise.allSettled(adapters.map((a) => (a.getLocks ? a.getLocks(address) : Promise.resolve([])))),
+    Promise.allSettled(
+      adapters.map(async (a, i) => {
+        const r = await orSlow(a.getPositions(address), left());
+        if (r === SLOW) {
+          slowed.add(i);
+          return [] as LpPosition[];
+        }
+        return r;
+      }),
+    ),
+    Promise.allSettled(
+      adapters.map(async (a) => {
+        if (!a.getLocks) return [] as LockPosition[];
+        const r = await orSlow(a.getLocks(address), left());
+        return r === SLOW ? ([] as LockPosition[]) : r;
+      }),
+    ),
   ]);
+  for (const i of slowed) {
+    notices.push({ kind: "slow", protocol: adapters[i].protocol, chainId: adapters[i].chainId });
+    warnings.push(
+      `${adapters[i].protocol}@${chainInfo(adapters[i].chainId).label} passou do prazo de leitura — posições dessa rede ficaram de fora`,
+    );
+  }
   const scanMs = Date.now() - t0;
 
   // falha ao ler lock vira aviso — nunca derruba a resposta das posições
@@ -650,6 +716,7 @@ export async function getWalletPositions(
       );
     }
   });
+  const heavy = normalized.length > HEAVY_WALLET_POSITIONS;
   if (settled.length > 0 && settled.every((r) => r.status === "rejected")) {
     throw new Error(`todos os protocolos falharam: ${warnings.join(" | ")}`);
   }
@@ -682,28 +749,44 @@ export async function getWalletPositions(
     warnings.push(m);
     notices.push({ kind: "prices" });
   };
-  await Promise.all(
+  const pricing = Promise.all(
     [...byChain.entries()].map(async ([chainId, addrs]) => {
       const info = chainInfo(chainId);
       const chainPrices = await priceProvider.fetchUsdPrices(info.priceSlug, [...addrs] as Address[], avisoPreco);
       for (const [addr, price] of chainPrices) prices.set(priceKey(chainId, addr), price);
       const faltam = [...addrs].filter((a) => !chainPrices.has(a.toLowerCase()));
-      if (fallbackPrices && info.dexSlug && faltam.length > 0) {
+      // carteira-robô: sem 2ª fonte de preço (milhares de tokens obscuros, quase nenhum com preço)
+      if (fallbackPrices && !heavy && info.dexSlug && faltam.length > 0) {
         const dex = await fallbackPrices.fetchUsdPrices(info.dexSlug, faltam as Address[], avisoPreco);
         for (const [addr, price] of dex) prices.set(priceKey(chainId, addr), price);
       }
     }),
   );
+  /* Prazo dos preços: o que já chegou fica em `prices` (cada rede grava ao
+     terminar); o resto vira "—" com aviso. As leituras atrasadas continuam em
+     segundo plano, mas não mexem no resultado depois do buildResponse. */
+  if ((await orSlow(pricing, budget.pricesMs - (Date.now() - t0))) === SLOW) notices.push({ kind: "slowPrices" });
   const semWeth = [...byChain.entries()]
     .filter(([id, addrs]) => chainInfo(id).opStackWeth && [...addrs].some((a) => a.toLowerCase() === OP_WETH))
     .map(([id]) => id)
     .filter((id) => !prices.has(priceKey(id, OP_WETH)));
   if (semWeth.length > 0) {
-    const eth = (await priceProvider.fetchUsdPrices("ethereum", [MAINNET_WETH], avisoPreco)).get(MAINNET_WETH.toLowerCase());
+    // mesmo prazo dos preços: passou dele, o WETH fica sem preço ("—") em vez de segurar a resposta
+    const r = await orSlow(
+      priceProvider.fetchUsdPrices("ethereum", [MAINNET_WETH], avisoPreco),
+      budget.pricesMs - (Date.now() - t0),
+    );
+    const eth = r === SLOW ? undefined : r.get(MAINNET_WETH.toLowerCase());
     if (eth !== undefined) for (const id of semWeth) prices.set(priceKey(id, OP_WETH), eth);
   }
 
-  const feeWindows = await readFeeWindows(normalized, (m) => warnings.push(m));
+  /* Medição ao vivo de taxa é extra: pulada em carteira-robô e quando o prazo
+     já acabou — o card cai na estimativa do pool, como já faz sem RPC com arquivo. */
+  const semExtras = heavy || Date.now() - t0 > budget.extrasMs;
+  if (heavy) notices.push({ kind: "heavy", positions: normalized.length });
+  const feeWindows: FeeWindowsResult = semExtras
+    ? { byTarget: new Map(), tooNew: new Set(), unmeasured: 0 }
+    : await readFeeWindows(normalized, (m) => warnings.push(m));
   if (feeWindows.unmeasured > 0) notices.push({ kind: "fees", positions: feeWindows.unmeasured });
 
   return buildResponse({
@@ -715,7 +798,8 @@ export async function getWalletPositions(
     notices,
     protocols: [...new Set(adapters.map((a) => a.protocol))],
     chains: [...new Set(adapters.map((a) => chainInfo(a.chainId).priceSlug))],
-    yields: await yieldsPromise,
+    // APR do pool também tem prazo: sem ele, o card cai em "—" como já cai quando a DefiLlama falha
+    yields: await orSlow(yieldsPromise, budget.extrasMs - (Date.now() - t0)).then((y) => (y === SLOW ? null : y)),
     feeWindows,
     locks,
   });

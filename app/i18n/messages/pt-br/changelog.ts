@@ -7,6 +7,14 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "big-wallets-partial-read": {
+    title: "Carteiras muito grandes agora recebem resposta, não erro",
+    body: "Carteiras com milhares de posições, em geral robôs, terminavam num erro de tempo esgotado depois de uma longa espera. Agora cada etapa tem um limite de tempo: o trackdefi mostra o que conseguiu ler, diz o que está faltando e por quê, e pula os extras lentos (taxas ao vivo e a segunda fonte de preços) em carteiras com mais de 1.000 posições. Carteiras normais não são afetadas.",
+  },
+  "top-100-positions": {
+    title: "Carteiras agora listam as 100 maiores posições",
+    body: "Uma carteira com centenas de posições, em geral um robô, agora mostra as 100 maiores por valor em vez de 200, o que deixa a página mais leve. Os totais no topo continuam somando todas as posições, e uma linha acima da lista diz quantas aparecem de quantas.",
+  },
   "uniswap-v4-more-networks": {
     title: "Uniswap v4 em mais quatro redes",
     body: "O trackdefi agora lê posições da Uniswap v4 na Ethereum, Base, Optimism e Arbitrum, além da BNB Chain e da Robinhood Chain. Você vê as quantidades, a faixa de preço e as taxas de swap prontas para coletar. Posições em pools com hook levam um aviso, porque um hook pode pagar recompensas que a estimativa não enxerga. Posições encerradas ficam ocultas, como na Uniswap.",

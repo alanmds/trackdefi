@@ -28,6 +28,9 @@ describe("noticeText", () => {
       { kind: "tokensCapped", protocol: "uniswap-v2", chainId: 1, checked: 2000 },
       { kind: "pairsCapped", protocol: "sushiswap-v2", chainId: 1, checked: 300 },
       { kind: "hooks", protocol: "uniswap-v4", chainId: 4663, positions: 1 },
+      { kind: "slow", protocol: "uniswap-v4", chainId: 4663 },
+      { kind: "slowPrices" },
+      { kind: "heavy", positions: 1500 },
     ];
     for (const n of retry) expect(noticeText(n, en).retry, n.kind).toBe(true);
     for (const n of fixo) expect(noticeText(n, en).retry, n.kind).toBe(false);
@@ -56,6 +59,9 @@ describe("noticeText", () => {
       { kind: "tokensCapped", protocol: "uniswap-v2", chainId: 8453, checked: 2000 },
       { kind: "pairsCapped", protocol: "sushiswap-v2", chainId: 8453, checked: 300 },
       { kind: "hooks", protocol: "uniswap-v4", chainId: 4663, positions: 2 },
+      { kind: "slow", protocol: "uniswap-v4", chainId: 4663 },
+      { kind: "slowPrices" },
+      { kind: "heavy", positions: 1500 },
     ];
     for (const n of todos) expect(noticeText(n, en).text).not.toMatch(/indispon|posi[çc]|RPC|fee APR/i);
   });

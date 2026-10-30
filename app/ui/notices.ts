@@ -43,6 +43,12 @@ export function noticeText(n: ScanNotice, i18n: I18n): { text: string; retry: bo
       return { text: fill(t.locks, { where: where(i18n, n.protocol, n.chainId) }), retry: true };
     case "prices":
       return { text: t.prices, retry: true };
+    case "slow":
+      return { text: fill(t.slow, { where: where(i18n, n.protocol, n.chainId) }), retry: false };
+    case "slowPrices":
+      return { text: t.slowPrices, retry: false };
+    case "heavy":
+      return { text: fill(t.heavy, { n: fmtInt(n.positions, locale) }), retry: false };
     case "apr":
       return { text: t.apr, retry: true };
     case "fees":

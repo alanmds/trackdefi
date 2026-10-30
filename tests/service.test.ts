@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { buildResponse, priceKey } from "../core/service";
+import { buildResponse, MAX_POSITIONS_IN_RESPONSE, priceKey } from "../core/service";
 import { DEMO_ACCOUNT, normalized, token } from "./demo-fixture";
 
 const todas = () => [...normalized("base"), ...normalized("optimism")];
@@ -218,6 +218,20 @@ describe("buildResponse", () => {
     expect(round.positions.find((p: { poolSymbol: string }) => p.poolSymbol === "CL100-USDC/WETH").positionId).toBe(
       "47980865",
     );
+  });
+
+  it("o teto padrão é 100 e corta por VALOR, não por ordem de chegada", () => {
+    expect(MAX_POSITIONS_IN_RESPONSE).toBe(100);
+    // 150 cópias com quantidades crescentes: as 100 que ficam são as de maior valor
+    const base = todas()[0];
+    const muitas = Array.from({ length: 150 }, (_, i) => ({ ...base, positionId: String(i), amount0Raw: base.amount0Raw * BigInt(i + 1) }));
+    const d = buildResponse({ address: DEMO_ACCOUNT, normalized: muitas, prices: PRICES, scanMs: 1, warnings: [] });
+    expect(d.totalPositions).toBe(150);
+    expect(d.positions).toHaveLength(100);
+    const valores = d.positions.map((p) => p.valueUsd ?? -1);
+    expect(valores).toEqual([...valores].sort((a, b) => b - a));
+    expect(d.positions.some((p) => p.positionId === "149")).toBe(true); // a maior fica
+    expect(d.positions.some((p) => p.positionId === "0")).toBe(false); // a menor sai
   });
 
   it("corte para carteiras-lixeira: top N por valor, totais sobre todas", () => {

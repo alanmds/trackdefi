@@ -55,6 +55,20 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "big-wallets-partial-read",
+    date: "2026-10-29",
+    kind: "improvement",
+    title: "Very large wallets now get an answer instead of an error",
+    body: "Wallets with thousands of positions, usually bots, used to end in a timeout error after a long wait. Now each step has a time limit: trackdefi shows what it managed to read, says what is missing and why, and skips the slow extras (live fee rates, a second price source) on wallets with over 1,000 positions. Normal wallets are not affected.",
+  },
+  {
+    id: "top-100-positions",
+    date: "2026-10-29",
+    kind: "improvement",
+    title: "Wallets now list the 100 largest positions",
+    body: "A wallet with hundreds of positions, usually a bot, now shows its 100 largest by value instead of 200, which makes the page lighter. The totals at the top still count every position, and a line above the list says how many are shown out of how many.",
+  },
+  {
     id: "uniswap-v4-more-networks",
     date: "2026-10-28",
     kind: "exchange",
