@@ -79,7 +79,7 @@ const ui = {
     refresh: "Refresh",
     scanning: "Scanning the blockchains…",
     scanningBody:
-      "Reading Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses and Orca across {networks} — classic, concentrated and staked positions.",
+      "Reading Aero, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses and Orca across {networks} — classic, concentrated and staked positions.",
     elapsed: "{secs}s — a full scan takes ~15 s on the first visit",
     errors: {
       invalid_address: { title: "Invalid address", body: "That doesn't look like a valid wallet address." },
@@ -97,7 +97,7 @@ const ui = {
     },
     empty: {
       title: "No liquidity positions found",
-      body: "This wallet has no active positions on Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses or Orca across {networks} right now.",
+      body: "This wallet has no active positions on Aero, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses or Orca across {networks} right now.",
       another: "Track another wallet",
     },
     kpi: {
@@ -244,7 +244,7 @@ const ui = {
     where: "{protocol} on {network}",
     /** lançamento do Aero — textos aprovados pelo Alan em 21/10/2026 */
     aeroMerged:
-      "Aerodrome and Velodrome merged into Aero on Oct 22, 2026. Their old gauges no longer pay emissions, so staked positions here now earn swap fees only. Positions and locks moved to Aero aren't read by trackdefi yet.",
+      "Aerodrome and Velodrome merged into Aero on Oct 22, 2026. Their old gauges no longer pay emissions, so staked positions here now earn swap fees only. Liquidity positions moved to Aero are read and appear under Aero; sAERO locks aren't read by trackdefi yet.",
     aeroLeaf: "Velodrome on {network} keeps trading and liquidity after the Aero launch, but without gauges or emissions.",
     aeroLisk: "Velodrome asks for deposits on Lisk to be withdrawn by Oct 31, 2026.",
     thisToken: "this token",

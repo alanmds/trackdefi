@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "aero-positions",
+    date: "2026-10-31",
+    kind: "exchange",
+    title: "Aero positions on six networks",
+    body: "trackdefi now reads Aero, the merger of Aerodrome and Velodrome, on Base, Optimism, Ethereum, Arbitrum, Ink and Robinhood Chain: concentrated positions that sit in your wallet or are staked in a gauge, with amounts, price range and pending fees. Staked positions show the xAERO they have earned, valued at the AERO price (xAERO redeems 1:1 for AERO). Fees from staked positions go to voters, so none are shown there. sAERO locks aren't read yet.",
+  },
+  {
     id: "big-wallets-partial-read",
     date: "2026-10-29",
     kind: "improvement",

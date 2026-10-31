@@ -18,6 +18,7 @@ import { UNISWAP_V3_CHAINS } from "../core/adapters/uniswap-v3/config";
 import { UNISWAP_V4_CHAINS } from "../core/adapters/uniswap-v4/config";
 import { PANCAKE_V3_CHAINS } from "../core/adapters/pancake-v3/config";
 import { SUSHISWAP_V3_CHAINS } from "../core/adapters/sushiswap-v3/config";
+import { AERO_CHAINS } from "../core/adapters/aero/config";
 import { RAMSES_V3_CHAINS } from "../core/adapters/ramses-v3/config";
 import { CLASSIC_V2_PROTOCOLS } from "../core/adapters/classic-v2/config";
 import {
@@ -94,6 +95,10 @@ describe("frase de cobertura", () => {
     if (!c) throw new Error(`protocolo ${protocolo} sumiu de COVERAGE`);
     return [...c.networks].sort();
   };
+
+  it("Aero cobre exatamente as redes do seu config", () => {
+    expect(redesDe("Aero")).toEqual(AERO_CHAINS.map((c) => nomeDaRede(c.chainId)).sort());
+  });
 
   it("Aerodrome cobre exatamente as redes do seu config", () => {
     expect(redesDe("Aerodrome")).toEqual([nomeDaRede(AERODROME_BASE.chainId)].sort());

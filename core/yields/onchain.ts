@@ -176,6 +176,8 @@ const LAYOUTS: Record<string, PoolLayout> = {
   "ramses-v3": RAMSES_LAYOUT,
   aerodrome: SLIPSTREAM_LAYOUT,
   velodrome: SLIPSTREAM_LAYOUT,
+  // Aero: slot0 de 6 campos como o Slipstream; `ticks()` conferido no poc/probe-aero.ts
+  aero: SLIPSTREAM_LAYOUT,
 };
 
 /**

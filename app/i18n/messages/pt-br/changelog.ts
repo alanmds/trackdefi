@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "aero-positions": {
+    title: "Posições da Aero em seis redes",
+    body: "O trackdefi agora lê a Aero, a fusão da Aerodrome com a Velodrome, na Base, Optimism, Ethereum, Arbitrum, Ink e Robinhood Chain: posições concentradas que estão na sua carteira ou em stake num gauge, com quantidades, faixa de preço e taxas pendentes. As posições em stake mostram o xAERO que já renderam, valorizado ao preço do AERO (o xAERO é resgatável 1:1 por AERO). As taxas das posições em stake vão para os votantes, então não aparecem ali. Os locks em sAERO ainda não são lidos.",
+  },
   "big-wallets-partial-read": {
     title: "Carteiras muito grandes agora recebem resposta, não erro",
     body: "Carteiras com milhares de posições, em geral robôs, terminavam num erro de tempo esgotado depois de uma longa espera. Agora cada etapa tem um limite de tempo: o trackdefi mostra o que conseguiu ler, diz o que está faltando e por quê, e pula os extras lentos (taxas ao vivo e a segunda fonte de preços) em carteiras com mais de 1.000 posições. Carteiras normais não são afetadas.",

@@ -49,6 +49,7 @@ const pages = {
     keywordsBase: [
       "liquidity pool tracker",
       "LP position tracker",
+      "Aero",
       "Aerodrome",
       "Uniswap v3",
       "Velodrome",
@@ -67,7 +68,7 @@ const pages = {
       networks: "{count} networks — read-only, no keys, no login",
     },
     /** "Aerodrome, Velodrome & Uniswap v3" no cartão — nomes próprios, não traduzir */
-    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap · SushiSwap · Ramses · Orca",
+    ogProtocols: "Aero · Aerodrome · Velodrome · Uniswap · PancakeSwap · SushiSwap · Ramses · Orca",
   },
 
   /** frase de "sem token" — promessa pública e permanente (ver `NO_TOKEN` em app/site.ts) */
@@ -88,7 +89,7 @@ const pages = {
       },
       {
         title: "Staked positions included",
-        body: "Positions staked in Aerodrome or Velodrome gauges, or in PancakeSwap farms, don't show up as tokens in the wallet. We read them straight from the protocol, with their pending emissions.",
+        body: "Positions staked in Aero, Aerodrome or Velodrome gauges, or in PancakeSwap farms, don't show up as tokens in the wallet. We read them straight from the protocol, with their pending emissions.",
       },
       {
         title: "Honest numbers",
@@ -101,7 +102,7 @@ const pages = {
     faq: [
       {
         q: "How do I track my liquidity pool positions across networks?",
-        a: "Paste your wallet address (0x…, or a Solana address) in the search box above. {name} reads the blockchains and lists every LP position that address holds on Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses and Orca across {networks} — value in USD, pending fees, emissions and price ranges.",
+        a: "Paste your wallet address (0x…, or a Solana address) in the search box above. {name} reads the blockchains and lists every LP position that address holds on Aero, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses and Orca across {networks} — value in USD, pending fees, emissions and price ranges.",
       },
       {
         q: "Why don't my staked Aerodrome LP positions show up in my wallet?",
@@ -154,7 +155,7 @@ const pages = {
     title: "Roadmap — networks & exchanges",
     heading: "Roadmap",
     description:
-      "Where trackdefi is today and what's next: per-position APR, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses and Orca on {count} networks.",
+      "Where trackdefi is today and what's next: per-position APR, Aero, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses and Orca on {count} networks.",
     lede: "Where trackdefi is today and where it's going. No deadlines and no promises — priorities follow what users actually ask for. One thing never changes: <b>read-only, forever</b>.",
     status: { live: "✓ Live", next: "→ Next", planned: "Planned", exploring: "Exploring" } as Record<RoadmapKind, string>,
     liveTitle: "Live today",
@@ -174,6 +175,10 @@ const pages = {
       {
         title: "Governance locks · veAERO & veVELO",
         body: "locked AERO and VELO next to your positions: amount, voting power, unlock date, and the rebase and voting rewards waiting to be claimed. Expired locks are flagged as withdrawable.",
+      },
+      {
+        title: "Aero · Base, Optimism, Ethereum, Arbitrum, Ink & Robinhood Chain",
+        body: "the merger of Aerodrome and Velodrome, live since Oct 22, 2026: concentrated positions in your wallet and staked in gauges, with their xAERO emissions. Staked positions are found by walking the pool gauges, because Aero publishes no helper contract. sAERO locks aren't read yet.",
       },
       {
         title: "Base · Aerodrome",
@@ -282,8 +287,8 @@ const pages = {
         body: "the remaining classic exchanges, on Polygon and Arbitrum. QuickSwap waits for Polygon; Camelot's pools report their reserves in a slightly different format and need their own check.",
       },
       {
-        title: "Arc · Aerodrome & Uniswap",
-        body: "Circle's network, where the new Aero launches. Aerodrome's part waits for Aero's documentation for integrators.",
+        title: "Arc · Aero & Uniswap",
+        body: "Circle's network, where Aero also runs. Aero's official addresses are public, so this is next for Aero; Uniswap v3 on Arc is not in Uniswap's official documentation yet.",
       },
       {
         title: "BNB Chain & Base · PancakeSwap Infinity",

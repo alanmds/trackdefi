@@ -167,6 +167,7 @@ export function fmtPct(n: number | null | undefined, locale: Locale = DEFAULT_LO
 }
 
 const PROTOCOL_LABELS: Record<string, string> = {
+  aero: "Aero",
   aerodrome: "Aerodrome",
   velodrome: "Velodrome",
   "uniswap-v2": "Uniswap v2",

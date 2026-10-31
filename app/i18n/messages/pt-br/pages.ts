@@ -19,6 +19,7 @@ const pages: PagesMessages = {
     keywordsBase: [
       "rastreador de pools de liquidez",
       "rastreador de posições LP",
+      "Aero",
       "Aerodrome",
       "Uniswap v3",
       "Velodrome",
@@ -35,7 +36,7 @@ const pages: PagesMessages = {
       subtitle: "Cole o endereço de uma carteira — veja todas as posições de LP, inclusive as em stake.",
       networks: "{count} redes — somente leitura, sem chaves, sem login",
     },
-    ogProtocols: "Aerodrome · Velodrome · Uniswap · PancakeSwap · SushiSwap · Ramses · Orca",
+    ogProtocols: "Aero · Aerodrome · Velodrome · Uniswap · PancakeSwap · SushiSwap · Ramses · Orca",
   },
 
   noToken: "Sem token, sem pré-venda, sem airdrop.",
@@ -55,7 +56,7 @@ const pages: PagesMessages = {
       },
       {
         title: "Posições em stake incluídas",
-        body: "Posições em stake nos gauges da Aerodrome ou da Velodrome, ou nas farms da PancakeSwap, não aparecem como tokens na carteira. Nós as lemos direto do protocolo, com as emissões pendentes.",
+        body: "Posições em stake nos gauges da Aero, da Aerodrome ou da Velodrome, ou nas farms da PancakeSwap, não aparecem como tokens na carteira. Nós as lemos direto do protocolo, com as emissões pendentes.",
       },
       {
         title: "Números honestos",
@@ -120,7 +121,7 @@ const pages: PagesMessages = {
     title: "Roadmap — redes e corretoras",
     heading: "Roadmap",
     description:
-      "Onde o trackdefi está hoje e o que vem depois: APR por posição, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses e Orca em {count} redes.",
+      "Onde o trackdefi está hoje e o que vem depois: APR por posição, Aero, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses e Orca em {count} redes.",
     lede: "Onde o trackdefi está hoje e para onde vai. Sem prazos e sem promessas — as prioridades seguem o que os usuários realmente pedem. Uma coisa nunca muda: <b>somente leitura, para sempre</b>.",
     status: { live: "✓ No ar", next: "→ Próximo", planned: "Planejado", exploring: "Explorando" },
     liveTitle: "No ar hoje",
@@ -140,6 +141,10 @@ const pages: PagesMessages = {
       {
         title: "Locks de governança · veAERO e veVELO",
         body: "AERO e VELO bloqueados ao lado das suas posições: quantidade, poder de voto, data de desbloqueio e as recompensas de rebase e de voto à espera de resgate. Locks vencidos aparecem sinalizados como sacáveis.",
+      },
+      {
+        title: "Aero · Base, Optimism, Ethereum, Arbitrum, Ink e Robinhood Chain",
+        body: "a fusão da Aerodrome com a Velodrome, no ar desde 22/10/2026: posições concentradas na carteira e em stake nos gauges, com as emissões em xAERO. As posições em stake são achadas percorrendo os gauges dos pools, porque a Aero não publica contrato auxiliar. Os locks em sAERO ainda não são lidos.",
       },
       {
         title: "Base · Aerodrome",
@@ -248,8 +253,8 @@ const pages: PagesMessages = {
         body: "as corretoras clássicas que faltam, na Polygon e na Arbitrum. A QuickSwap espera a Polygon; os pools da Camelot informam as reservas num formato um pouco diferente e pedem uma conferência própria.",
       },
       {
-        title: "Arc · Aerodrome e Uniswap",
-        body: "a rede da Circle, onde o novo Aero é lançado. A parte da Aerodrome espera a documentação do Aero para integradores.",
+        title: "Arc · Aero e Uniswap",
+        body: "a rede da Circle, onde a Aero também roda. Os endereços oficiais da Aero já são públicos, então esta é a próxima da Aero; o Uniswap v3 na Arc ainda não está na documentação oficial da Uniswap.",
       },
       {
         title: "BNB Chain e Base · PancakeSwap Infinity",

@@ -3,7 +3,7 @@
 **Live at [trackdefi.app](https://trackdefi.app) — free, no login, no wallet connection.**
 
 Paste any wallet address (EVM `0x…` or Solana) and see all of its liquidity-pool positions on
-Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses and Orca, across every network in the
+Aero, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses and Orca, across every network in the
 [coverage table](#coverage) — including the gauge-staked (and MasterChef-staked)
 ones that most trackers miss. Read-only: trackdefi never asks for private keys or seed
 phrases, and cannot move funds. No token, no presale, no airdrop.
@@ -32,6 +32,7 @@ When a token has no reliable price, trackdefi shows `—` instead of guessing.
 
 | Exchange | Networks |
 |---|---|
+| Aero | Base, Optimism, Ethereum, Arbitrum, Ink, Robinhood Chain |
 | Aerodrome | Base |
 | Velodrome | Optimism, Unichain, Ink, Mode, Soneium, Fraxtal, Lisk, Swell, Metal L2, Superseed, Celo |
 | Uniswap v2 | Base, Optimism, Ethereum, Arbitrum, Robinhood Chain, Unichain, BNB Chain |
@@ -65,7 +66,8 @@ comes from.
 
 - **Next.js (App Router) + TypeScript** — site + API
 - **viem** — read-only on-chain access (Sugar contracts for the Aerodrome/
-  Velodrome family; the NonfungiblePositionManager for Uniswap v3; the
+  Velodrome family; for Aero, whose merger has no Sugar, the Slipstream
+  position manager plus a walk over the pool gauges for staked positions; the NonfungiblePositionManager for Uniswap v3; the
   PositionManager and StateView for Uniswap v4; the same NonfungiblePositionManager
   plus the MasterChef v3 for PancakeSwap v3; SushiSwap v3's own
   NonfungiblePositionManager, which has the Uniswap v3 layout; Ramses' own position manager and

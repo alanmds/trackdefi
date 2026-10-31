@@ -59,6 +59,9 @@ export interface MatchQuery {
 
 /** slug de projeto DefiLlama → nosso id de protocolo */
 const PROJECT_TO_PROTOCOL: Record<string, string> = {
+  // Aero (22/10/2026): o dataset de APR ainda não tem o projeto (31/10/2026);
+  // quando aparecer com este slug, o APR do pool entra sozinho
+  "aero-slipstream": "aero",
   "aerodrome-slipstream": "aerodrome",
   "aerodrome-v1": "aerodrome",
   "velodrome-v3": "velodrome",

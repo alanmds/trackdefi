@@ -12,6 +12,7 @@ import { formatUnits, type Address } from "viem";
 import type { AdapterNotice, LockPosition, LpPosition, PositionKind, ProtocolAdapter } from "./types";
 import { buildAdapters } from "./adapters/registry";
 import { chainInfo } from "./chains";
+import { AERO_CHAINS, AERO_TOKEN_BASE } from "./adapters/aero/config";
 import { defillamaPrices } from "./prices/defillama";
 import { dexscreenerPrices } from "./prices/dexscreener";
 
@@ -778,6 +779,20 @@ export async function getWalletPositions(
     );
     const eth = r === SLOW ? undefined : r.get(MAINNET_WETH.toLowerCase());
     if (eth !== undefined) for (const id of semWeth) prices.set(priceKey(id, OP_WETH), eth);
+  }
+
+  /* xAERO (emissão dos gauges da Aero) é resgatável 1:1 por AERO e a DefiLlama
+     não o precifica: copia o preço do AERO da Base. Sem preço do AERO, fica "—". */
+  const xaeros = AERO_CHAINS.filter(
+    (c) => byChain.get(c.chainId)?.has(c.receiptToken.address) && !prices.has(priceKey(c.chainId, c.receiptToken.address)),
+  );
+  if (xaeros.length > 0) {
+    const r = await orSlow(
+      priceProvider.fetchUsdPrices(chainInfo(8453).priceSlug, [AERO_TOKEN_BASE], avisoPreco),
+      budget.pricesMs - (Date.now() - t0),
+    );
+    const aero = r === SLOW ? undefined : r.get(AERO_TOKEN_BASE.toLowerCase());
+    if (aero !== undefined) for (const c of xaeros) prices.set(priceKey(c.chainId, c.receiptToken.address), aero);
   }
 
   /* Medição ao vivo de taxa é extra: pulada em carteira-robô e quando o prazo

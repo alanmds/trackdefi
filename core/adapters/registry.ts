@@ -8,6 +8,8 @@ import type { AdapterNotice, ChainReader, ProtocolAdapter, WarnSink } from "../t
 import { createReader } from "../chain";
 import { AerodromeAdapter } from "./aerodrome/index";
 import { VELODROME_LEAF_CHAINS, VELODROME_OPTIMISM } from "./aerodrome/config";
+import { AeroAdapter } from "./aero/index";
+import { AERO_CHAINS } from "./aero/config";
 import { UniswapV3Adapter } from "./uniswap-v3/index";
 import { UNISWAP_V3_CHAINS } from "./uniswap-v3/config";
 import { UniswapV4Adapter } from "./uniswap-v4/index";
@@ -54,6 +56,8 @@ export function buildAdapters(opts: { onWarn?: AdapterWarn } = {}): ProtocolAdap
     ...VELODROME_LEAF_CHAINS.map((config) =>
       tagged((onWarn) => new AerodromeAdapter(readerFor(config.chainId), { onWarn, config })),
     ),
+    // Aero (fusão Aerodrome + Velodrome, 22/10/2026): sem Sugar — NFTs + gauges
+    ...AERO_CHAINS.map((config) => tagged((onWarn) => new AeroAdapter(readerFor(config.chainId), { onWarn, config }))),
     ...UNISWAP_V3_CHAINS.map((config) =>
       tagged((onWarn) => new UniswapV3Adapter(readerFor(config.chainId), { onWarn, config })),
     ),

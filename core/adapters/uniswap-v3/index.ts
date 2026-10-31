@@ -291,6 +291,14 @@ export class UniswapV3Adapter implements ProtocolAdapter {
     return this.nfpm;
   }
 
+  /**
+   * Gancho: false = as taxas da posição NÃO vão para a conta (Aero: em stake,
+   * as taxas são dos votantes), então não há `collect()` a simular.
+   */
+  protected feesGoToAccount(_p: UniRawPosition): boolean {
+    return true;
+  }
+
   /** NFTs da conta (na carteira + em stake) → posições cruas com liquidez ou taxas a receber. */
   private async fetchRawPositions(account: Address): Promise<UniRawPosition[]> {
     const [livres, emStake] = await Promise.all([this.enumerateIds(this.nfpm, account), this.stakedTokenIds(account)]);
@@ -368,6 +376,10 @@ export class UniswapV3Adapter implements ProtocolAdapter {
     }
     let failures = 0;
     await mapLimit(raw, 5, async (p) => {
+      if (!this.feesGoToAccount(p)) {
+        out.set(p.tokenId, [0n, 0n]);
+        return;
+      }
       try {
         const sim = await this.reader.simulateContract!({
           address: this.collectTarget(p),

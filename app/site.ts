@@ -129,6 +129,7 @@ export function networksDotted(kind?: "evm" | "solana"): string {
  * ou perca rede sem atualizar aqui quebra o teste, não o site.
  */
 export const COVERAGE = [
+  { protocol: "Aero", networks: ["Base", "Optimism", "Ethereum", "Arbitrum", "Ink", "Robinhood Chain"] as readonly string[] },
   { protocol: "Aerodrome", networks: ["Base"] as readonly string[] },
   {
     protocol: "Velodrome",
@@ -208,10 +209,12 @@ export const PROTOCOL_FAMILIES: readonly string[] = [
  * Velodrome US$ 0,6 bi. Orca entrou em 14/10/2026 com US$ 8,5 bi (mesma
  * fonte), entre a Aerodrome (US$ 15 bi) e a Ramses (US$ 2 bi). SushiSwap
  * entrou em 20/10/2026 com US$ 0,24 bi (todos os produtos da Sushi, mesma
- * fonte) — abaixo da Velodrome (US$ 0,59 bi).
+ * fonte) — abaixo da Velodrome (US$ 0,59 bi). Aero entrou em 31/10/2026 com
+ * US$ 4,3 bi (aero-slipstream, mesma fonte; já passa a Aerodrome no volume
+ * de 24 h), entre a Orca e a Ramses.
  * Família nova precisa entrar aqui (teste cobra), conferida na mesma fonte.
  */
-export const FAMILIES_BY_VOLUME: readonly string[] = ["Uniswap", "PancakeSwap", "Aerodrome", "Orca", "Ramses", "Velodrome", "SushiSwap"];
+export const FAMILIES_BY_VOLUME: readonly string[] = ["Uniswap", "PancakeSwap", "Aerodrome", "Orca", "Aero", "Ramses", "Velodrome", "SushiSwap"];
 
 /** nome do arquivo de logo: "Metal L2" → "metal-l2" (public/logos/…/<slug>.webp) */
 export function logoSlug(name: string): string {

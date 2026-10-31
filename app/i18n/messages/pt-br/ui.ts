@@ -109,7 +109,7 @@ const ui: UiMessages = {
     refresh: "Atualizar",
     scanning: "Varrendo as blockchains…",
     scanningBody:
-      "Lendo Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses e Orca em {networks} — posições clássicas, concentradas e em stake.",
+      "Lendo Aero, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses e Orca em {networks} — posições clássicas, concentradas e em stake.",
     elapsed: "{secs}s — a primeira varredura completa leva cerca de 15 s",
     errors: {
       invalid_address: { title: "Endereço inválido", body: "Isso não parece um endereço de carteira válido." },
@@ -127,7 +127,7 @@ const ui: UiMessages = {
     },
     empty: {
       title: "Nenhuma posição de liquidez encontrada",
-      body: "Esta carteira não tem posições ativas na Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses ou Orca em {networks} no momento.",
+      body: "Esta carteira não tem posições ativas na Aero, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses ou Orca em {networks} no momento.",
       another: "Ver outra carteira",
     },
     kpi: {
@@ -271,7 +271,7 @@ const ui: UiMessages = {
     },
     where: "{protocol} em {network}",
     aeroMerged:
-      "A Aerodrome e a Velodrome se fundiram no Aero em 22/10/2026. Os gauges antigos não pagam mais emissões, então as posições em stake aqui passam a render só taxas de swap. Posições e locks levados para o Aero ainda não são lidos pelo trackdefi.",
+      "A Aerodrome e a Velodrome se fundiram no Aero em 22/10/2026. Os gauges antigos não pagam mais emissões, então as posições em stake aqui passam a render só taxas de swap. As posições de liquidez levadas para o Aero são lidas e aparecem como Aero; os locks em sAERO ainda não são lidos pelo trackdefi.",
     aeroLeaf: "A Velodrome na {network} continua com troca e liquidez depois do lançamento do Aero, mas sem gauges nem emissões.",
     aeroLisk: "A Velodrome pede que os depósitos na Lisk sejam sacados até 31/10/2026.",
     thisToken: "este token",
