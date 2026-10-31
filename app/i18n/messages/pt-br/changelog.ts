@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "defi-search-wording": {
+    title: "Mais fácil de achar: a home agora diz \"rastreador DeFi\"",
+    body: "O título, a descrição e a introdução da home agora chamam o trackdefi pelo nome que a maioria procura, um rastreador DeFi grátis de carteiras para pools de liquidez, e o título do roadmap diz a que rastreador ele pertence. Nada muda no funcionamento do app.",
+  },
   "aero-positions": {
     title: "Posições da Aero em seis redes",
     body: "O trackdefi agora lê a Aero, a fusão da Aerodrome com a Velodrome, na Base, Optimism, Ethereum, Arbitrum, Ink e Robinhood Chain: posições concentradas que estão na sua carteira ou em stake num gauge, com quantidades, faixa de preço e taxas pendentes. As posições em stake mostram o xAERO que já renderam, valorizado ao preço do AERO (o xAERO é resgatável 1:1 por AERO). As taxas das posições em stake vão para os votantes, então não aparecem ali. Os locks em sAERO ainda não são lidos.",

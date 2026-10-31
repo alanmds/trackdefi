@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "defi-search-wording",
+    date: "2026-10-31",
+    kind: "improvement",
+    title: "Easier to find: the home page now says \"DeFi tracker\"",
+    body: "The home page title, description and intro now call trackdefi what most people search for, a free DeFi wallet tracker for liquidity pools, and the roadmap page title says which tracker it belongs to. Nothing changes in how the app works.",
+  },
+  {
     id: "aero-positions",
     date: "2026-10-31",
     kind: "exchange",

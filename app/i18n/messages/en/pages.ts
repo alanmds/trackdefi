@@ -42,9 +42,9 @@ const pages = {
 
   meta: {
     /** `{families}`: "Aerodrome, Velodrome & Uniswap" */
-    siteTitle: "Liquidity Pool Tracker · {families}",
+    siteTitle: "DeFi Liquidity Pool Tracker · {families}",
     siteDescription:
-      "Free LP tracker: paste a wallet address to see every {families} position across {count} networks — gauge-staked ones included.",
+      "Free DeFi LP tracker: paste a wallet address to see every {families} position across {count} networks — gauge-staked ones included.",
     ogAlt: "{name} — liquidity pool tracker",
     keywordsBase: [
       "liquidity pool tracker",
@@ -60,7 +60,7 @@ const pages = {
     ],
     /** uma por rede */
     keywordNetwork: "{network} LP tracker",
-    keywordsExtra: ["DeFi portfolio", "concentrated liquidity", "wallet address"],
+    keywordsExtra: ["DeFi tracker", "DeFi wallet tracker", "track DeFi", "DeFi portfolio", "concentrated liquidity", "wallet address"],
     walletFallback: "wallet",
     ogCard: {
       title: "Liquidity Pool Tracker",
@@ -76,7 +76,7 @@ const pages = {
 
   home: {
     heading: ["Every LP position.", "One wallet address."],
-    lede: "Paste any wallet address and see all of its liquidity pool positions across {networks} — value, pending fees, emissions and price ranges. Including positions staked in gauges and farms, which most trackers miss.",
+    lede: "A free DeFi wallet tracker for liquidity pools: paste any wallet address and see all of its positions across {networks} — value, pending fees, emissions and price ranges. Including positions staked in gauges and farms, which most trackers miss.",
     tryDemo: "No wallet handy? <link>Try a demo wallet →</link>",
     whatsNew: "<date>Updated {date}</date> — {title}. <link>What's new →</link>",
     more: "More <soon>— see the roadmap →</soon>",
@@ -152,7 +152,7 @@ const pages = {
   },
 
   roadmap: {
-    title: "Roadmap — networks & exchanges",
+    title: "DeFi LP tracker roadmap — networks & exchanges",
     heading: "Roadmap",
     description:
       "Where trackdefi is today and what's next: per-position APR, Aero, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses and Orca on {count} networks.",

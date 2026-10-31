@@ -12,9 +12,9 @@ const pages: PagesMessages = {
   },
 
   meta: {
-    siteTitle: "Rastreador de Pools · {families}",
+    siteTitle: "Rastreador DeFi de Pools · {families}",
     siteDescription:
-      "Rastreador de LP grátis: cole o endereço de uma carteira e veja cada posição de {families} em {count} redes, inclusive as em stake.",
+      "Rastreador DeFi de LP grátis: cole o endereço de uma carteira e veja cada posição de {families} em {count} redes, inclusive as em stake.",
     ogAlt: "{name} — rastreador de pools de liquidez",
     keywordsBase: [
       "rastreador de pools de liquidez",
@@ -29,7 +29,7 @@ const pages: PagesMessages = {
       "Orca",
     ],
     keywordNetwork: "rastreador de LP {network}",
-    keywordsExtra: ["portfólio DeFi", "liquidez concentrada", "endereço de carteira"],
+    keywordsExtra: ["rastreador DeFi", "rastreador de carteira DeFi", "rastrear DeFi", "portfólio DeFi", "liquidez concentrada", "endereço de carteira"],
     walletFallback: "carteira",
     ogCard: {
       title: "Rastreador de Pools de Liquidez",
@@ -43,7 +43,7 @@ const pages: PagesMessages = {
 
   home: {
     heading: ["Todas as posições de LP.", "Um só endereço de carteira."],
-    lede: "Cole qualquer endereço de carteira e veja todas as posições dela em pools de liquidez em {networks} — valor, taxas pendentes, emissões e faixas de preço. Inclusive as posições em stake nos gauges e nas farms, que a maioria dos rastreadores não mostra.",
+    lede: "Rastreador DeFi grátis para pools de liquidez: cole qualquer endereço de carteira e veja todas as posições dela em {networks} — valor, taxas pendentes, emissões e faixas de preço. Inclusive as posições em stake nos gauges e nas farms, que a maioria dos rastreadores não mostra.",
     tryDemo: "Sem uma carteira à mão? <link>Experimente uma carteira de demonstração →</link>",
     whatsNew: "<date>Atualizado em {date}</date> — {title}. <link>Novidades →</link>",
     more: "Mais <soon>— veja o roadmap →</soon>",
@@ -118,7 +118,7 @@ const pages: PagesMessages = {
   },
 
   roadmap: {
-    title: "Roadmap — redes e corretoras",
+    title: "Roadmap do rastreador DeFi — redes e corretoras",
     heading: "Roadmap",
     description:
       "Onde o trackdefi está hoje e o que vem depois: APR por posição, Aero, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses e Orca em {count} redes.",
