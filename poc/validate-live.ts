@@ -97,8 +97,9 @@ async function main() {
         detail: `veio ${[...new Set(dto?.positions?.map((p) => p.chainId) ?? [])].join(", ") || "nada"}`,
       },
       {
-        name: "totais plausíveis (US$ 50–5.000, recompensas ≥ 0)",
-        ok: dto?.totals?.valueUsd > 50 && dto?.totals?.valueUsd < 5000 && dto?.totals?.rewardsUsd >= 0,
+        // sem faixa em dólar: carteira de terceiro muda de valor e o piso fixo quebrava (31/10/2026: caiu para US$ 13)
+        name: "totais plausíveis (valor > 0 e finito, recompensas ≥ 0)",
+        ok: Number.isFinite(dto?.totals?.valueUsd) && dto.totals.valueUsd > 0 && dto?.totals?.rewardsUsd >= 0,
       },
     ]) && allOk;
   if (dto?.positions) allOk = report(dtoInvariants(dto)) && allOk;
