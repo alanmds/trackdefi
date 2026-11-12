@@ -31,6 +31,9 @@ const pages: PagesMessages = {
     keywordNetwork: "rastreador de LP {network}",
     keywordsExtra: ["rastreador DeFi", "rastreador de carteira DeFi", "rastrear DeFi", "portfólio DeFi", "liquidez concentrada", "endereço de carteira"],
     walletFallback: "carteira",
+    walletShareTitle: "Posições de LP de {address}",
+    walletShareDescription:
+      "Todas as posições em pools de liquidez deste endereço: valor, faixa de preço, taxas a receber e quanto cada uma rende agora. Somente leitura, sem cadastro.",
     ogCard: {
       title: "Rastreador de Pools de Liquidez",
       subtitle: "Cole o endereço de uma carteira — veja todas as posições de LP, inclusive as em stake.",
@@ -316,6 +319,153 @@ const pages: PagesMessages = {
       improvement: "Melhoria",
       maintenance: "Manutenção",
       project: "Novidade do projeto",
+    },
+  },
+
+  trackers: {
+    common: {
+      coverageTitle: "Onde lemos {family}",
+      coverageProtocol: "Corretora",
+      coverageNetworks: "Redes",
+      readsTitle: "O que você vê em cada posição",
+      limitsTitle: "O que ainda não faz",
+      faqTitle: "Perguntas comuns",
+      safe: "Somente leitura: você cola um endereço público. Sem conectar carteira, sem cadastro, sem chaves. <link>Como funciona e por que é seguro →</link>",
+      simulator: "Planejando uma posição? <link>Simule quanto um pool e uma faixa de preço renderiam →</link>",
+      othersTitle: "Outras corretoras",
+      homeTitle: "Rastreadores por corretora",
+    },
+    pages: {
+      uniswap: {
+        name: "Uniswap",
+        title: "Rastreador de posições Uniswap: v2, v3 e v4 por endereço",
+        description:
+          "Cole um endereço de carteira e veja todas as posições na Uniswap v2, v3 e v4: quantidades, faixa de preço, taxas a coletar e quanto rende agora. Grátis.",
+        heading: "Rastreador de posições da Uniswap",
+        lede: "Veja todas as posições de liquidez que uma carteira tem na Uniswap, só com o endereço público dela: v3, v4 e os pools clássicos v2, em todas as redes listadas abaixo, numa lista só.",
+        reads: [
+          "<b>Quantidades e valor.</b> Quanto de cada token a posição tem agora e quanto isso vale em dólares.",
+          "<b>Faixa de preço.</b> Na v3 e na v4: a faixa que você escolheu, onde o preço atual está dentro dela e um selo claro de dentro ou fora da faixa.",
+          "<b>Taxas a coletar.</b> As taxas de swap esperando para serem coletadas, token por token. Na v2 as taxas já estão dentro das quantidades, então não há nada pendente a mostrar.",
+          "<b>Quanto a posição rende agora.</b> Na v3, a taxa da sua própria posição, medida no contrato do pool nos últimos 15 minutos e nas últimas 24 horas. Não é a média do pool: uma posição fora da faixa mostra 0%, porque é isso que ela rende. Quando o contrato não pode ser medido numa leitura, a taxa é estimada com dados do pool inteiro, e a tela avisa.",
+        ],
+        limits: [
+          "Não mostra lucro e prejuízo nem perda impermanente desde a abertura da posição.",
+          "Pools da v4 com hook levam um aviso: um hook pode pagar recompensas que a leitura não enxerga.",
+          "Posições encerradas ficam ocultas, como no aplicativo da própria Uniswap.",
+          "v2: uma carteira com um número muito grande de tokens diferentes é lida até um limite, e a página avisa quando isso acontece.",
+          "Incentivos pagos fora dos contratos da própria Uniswap não entram.",
+        ],
+        faq: [
+          {
+            q: "Como vejo minhas posições da Uniswap v3 sem conectar a carteira?",
+            a: "Cole o endereço público da carteira no campo no topo desta página. Uma posição é um dado público da blockchain, então lê-la não exige conexão, assinatura nem cadastro. O trackdefi só faz chamadas de leitura e não consegue mover fundos.",
+          },
+          {
+            q: "Minha posição da Uniswap fora da faixa continua rendendo taxas?",
+            a: "Não. Uma posição concentrada só rende taxas de swap enquanto o preço está dentro da faixa dela. O pool pode continuar mostrando um APR alto, mas uma posição fora da faixa rende 0% até o preço voltar ou a faixa ser movida. O trackdefi mostra a taxa da própria posição, então isso fica visível de imediato.",
+          },
+          {
+            q: "Por que minha posição da Uniswap v4 não aparece em outros rastreadores?",
+            a: "Uma posição da v4 não pode ser listada por carteira direto na blockchain, como uma da v3 pode, então a ferramenta precisa achá-la de outro jeito. O trackdefi acha as posições da v4 pelo índice de transferências da rede e confirma cada uma no contrato de posições da Uniswap.",
+          },
+        ],
+      },
+      aerodrome: {
+        name: "Aerodrome, Velodrome e Aero",
+        title: "Rastreador Aerodrome e Aero: posições em stake incluídas",
+        description:
+          "Cole um endereço de carteira e veja todas as posições na Aerodrome, Velodrome e Aero, inclusive as em stake nos gauges: valor, faixa, taxas e emissões. Grátis.",
+        heading: "Rastreador de posições da Aerodrome, Velodrome e Aero",
+        lede: "Veja todas as posições de liquidez que uma carteira tem na Aerodrome, na Velodrome e na Aero, a fusão das duas, só com o endereço público dela. As posições em stake nos gauges entram: o stake tira a posição da carteira, e é por isso que a maioria dos rastreadores deixa de mostrá-la.",
+        reads: [
+          "<b>Posições em stake.</b> Uma posição em stake num gauge é lida direto do protocolo, com as emissões que ela já rendeu e ainda não foram resgatadas.",
+          "<b>Pools clássicos e concentrados.</b> Quantidades, valor em dólares e, nas posições concentradas (Slipstream), a faixa de preço e se o preço está dentro dela.",
+          "<b>Taxas e emissões a receber.</b> O que está esperando para ser resgatado, token por token. Na Aero, as posições em stake rendem xAERO, valorizado ao preço do AERO porque é resgatável 1:1 por AERO.",
+          "<b>Locks de governança.</b> Locks em veAERO e veVELO, com o poder de voto e as recompensas a receber.",
+          "<b>Depois da fusão.</b> Os gauges antigos da Aerodrome e da Velodrome pararam de pagar emissões quando a Aero foi lançada, em 22/10/2026. Uma posição ainda em stake neles mostra as emissões em 0%, com a data em que acabaram.",
+        ],
+        limits: [
+          "Os locks em sAERO ainda não são lidos.",
+          "Na Aero, as taxas de swap de uma posição em stake vão para os votantes, então nenhuma aparece nela, e o ritmo atual das emissões não é mostrado porque os gauges novos não o expõem.",
+          "Os pools da Aero ainda não estão no simulador de APR.",
+          "Não mostra lucro e prejuízo nem perda impermanente desde a abertura da posição.",
+        ],
+        faq: [
+          {
+            q: "Por que minhas posições em stake na Aerodrome não aparecem na carteira?",
+            a: "O stake move o token de LP ou o NFT para o contrato do gauge, então a carteira deixa de tê-lo e a maioria dos rastreadores de portfólio perde a posição de vista. O trackdefi pergunta direto aos gauges quais posições são do endereço e as lista com as emissões a receber.",
+          },
+          {
+            q: "Migrei minha liquidez para a Aero. Ela aparece?",
+            a: "Sim, nas redes listadas nesta página: posições concentradas que estão na carteira ou em stake num gauge. As posições que ficaram nos pools antigos da Aerodrome ou da Velodrome também continuam aparecendo.",
+          },
+          {
+            q: "Preciso conectar a carteira para ver minhas posições?",
+            a: "Não. Você cola um endereço público. Não há conexão de carteira, assinatura nem cadastro, e o trackdefi não consegue mover fundos.",
+          },
+        ],
+      },
+      pancakeswap: {
+        name: "PancakeSwap",
+        title: "Rastreador de posições PancakeSwap: v3, farms e v2",
+        description:
+          "Cole um endereço de carteira e veja todas as posições na PancakeSwap: faixas e taxas da v3, posições em stake nas farms com CAKE a receber e pools v2. Grátis.",
+        heading: "Rastreador de posições da PancakeSwap",
+        lede: "Veja todas as posições de liquidez que uma carteira tem na PancakeSwap, só com o endereço público dela: posições da v3, inclusive as em stake nas farms, e os pools clássicos v2.",
+        reads: [
+          "<b>Posições em stake nas farms.</b> Uma posição da v3 depositada numa farm da PancakeSwap (o contrato MasterChef) sai da carteira. O trackdefi lê a farm direto e mostra o CAKE a receber e quanto a posição rende em CAKE agora.",
+          "<b>Faixa de preço.</b> Na v3: a faixa que você escolheu e se o preço atual está dentro dela.",
+          "<b>Quantidades, valor e taxas a receber.</b> Token por token, com o valor em dólares.",
+          "<b>Pools clássicos v2.</b> Achados pelos tokens de LP na carteira e conferidos na factory da própria PancakeSwap. As quantidades já incluem as taxas de swap.",
+        ],
+        limits: [
+          "A PancakeSwap Infinity ainda não é lida.",
+          "O CAKE a receber pode aparecer um pouco abaixo do valor real: a farm só atualiza o número quando alguém interage com o pool.",
+          "Tokens de LP da v2 depositados numa farm não são lidos.",
+          "Não mostra lucro e prejuízo nem perda impermanente desde a abertura da posição.",
+        ],
+        faq: [
+          {
+            q: "Por que minha posição da PancakeSwap v3 sumiu da carteira depois do stake?",
+            a: "O stake deposita o NFT da posição no contrato da farm (o MasterChef), então a carteira deixa de tê-lo. O trackdefi lê a farm direto, e a posição aparece com o CAKE a receber.",
+          },
+          {
+            q: "Preciso conectar a carteira para ver minhas posições da PancakeSwap?",
+            a: "Não. Você cola um endereço público. Não há conexão de carteira, assinatura nem cadastro, e o trackdefi não consegue mover fundos.",
+          },
+        ],
+      },
+      orca: {
+        name: "Orca",
+        title: "Rastreador de posições Orca: Whirlpools na Solana",
+        description:
+          "Cole um endereço Solana e veja as posições em Whirlpools da Orca: quantidades, faixa de preço, taxas e recompensas a receber e uma estimativa do que rende.",
+        heading: "Rastreador de posições da Orca",
+        lede: "Cole um endereço Solana e veja todas as posições em Whirlpools da Orca que ele tem. O mesmo campo de busca aceita endereços 0x, então posições na Solana e nas redes EVM são lidas pela mesma ferramenta.",
+        reads: [
+          "<b>Quantidades e valor.</b> Quanto de cada token a posição tem agora e quanto isso vale em dólares.",
+          "<b>Faixa de preço.</b> A faixa que você escolheu e se o preço atual está dentro dela.",
+          "<b>Taxas e recompensas a receber.</b> As taxas de swap e as recompensas do pool esperando para serem coletadas, token por token.",
+          "<b>Quanto a posição rende agora, como estimativa.</b> Calculada pela média do pool e pela fatia da posição na liquidez ativa, e rotulada como estimativa.",
+        ],
+        limits: [
+          "Na Solana, o quanto a posição rende agora é uma estimativa, não uma medição feita no pool.",
+          "Raydium e Meteora ainda não são lidas.",
+          "Os pools da Orca ainda não estão no simulador de APR.",
+          "Não mostra lucro e prejuízo nem perda impermanente desde a abertura da posição.",
+        ],
+        faq: [
+          {
+            q: "Consigo ver minhas posições da Orca sem conectar a Phantom ou outra carteira?",
+            a: "Sim. Cole o endereço Solana no campo no topo desta página. As posições são dados públicos, então lê-las não exige conexão, assinatura nem cadastro.",
+          },
+          {
+            q: "Ele mostra posições da Solana e das redes EVM juntas?",
+            a: "Cada endereço é lido separadamente: cole o endereço Solana para ver as posições da Orca e o endereço 0x para ver as posições nas redes EVM. Os dois vão no mesmo campo de busca.",
+          },
+        ],
+      },
     },
   },
 

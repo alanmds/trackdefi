@@ -1,6 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import type { PositionDTO } from "../../core/service";
+import { SIMULATOR_CLASSIC_PROTOCOLS, SIMULATOR_PROTOCOLS } from "../../core/simulator/math";
+import { localePath } from "../i18n/config";
 import { CHAINS } from "../../core/chains";
 import { basicTags, fill, rich } from "../i18n/rich";
 import { useI18n } from "../i18n/provider";
@@ -27,6 +30,14 @@ export default function PositionCard({ p, pricesFailed = false }: { p: PositionD
   const recSemPreco = p.rewards.filter((r) => r.valueUsd === null).map((r) => r.symbol);
   const recComPrecoUsd = p.rewards.reduce((s, r) => s + (r.valueUsd ?? 0), 0);
   const tip = (symbols: string[]) => noPriceTip(symbols, pricesFailed, i18n);
+
+  /* Atalho para o simulador com ESTE pool (12/11/2026). O link leva só o
+     endereço do pool — nunca o da carteira —, então pode ser passado adiante
+     sem expor quem é o dono da posição. Só aparece onde o simulador atende:
+     mesma lista que a tela do simulador cita (`core/simulator/math.ts`). */
+  const simulavel =
+    /^0x([0-9a-fA-F]{40}|[0-9a-fA-F]{64})$/.test(p.poolAddress) &&
+    (p.kind === "concentrated" ? SIMULATOR_PROTOCOLS : SIMULATOR_CLASSIC_PROTOCOLS).includes(p.protocol);
 
   /* "Rendendo agora" (Receitas C2 + G v2). Desde 15/09/2026 são VÁRIAS linhas:
      uma por janela medida (24 h e 15 min), cada uma com o valor em dólar ao
@@ -234,6 +245,12 @@ export default function PositionCard({ p, pricesFailed = false }: { p: PositionD
             )}
           </div>
         </div>
+      )}
+
+      {simulavel && (
+        <Link className="pos-simulate" href={`${localePath(locale, "/tools/apr-simulator")}?pool=${p.poolAddress}`}>
+          {t.simulate}
+        </Link>
       )}
     </article>
   );

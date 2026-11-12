@@ -27,6 +27,7 @@ const IMPRESSAO: Record<keyof typeof EDITADA_EM, { data: string; hash: string }>
   tools: { data: "2026-10-26", hash: "e9fefbb4702909c6" },
   simulator: { data: "2026-10-26", hash: "7411f964679a6c04" },
   pairs: { data: "2026-10-26", hash: "0402b19b9dd876a7" },
+  trackers: { data: "2026-11-12", hash: "506c087b55142613" },
 };
 
 /** texto da página em todos os idiomas → 16 caracteres de sha256 */

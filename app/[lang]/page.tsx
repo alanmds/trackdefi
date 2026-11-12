@@ -8,6 +8,7 @@ import { getMessages, localizedChangelog } from "../i18n/get";
 import { basicTags, fill, rich, stripTags } from "../i18n/rich";
 import { localeFrom, type LangParams } from "../i18n/server";
 import { pageMetadata } from "../i18n/seo";
+import { TRACKER_PAGES } from "../trackers";
 import {
   coverageSentence,
   DEMO_WALLET,
@@ -115,6 +116,19 @@ export default async function Home({ params }: LangParams) {
           </details>
         ))}
       </section>
+
+      {/* páginas por corretora (app/trackers.ts): sem link interno o Google não
+          as acha nem lhes dá peso */}
+      <nav className="tracker-links" aria-label={pages.trackers.common.homeTitle}>
+        <h2>{pages.trackers.common.homeTitle}</h2>
+        <ul>
+          {TRACKER_PAGES.map((t) => (
+            <li key={t.key}>
+              <Link href={to(`/${t.slug}`)}>{pages.trackers.pages[t.key].heading}</Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </main>
   );
 }

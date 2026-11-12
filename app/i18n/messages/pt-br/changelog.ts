@@ -7,6 +7,14 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "exchange-tracker-pages": {
+    title: "Uma página por corretora: Uniswap, Aerodrome, PancakeSwap, Orca",
+    body: "Quatro páginas novas dizem exatamente o que o trackdefi lê em cada família de corretora, em quais redes, e o que ainda não faz: Uniswap, Aerodrome junto com Velodrome e Aero, PancakeSwap e Orca. Cada uma tem o próprio campo de busca e responde às perguntas mais comuns sobre aquela corretora.",
+  },
+  "share-wallet-simulate-pool": {
+    title: "Compartilhe a página da carteira e simule um pool pelo card",
+    body: "A página da carteira ganhou o botão Compartilhar: no celular ele abre o menu de compartilhamento do aparelho, nos outros copia o link, e a prévia do link agora diz de quem são as posições em vez de repetir a home. Cada card de posição também leva ao simulador de APR com aquele pool já carregado. Esse link leva só o endereço do pool, nunca o da carteira.",
+  },
   "defi-search-wording": {
     title: "Mais fácil de achar: a home agora diz \"rastreador DeFi\"",
     body: "O título, a descrição e a introdução da home agora chamam o trackdefi pelo nome que a maioria procura, um rastreador DeFi grátis de carteiras para pools de liquidez, e o título do roadmap diz a que rastreador ele pertence. Nada muda no funcionamento do app.",

@@ -55,6 +55,20 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "exchange-tracker-pages",
+    date: "2026-11-12",
+    kind: "feature",
+    title: "A page for each exchange: Uniswap, Aerodrome, PancakeSwap, Orca",
+    body: "Four new pages say exactly what trackdefi reads on each exchange family, on which networks, and what it doesn't do yet: Uniswap, Aerodrome together with Velodrome and Aero, PancakeSwap and Orca. Each one has its own search box and answers the questions people ask most about that exchange.",
+  },
+  {
+    id: "share-wallet-simulate-pool",
+    date: "2026-11-12",
+    kind: "feature",
+    title: "Share a wallet page, and simulate a pool from its card",
+    body: "The wallet page has a Share button: on a phone it opens the device's share menu, elsewhere it copies the link, and the link's preview now says whose positions it shows instead of repeating the home page. Each position card also links to the APR simulator with that pool already loaded. That link carries only the pool's address, never the wallet's.",
+  },
+  {
     id: "defi-search-wording",
     date: "2026-10-31",
     kind: "improvement",

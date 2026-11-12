@@ -850,6 +850,20 @@ button {
   gap: 12px;
 }
 
+/* atalho "simular este pool" no pé do card (12/11/2026) — discreto: o card é
+   de leitura, o link é um convite, não uma ação principal */
+.pos-simulate {
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.pos-simulate:hover {
+  color: var(--ink);
+}
+
 .pos-head {
   display: flex;
   align-items: flex-start;
@@ -2214,4 +2228,77 @@ button.chip {
 .pairs-soon {
   font-size: 13px;
   color: var(--ink-3);
+}
+
+/* ---------- páginas por corretora (app/trackers.ts), 12/11/2026 ---------- */
+
+.tracker-search {
+  margin: 22px 0 10px;
+}
+
+.tracker-safe {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.tracker-coverage {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  margin: 12px 0 4px;
+}
+
+.tracker-coverage th,
+.tracker-coverage td {
+  text-align: left;
+  vertical-align: top;
+  padding: 9px 12px 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.tracker-coverage thead th {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+}
+
+.tracker-coverage tbody th {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.prose ul.tracker-others {
+  list-style: none;
+  padding-left: 0;
+}
+
+/* faixa de links na home */
+.tracker-links {
+  margin: 34px auto 0;
+  max-width: 760px;
+}
+
+.tracker-links h2 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+  margin: 0 0 10px;
+}
+
+.tracker-links ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.tracker-links a {
+  font-size: 14px;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

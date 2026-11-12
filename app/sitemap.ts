@@ -3,6 +3,7 @@ import { CHANGELOG } from "./changelog";
 import { DEFAULT_LOCALE, LOCALES, localePath, type Locale } from "./i18n/config";
 import { PAIRS_LISTED, SITE_URL, TOOLS_INDEXED } from "./site";
 import { EDITADA_EM } from "./sitemap-datas";
+import { TRACKER_PAGES } from "./trackers";
 
 /**
  * Dia em que cada idioma foi ao ar. Uma tradução nova nunca tem `lastmod`
@@ -38,6 +39,8 @@ const PAGINAS: Pagina[] = [
   ...(TOOLS_INDEXED && PAIRS_LISTED
     ? [{ path: "/tools/pairs", data: EDITADA_EM.pairs, changeFrequency: "weekly" as const, priority: 0.7 }]
     : []),
+  // páginas por corretora (app/trackers.ts): uma data para o conjunto — os textos moram juntos
+  ...TRACKER_PAGES.map((t) => ({ path: `/${t.slug}`, data: EDITADA_EM.trackers, changeFrequency: "monthly" as const, priority: 0.8 })),
   // a data da última entrada do log — é exatamente quando a página mudou
   { path: "/changelog", data: CHANGELOG[0].date, changeFrequency: "weekly", priority: 0.6 },
 ];

@@ -77,6 +77,10 @@ const ui = {
     copyAddress: "Copy address",
     copied: "Copied ✓",
     refresh: "Refresh",
+    share: "Share",
+    shareCopied: "Link copied ✓",
+    /** acompanha o link no menu de compartilhar do aparelho */
+    shareText: "LP positions of {address} on {name}",
     scanning: "Scanning the blockchains…",
     scanningBody:
       "Reading Aero, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses and Orca across {networks} — classic, concentrated and staked positions.",
@@ -132,6 +136,7 @@ const ui = {
       v2volatile: "Classic · volatile",
     },
     viewPool: "View pool on {explorer}",
+    simulate: "Simulate this pool →",
     theExplorer: "the explorer",
     inRange: "✓ In range",
     outOfRange: "⚠ Out of range",

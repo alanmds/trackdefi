@@ -107,6 +107,9 @@ const ui: UiMessages = {
     copyAddress: "Copiar endereço",
     copied: "Copiado ✓",
     refresh: "Atualizar",
+    share: "Compartilhar",
+    shareCopied: "Link copiado ✓",
+    shareText: "Posições de LP de {address} no {name}",
     scanning: "Varrendo as blockchains…",
     scanningBody:
       "Lendo Aero, Aerodrome, Velodrome, Uniswap, PancakeSwap, SushiSwap, Ramses e Orca em {networks} — posições clássicas, concentradas e em stake.",
@@ -162,6 +165,7 @@ const ui: UiMessages = {
       v2volatile: "Clássica · volátil",
     },
     viewPool: "Ver o pool em {explorer}",
+    simulate: "Simular este pool →",
     theExplorer: "o explorador de blocos",
     inRange: "✓ Dentro da faixa",
     outOfRange: "⚠ Fora da faixa",

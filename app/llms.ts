@@ -17,11 +17,16 @@
  */
 
 import { LOCALES, localePath } from "./i18n/config";
+import { TRACKER_PAGES } from "./trackers";
 import { COVERAGE, humanList, NETWORK_COUNT, NETWORK_NAMES, NO_TOKEN, PROTOCOL_FAMILIES, SITE_NAME, SITE_URL } from "./site";
 
 export function llmsTxt(): string {
   const families = humanList(PROTOCOL_FAMILIES);
   const coverage = COVERAGE.map((c) => `- ${c.protocol}: ${humanList(c.networks)}`).join("\n");
+
+  const trackerLines = TRACKER_PAGES.map(
+    (t) => `- [${t.protocols.join(", ")} position tracker](${SITE_URL}/${t.slug})`,
+  ).join("\n");
 
   const languages = LOCALES.map((l) => `- ${l.native}: ${SITE_URL}${localePath(l.code, "/")}`).join("\n");
 
@@ -70,6 +75,7 @@ Networks (${NETWORK_COUNT}): ${humanList(NETWORK_NAMES)}. Classic and concentrat
 - [Glossary — what every number means](${SITE_URL}/glossary)
 - [APR simulator — what a pool and price range would earn](${SITE_URL}/tools/apr-simulator)
 - [Pair finder — pools by APR, volume, TVL and market cap](${SITE_URL}/tools/pairs)
+${trackerLines}
 - [Roadmap](${SITE_URL}/roadmap)
 - [Changelog](${SITE_URL}/changelog)
 

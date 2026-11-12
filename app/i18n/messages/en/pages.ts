@@ -62,6 +62,10 @@ const pages = {
     keywordNetwork: "{network} LP tracker",
     keywordsExtra: ["DeFi tracker", "DeFi wallet tracker", "track DeFi", "DeFi portfolio", "concentrated liquidity", "wallet address"],
     walletFallback: "wallet",
+    /** prévia do link de uma carteira (X, Telegram, WhatsApp…) — `{address}` já encurtado */
+    walletShareTitle: "LP positions of {address}",
+    walletShareDescription:
+      "Every liquidity pool position this address holds: value, price range, pending fees and what each one is earning now. Read-only, no login.",
     ogCard: {
       title: "Liquidity Pool Tracker",
       subtitle: "Paste a wallet address — see every LP position, staked ones included.",
@@ -351,6 +355,162 @@ const pages = {
       maintenance: "Maintenance",
       project: "Project news",
     } as Record<ChangeKind, string>,
+  },
+
+  /**
+   * Páginas por corretora (`app/trackers.ts`). Uma por FAMÍLIA com assunto
+   * próprio — nada de página por rede. Nome de rede não se escreve aqui: a
+   * tabela de redes de cada página sai de `COVERAGE`.
+   * `title` leva o sufixo " — trackdefi" (≤ 70 no total); `description` ≤ 160.
+   * `faq` em texto puro: vai também para os dados estruturados do Google.
+   */
+  trackers: {
+    common: {
+      coverageTitle: "Where it reads {family}",
+      coverageProtocol: "Exchange",
+      coverageNetworks: "Networks",
+      readsTitle: "What you see for each position",
+      limitsTitle: "What it doesn't do yet",
+      faqTitle: "Common questions",
+      safe: "Read-only: you paste a public address. No wallet connection, no login, no keys. <link>How it works and why it's safe →</link>",
+      simulator: "Planning a position? <link>Simulate what a pool and a price range would earn →</link>",
+      othersTitle: "Other exchanges",
+      /** título da faixa de links na home */
+      homeTitle: "Trackers by exchange",
+    },
+    pages: {
+      uniswap: {
+        /** nome curto, usado nos links entre as páginas e na home */
+        name: "Uniswap",
+        title: "Uniswap position tracker: v2, v3 & v4 by wallet address",
+        description:
+          "Paste a wallet address to see every Uniswap v2, v3 and v4 liquidity position: amounts, price range, uncollected fees and what it earns now. Free.",
+        heading: "Uniswap position tracker",
+        lede: "See every Uniswap liquidity position a wallet holds, from just its public address: v3, v4 and classic v2, on every network listed below, in one list.",
+        reads: [
+          "<b>Amounts and value.</b> How much of each token the position holds right now, and what that is worth in US dollars.",
+          "<b>Price range.</b> For v3 and v4: the range you chose, where the current price sits in it, and a plain in-range or out-of-range badge.",
+          "<b>Uncollected fees.</b> Swap fees waiting to be collected, token by token. In v2 the fees are already inside the amounts, so there is nothing pending to show.",
+          "<b>What the position earns now.</b> For v3, the fee rate of your own position, measured in the pool's contract over the last 15 minutes and the last 24 hours. It is not the pool's average: a position that is out of range shows 0%, because that is what it earns. When the contract can't be measured for a scan, the rate is estimated from pool-wide data and says so.",
+        ],
+        limits: [
+          "No profit and loss, and no impermanent loss since you opened the position.",
+          "v4 pools with a hook carry a warning: a hook can pay rewards that the reading doesn't see.",
+          "Closed positions are hidden, as in Uniswap's own app.",
+          "v2: a wallet holding a very large number of different tokens is read up to a limit, and the page says so when that happens.",
+          "Incentives paid outside Uniswap's own contracts aren't included.",
+        ],
+        faq: [
+          {
+            q: "How do I see my Uniswap v3 positions without connecting a wallet?",
+            a: "Paste the wallet's public address in the box at the top of this page. A position is public data on the blockchain, so reading it needs no connection, no signature and no login. trackdefi only makes read calls and cannot move funds.",
+          },
+          {
+            q: "Is my out-of-range Uniswap position still earning fees?",
+            a: "No. A concentrated position earns swap fees only while the price is inside its range. The pool can keep showing a high APR, but an out-of-range position earns 0% until the price comes back or the range is moved. trackdefi shows the rate of the position itself, so this is visible at a glance.",
+          },
+          {
+            q: "Why is my Uniswap v4 position missing from other trackers?",
+            a: "A v4 position can't be listed by wallet directly on-chain the way a v3 position can, so a tool has to find it another way. trackdefi finds v4 positions through the network's transfer index and confirms each one against Uniswap's position contract.",
+          },
+        ],
+      },
+      aerodrome: {
+        name: "Aerodrome, Velodrome & Aero",
+        title: "Aerodrome & Aero position tracker: staked LPs included",
+        description:
+          "Paste a wallet address to see every Aerodrome, Velodrome and Aero position, including the ones staked in gauges: value, range, fees and emissions. Free.",
+        heading: "Aerodrome, Velodrome & Aero position tracker",
+        lede: "See every liquidity position a wallet holds on Aerodrome, Velodrome and Aero, the merger of the two, from just its public address. Positions staked in gauges are included: staking takes them out of the wallet, which is why most trackers stop showing them.",
+        reads: [
+          "<b>Staked positions.</b> A position staked in a gauge is read straight from the protocol, with the emissions it has earned and not yet claimed.",
+          "<b>Classic and concentrated pools.</b> Amounts, value in US dollars and, for concentrated (Slipstream) positions, the price range and whether the price is inside it.",
+          "<b>Pending fees and emissions.</b> What is waiting to be claimed, token by token. On Aero, staked positions earn xAERO, valued at the AERO price because it redeems 1:1 for AERO.",
+          "<b>Governance locks.</b> veAERO and veVELO locks, with their voting power and pending rewards.",
+          "<b>After the merger.</b> The old Aerodrome and Velodrome gauges stopped paying emissions when Aero launched on 22 Oct 2026. A position still staked there shows its emissions at 0%, with the date they ended.",
+        ],
+        limits: [
+          "sAERO locks aren't read yet.",
+          "On Aero, the swap fees of a staked position go to voters, so none are shown for it, and the live emission rate isn't shown because the new gauges don't expose it.",
+          "Aero pools aren't in the APR simulator yet.",
+          "No profit and loss, and no impermanent loss since you opened the position.",
+        ],
+        faq: [
+          {
+            q: "Why don't my staked Aerodrome positions show up in my wallet?",
+            a: "Staking moves the LP token or NFT into the gauge contract, so the wallet no longer holds it and most portfolio trackers lose track of it. trackdefi asks the gauges directly which positions belong to the address, and lists them with their pending emissions.",
+          },
+          {
+            q: "I moved my liquidity to Aero. Will it show up?",
+            a: "Yes, on the networks listed on this page: concentrated positions held in the wallet or staked in a gauge. Positions left in the old Aerodrome or Velodrome pools keep showing too.",
+          },
+          {
+            q: "Do I need to connect my wallet to see my positions?",
+            a: "No. You paste a public address. There is no wallet connection, no signature and no login, and trackdefi cannot move funds.",
+          },
+        ],
+      },
+      pancakeswap: {
+        name: "PancakeSwap",
+        title: "PancakeSwap position tracker: v3, farms & v2 pools",
+        description:
+          "Paste a wallet address to see every PancakeSwap position: v3 ranges and fees, positions staked in farms with pending CAKE, and classic v2 pools. Free.",
+        heading: "PancakeSwap position tracker",
+        lede: "See every PancakeSwap liquidity position a wallet holds, from just its public address: v3 positions, including the ones staked in farms, and classic v2 pools.",
+        reads: [
+          "<b>Positions staked in farms.</b> A v3 position deposited in a PancakeSwap farm (the MasterChef contract) leaves the wallet. trackdefi reads the farm directly and shows the pending CAKE and what the position earns in CAKE right now.",
+          "<b>Price range.</b> For v3: the range you chose and whether the current price is inside it.",
+          "<b>Amounts, value and pending fees.</b> Token by token, with the value in US dollars.",
+          "<b>Classic v2 pools.</b> Found through the LP tokens in the wallet and checked against PancakeSwap's own factory. The amounts already include the swap fees.",
+        ],
+        limits: [
+          "PancakeSwap Infinity isn't read yet.",
+          "Pending CAKE can read a little lower than the real figure: the farm only updates the number when someone interacts with the pool.",
+          "v2 LP tokens deposited in a farm aren't read.",
+          "No profit and loss, and no impermanent loss since you opened the position.",
+        ],
+        faq: [
+          {
+            q: "Why did my PancakeSwap v3 position disappear from my wallet after I staked it?",
+            a: "Staking deposits the position NFT in the farm contract (the MasterChef), so the wallet no longer holds it. trackdefi reads the farm directly, so the position appears with its pending CAKE.",
+          },
+          {
+            q: "Do I need to connect my wallet to see my PancakeSwap positions?",
+            a: "No. You paste a public address. There is no wallet connection, no signature and no login, and trackdefi cannot move funds.",
+          },
+        ],
+      },
+      orca: {
+        name: "Orca",
+        title: "Orca position tracker: Whirlpools by Solana address",
+        description:
+          "Paste a Solana address to see every Orca Whirlpool position: amounts, price range, pending fees and rewards, and an estimate of what it earns now. Free.",
+        heading: "Orca position tracker",
+        lede: "Paste a Solana address and see every Orca Whirlpool position it holds. The same search box also takes 0x addresses, so positions on Solana and on the EVM networks are read by the same tool.",
+        reads: [
+          "<b>Amounts and value.</b> How much of each token the position holds right now, and what that is worth in US dollars.",
+          "<b>Price range.</b> The range you chose and whether the current price is inside it.",
+          "<b>Pending fees and rewards.</b> Swap fees and pool rewards waiting to be collected, token by token.",
+          "<b>What the position earns now, as an estimate.</b> Worked out from the pool's average and the position's share of the active liquidity, and labelled as an estimate.",
+        ],
+        limits: [
+          "On Solana, what a position earns now is an estimate, not a measurement taken in the pool.",
+          "Raydium and Meteora aren't read yet.",
+          "Orca pools aren't in the APR simulator yet.",
+          "No profit and loss, and no impermanent loss since you opened the position.",
+        ],
+        faq: [
+          {
+            q: "Can I see my Orca positions without connecting Phantom or another wallet?",
+            a: "Yes. Paste the Solana address in the box at the top of this page. Positions are public data, so reading them needs no connection, no signature and no login.",
+          },
+          {
+            q: "Does it show Solana and EVM positions together?",
+            a: "Each address is read on its own: paste the Solana address to see Orca positions, and the 0x address to see positions on the EVM networks. Both go in the same search box.",
+          },
+        ],
+      },
+    },
   },
 
   tools: {

@@ -8,7 +8,7 @@ import { aeroWalletNotices } from "../aero";
 import { GRAMMAR, localePath } from "../i18n/config";
 import { fill, pl } from "../i18n/rich";
 import { useI18n } from "../i18n/provider";
-import { networksDotted, networksSentence } from "../site";
+import { networksDotted, networksSentence, SITE_NAME } from "../site";
 import AdSlot from "./AdSlot";
 import { fmtDecimal, fmtInt, fmtUsd, shortAddress } from "./format";
 import LockCard from "./LockCard";
@@ -43,6 +43,7 @@ export default function PositionsView({ address }: { address: string }) {
   const w = ui.wallet;
   const [state, setState] = useState<ViewState>({ phase: "loading" });
   const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   const load = useCallback(async () => {
@@ -76,6 +77,26 @@ export default function PositionsView({ address }: { address: string }) {
       setTimeout(() => setCopied(false), 1500);
     } catch {
       /* clipboard indisponível — sem drama */
+    }
+  }
+
+  /* Compartilhar a página desta carteira (12/11/2026). No celular abre o menu
+     do próprio aparelho (WhatsApp, Telegram…); onde ele não existe, copia o
+     link. O link é a própria URL — nada de número dentro dele: quem abre vê
+     a leitura feita na hora, não um valor que alguém pudesse forjar. */
+  async function share() {
+    const url = window.location.origin + localePath(locale, `/w/${address}`);
+    const text = fill(w.shareText, { address: shortAddress(address), name: SITE_NAME });
+    try {
+      if (typeof navigator.share === "function") {
+        await navigator.share({ title: text, text, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setShared(true);
+      setTimeout(() => setShared(false), 1500);
+    } catch {
+      /* menu fechado sem escolher, ou clipboard indisponível — sem drama */
     }
   }
 
@@ -119,6 +140,9 @@ export default function PositionsView({ address }: { address: string }) {
         <div className="wallet-actions">
           <button type="button" className="btn btn-ghost btn-sm" onClick={copy}>
             {copied ? w.copied : w.copyAddress}
+          </button>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={share}>
+            {shared ? w.shareCopied : w.share}
           </button>
           <button type="button" className="btn btn-sm" onClick={load} disabled={state.phase === "loading"}>
             {w.refresh}

@@ -23,4 +23,5 @@ export const EDITADA_EM = {
   tools: "2026-10-26",
   simulator: "2026-10-26",
   pairs: "2026-10-26",
+  trackers: "2026-11-12",
 } as const;
