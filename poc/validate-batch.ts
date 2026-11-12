@@ -76,7 +76,15 @@ export function dtoInvariants(dto: PositionsResponseDTO): Check[] {
     }
     if (p.range) {
       if (p.range.lower > p.range.upper) issues.push(`${p.poolSymbol}: faixa invertida (lower > upper)`);
-      const inside = p.range.current >= p.range.lower && p.range.current < p.range.upper;
+      /* A regra do protocolo é [tickInferior, tickSuperior): o limite inferior
+         está DENTRO, o superior está fora. Com a faixa exibida invertida
+         (1/preço) os extremos trocam de lado, então a borda que está dentro é a
+         de CIMA. Visto em 12/11/2026: CL50-FXB20291231/frxUSD com o preço
+         exatamente no tick inferior — dentro da faixa de verdade, e a checagem
+         antiga a reprovava. */
+      const inside = p.range.inverted
+        ? p.range.current > p.range.lower && p.range.current <= p.range.upper
+        : p.range.current >= p.range.lower && p.range.current < p.range.upper;
       if (inside !== p.range.inRange) issues.push(`${p.poolSymbol}: inRange inconsistente com preços exibidos`);
     }
     if (p.apr) {
