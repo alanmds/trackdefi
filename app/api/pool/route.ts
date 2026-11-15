@@ -18,6 +18,7 @@
 import { readFileSync } from "node:fs";
 import { FixedWindowLimiter, Semaphore, TtlCache } from "../../../core/guards";
 import { extractPoolAddress, lookupPool } from "../../../core/simulator/lookup";
+import { isHostedServer } from "../hosting";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -51,9 +52,9 @@ export async function GET(request: Request): Promise<Response> {
   if (!pool) return json({ error: "invalid" }, 400);
   const key = pool.toLowerCase();
 
-  // Modo fixture (preview sem rede), como o de /api/positions; nunca na Vercel.
+  // Modo fixture (preview sem rede), como o de /api/positions; nunca no servidor publicado.
   const fixture = process.env.TRACKDEFI_POOL_FIXTURE?.trim();
-  if (fixture && !process.env.VERCEL) {
+  if (fixture && !isHostedServer()) {
     try {
       return json(readFileSync(fixture, "utf8"), 200, { "x-fixture": "1" });
     } catch {

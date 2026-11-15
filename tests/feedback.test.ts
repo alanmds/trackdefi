@@ -135,6 +135,21 @@ describe("POST /api/feedback", () => {
     expect(chamadas).toHaveLength(0);
   });
 
+  it("sem a URL FORA da Vercel com TRACKDEFI_PRODUCTION=1 (Hostinger): também 503, sem detalhe", async () => {
+    delete process.env.FEEDBACK_WEBHOOK_URL;
+    delete process.env.VERCEL;
+    delete process.env.VERCEL_ENV;
+    process.env.TRACKDEFI_PRODUCTION = "1";
+    try {
+      const res = await post(agora());
+      expect(res.status).toBe(503);
+      expect(await res.json()).toEqual({ error: "not_configured" });
+      expect(chamadas).toHaveLength(0);
+    } finally {
+      delete process.env.TRACKDEFI_PRODUCTION;
+    }
+  });
+
   it("script com erro devolve página HTML com status 200 — isso NÃO conta como entregue", async () => {
     process.env.FEEDBACK_WEBHOOK_URL = SCRIPT;
     scriptResponde("<html>TypeError: Cannot read properties…</html>", 200);

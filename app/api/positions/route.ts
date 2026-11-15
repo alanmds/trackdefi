@@ -17,6 +17,7 @@ import { readFileSync } from "node:fs";
 import { parseWalletAddress } from "../../../core/address";
 import { getWalletPositions } from "../../../core/service";
 import { FixedWindowLimiter, Semaphore, TtlCache } from "../../../core/guards";
+import { isHostedServer } from "../hosting";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,6 +34,15 @@ const MAX_CONCURRENT_SCANS = 4; // varreduras simultâneas por instância (prote
 const cache = new TtlCache<string>(CACHE_TTL_MS);
 const limiter = new FixedWindowLimiter(RL_WINDOW_MS, RL_MAX);
 const scans = new Semaphore(MAX_CONCURRENT_SCANS);
+
+/**
+ * Cache da CDN (13/11/2026): a mesma carteira lida de novo dentro de 5 min sai
+ * da borda, sem acordar a função — na Vercel grátis a CPU ativa é o que acaba
+ * (4 h/30 dias). `max-age=0` mantém o navegador sempre perguntando à borda;
+ * `stale-while-revalidate` serve a cópia velha enquanto uma nova é lida. Só
+ * respostas 200: erro, 429 e 503 nunca são guardados.
+ */
+const CDN_CACHE = "public, max-age=0, s-maxage=300, stale-while-revalidate=900";
 
 function jsonResponse(body: unknown, status: number, extra?: Record<string, string>): Response {
   return new Response(typeof body === "string" ? body : JSON.stringify(body), {
@@ -78,9 +88,9 @@ export async function GET(request: Request): Promise<Response> {
   const cacheKey = parsed.kind === "evm" ? address.toLowerCase() : address;
 
   // Modo fixture (dev/preview sem rede): serve um DTO congelado do disco.
-  // Ignorado na Vercel por segurança, além de documentado no .env.example.
+  // Ignorado no servidor publicado por segurança (ver app/api/hosting.ts).
   const fixturePath = process.env.TRACKDEFI_FIXTURE?.trim();
-  if (fixturePath && !process.env.VERCEL) {
+  if (fixturePath && !isHostedServer()) {
     try {
       return jsonResponse(readFileSync(fixturePath, "utf8"), 200, { "x-fixture": "1" });
     } catch {
@@ -89,7 +99,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   const cached = cache.get(cacheKey);
-  if (cached) return jsonResponse(cached, 200, { "x-cache": "HIT" });
+  if (cached) return jsonResponse(cached, 200, { "x-cache": "HIT", "cache-control": CDN_CACHE });
 
   if (!scans.tryAcquire()) {
     return jsonResponse(
@@ -103,7 +113,7 @@ export async function GET(request: Request): Promise<Response> {
     const dto = await withTimeout(getWalletPositions(address), SCAN_TIMEOUT_MS);
     const body = JSON.stringify(dto);
     cache.set(cacheKey, body);
-    return jsonResponse(body, 200, { "x-cache": "MISS" });
+    return jsonResponse(body, 200, { "x-cache": "MISS", "cache-control": CDN_CACHE });
   } catch (e) {
     if ((e as Error).message === "timeout") {
       return jsonResponse({ error: "timeout", message: "The blockchain read took too long. Please try again." }, 504);

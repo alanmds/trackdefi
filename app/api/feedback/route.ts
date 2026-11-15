@@ -33,6 +33,7 @@
 import { buildFeedbackEmail, validateFeedback, type FeedbackInput } from "../../../core/feedback";
 import { FixedWindowLimiter } from "../../../core/guards";
 import { SITE_URL } from "../../site";
+import { isHostedServer, isPublicProduction } from "../hosting";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -44,7 +45,7 @@ const limiter = new FixedWindowLimiter(10 * 60_000, 5);
 /** Erro de entrega: sempre no log; o motivo só vai na resposta fora da produção. */
 function falha(error: string, status: number, detail: string): Response {
   console.error(`[feedback] ${error}: ${detail}`);
-  const mostrar = process.env.VERCEL_ENV !== "production";
+  const mostrar = !isPublicProduction();
   return json(mostrar ? { error, detail } : { error }, status);
 }
 
@@ -98,7 +99,7 @@ export async function POST(request: Request): Promise<Response> {
     // Modo local: sem URL e fora da Vercel, só imprime no terminal — dá para
     // testar a tela inteira sem o script. Em produção, falta de URL é erro de
     // configuração, nunca "ok" mentiroso.
-    if (!process.env.VERCEL) {
+    if (!isHostedServer()) {
       console.log(`\n[feedback — modo local, NÃO enviado]\n${subject}\n${text}\n`);
       return json({ ok: true }, 200);
     }

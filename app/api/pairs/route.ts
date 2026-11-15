@@ -11,6 +11,7 @@
 import { readFileSync } from "node:fs";
 import { FixedWindowLimiter, TtlCache } from "../../../core/guards";
 import { loadPairs } from "../../../core/discovery/pairs";
+import { isHostedServer } from "../hosting";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,9 +29,9 @@ export async function GET(request: Request): Promise<Response> {
   const ip = (request.headers.get("x-forwarded-for") ?? "local").split(",")[0].trim();
   if (!limiter.check(ip)) return json(JSON.stringify({ error: "rate_limited" }), 429);
 
-  // Modo fixture (preview sem rede), como os outros; nunca na Vercel.
+  // Modo fixture (preview sem rede), como os outros; nunca no servidor publicado.
   const fixture = process.env.TRACKDEFI_PAIRS_FIXTURE?.trim();
-  if (fixture && !process.env.VERCEL) {
+  if (fixture && !isHostedServer()) {
     try {
       return json(readFileSync(fixture, "utf8"), 200, { "x-fixture": "1" });
     } catch {
