@@ -136,7 +136,7 @@ describe("cadeia de preço", () => {
 });
 
 describe("prazo da varredura (carteira-robô)", () => {
-  const curto = { adaptersMs: 60, pricesMs: 200, extrasMs: 300 };
+  const curto = { adaptersMs: 60, pricesMs: 200, extrasMs: 300, feesMs: 400 };
 
   it("adapter que passa do prazo fica de fora com aviso `slow`; os outros entram", async () => {
     const lento: ProtocolAdapter = {

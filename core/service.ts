@@ -242,8 +242,15 @@ export interface ScanBudget {
   pricesMs: number;
   /** passou disso (desde o início), as medições extras de taxa são puladas */
   extrasMs: number;
+  /**
+   * tempo máximo, desde o início, para a medição de taxa ao vivo TERMINAR.
+   * Até 15/11/2026 ela só tinha prazo para COMEÇAR (`extrasMs`): começava aos
+   * 25 s e, com RPC lento para histórico, levava ~90 s — a rota cortava aos 50 s
+   * e a carteira demo da home dava 504 com as posições já lidas na mão.
+   */
+  feesMs: number;
 }
-export const DEFAULT_SCAN_BUDGET: ScanBudget = { adaptersMs: 24_000, pricesMs: 36_000, extrasMs: 38_000 };
+export const DEFAULT_SCAN_BUDGET: ScanBudget = { adaptersMs: 24_000, pricesMs: 36_000, extrasMs: 38_000, feesMs: 44_000 };
 
 /** acima disto a carteira é tratada como robô: sem medição de taxa ao vivo nem 2ª fonte de preço */
 export const HEAVY_WALLET_POSITIONS = 1000;
@@ -801,7 +808,7 @@ export async function getWalletPositions(
   if (heavy) notices.push({ kind: "heavy", positions: normalized.length });
   const feeWindows: FeeWindowsResult = semExtras
     ? { byTarget: new Map(), tooNew: new Set(), unmeasured: 0 }
-    : await readFeeWindows(normalized, (m) => warnings.push(m));
+    : await readFeeWindows(normalized, (m) => warnings.push(m), budget.feesMs - (Date.now() - t0));
   if (feeWindows.unmeasured > 0) notices.push({ kind: "fees", positions: feeWindows.unmeasured });
 
   return buildResponse({
@@ -843,7 +850,10 @@ function feeWindowKey(p: LpPosition): string {
 async function readFeeWindows(
   positions: LpPosition[],
   onWarn: (msg: string) => void,
+  /** prazo em ms a partir de agora; a rede que não terminar até lá fica na estimativa */
+  ms: number,
 ): Promise<FeeWindowsResult> {
+  const limite = Date.now() + ms;
   const out: FeeWindowsResult = { byTarget: new Map(), tooNew: new Set(), unmeasured: 0 };
   const porRede = new Map<number, FeeWindowTarget[]>();
 
@@ -876,12 +886,26 @@ async function readFeeWindows(
     [...porRede.entries()].map(async ([chainId, alvos]) => {
       const info = chainInfo(chainId);
       try {
-        const reader = createReader(chainId);
-        const bloco = await reader.getBlockNumber?.();
-        if (bloco === undefined) return;
-        const fatia = alvos.slice(0, Math.max(0, orcamento));
-        orcamento -= fatia.length;
-        const r = await readPositionFeeWindows(reader, fatia, bloco, info.secPerBlock, onWarn);
+        const leitura = (async () => {
+          const reader = createReader(chainId);
+          const bloco = await reader.getBlockNumber?.();
+          if (bloco === undefined) return null;
+          const fatia = alvos.slice(0, Math.max(0, orcamento));
+          orcamento -= fatia.length;
+          const lido = await readPositionFeeWindows(reader, fatia, bloco, info.secPerBlock, onWarn);
+          return { lido, fatia };
+        })();
+        /* Prazo por rede: a que terminou entra; a lenta fica inteira na estimativa
+           (o card cai no APR do pool, como já cai sem RPC com histórico). A
+           leitura atrasada segue em segundo plano, mas não escreve mais nada. */
+        const pronto = await orSlow(leitura, limite - Date.now());
+        if (pronto === SLOW) {
+          out.unmeasured += alvos.length;
+          onWarn(`fee APR on-chain passou do prazo em ${info.label} — ${alvos.length} posição(ões) na estimativa do pool`);
+          return;
+        }
+        if (pronto === null) return;
+        const { lido: r, fatia } = pronto;
         for (const [k, v] of r.byTarget) out.byTarget.set(k, v);
         for (const k of r.tooNew) out.tooNew.add(k);
         // os que passaram do teto também ficam na estimativa

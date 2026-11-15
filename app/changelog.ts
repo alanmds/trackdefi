@@ -69,6 +69,13 @@ export const CHANGELOG: ChangeEntry[] = [
     body: "Who runs trackdefi, how it is paid for and how to reach us now have their own pages, along with the terms of use. The links are at the bottom of every page.",
   },
   {
+    id: "slow-fee-measurement-deadline",
+    date: "2026-11-15",
+    kind: "improvement",
+    title: "Wallets on slow networks load instead of failing",
+    body: "Some wallets ended in a time-out error after a long wait, even though their positions had already been read: measuring live fees on a slow network took too long. That measurement now has its own time limit. When it runs out, the positions still appear, and their fee rate is estimated from pool-wide data, with a note saying so.",
+  },
+  {
     id: "exchange-tracker-pages",
     date: "2026-11-12",
     kind: "feature",

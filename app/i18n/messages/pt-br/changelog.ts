@@ -15,6 +15,10 @@ const changelog: ChangelogTranslations = {
     title: "Páginas de sobre, contato e termos",
     body: "Quem mantém o trackdefi, como ele se paga e como falar com a gente agora têm páginas próprias, junto com os termos de uso. Os links ficam no rodapé de toda página.",
   },
+  "slow-fee-measurement-deadline": {
+    title: "Carteiras em redes lentas carregam em vez de falhar",
+    body: "Algumas carteiras terminavam num erro de tempo esgotado depois de uma longa espera, mesmo com as posições já lidas: medir as taxas ao vivo numa rede lenta demorava demais. Agora essa medição tem um limite de tempo próprio. Quando ele acaba, as posições aparecem do mesmo jeito, com a taxa estimada a partir dos dados do pool inteiro e um aviso dizendo isso.",
+  },
   "exchange-tracker-pages": {
     title: "Uma página por corretora: Uniswap, Aerodrome, PancakeSwap, Orca",
     body: "Quatro páginas novas dizem exatamente o que o trackdefi lê em cada família de corretora, em quais redes, e o que ainda não faz: Uniswap, Aerodrome junto com Velodrome e Aero, PancakeSwap e Orca. Cada uma tem o próprio campo de busca e responde às perguntas mais comuns sobre aquela corretora.",
