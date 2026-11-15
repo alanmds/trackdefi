@@ -5,10 +5,14 @@ endereço da carteira (0x…), sem login, e vê todas as posições. **NO AR:**
 https://trackdefi.app (domínio próprio desde ~24/07/2026; `www`,
 `trackdefi.xyz` e `trackdefi.vercel.app` redirecionam 308 para ele) · repo:
 https://github.com/alanmds/trackdefi (push na `main` → deploy automático).
+**Hospedagem: Hostinger** (app web Node.js, servidor na Holanda) desde
+15/11/2026; o DNS do `.app` e os redirecionamentos 308 continuam na Vercel.
+Ver `DEPLOY.md` e `privado/INFRA_E_DOMINIO.md`.
 
 ⚠️ **Configuração de painel não vive no repo.** Domínio, variáveis de
-ambiente (`NEXT_PUBLIC_SITE_URL`, RPCs), Analytics — tudo isso só existe na
-Vercel e não chega aqui por git nem pelo Drive. Na dúvida sobre o que está
+ambiente (`NEXT_PUBLIC_SITE_URL`, `TRACKDEFI_PRODUCTION`, RPCs) — tudo isso só
+existe no hPanel da Hostinger (DNS e redirects: Vercel) e não chega aqui por
+git nem pelo Drive. Na dúvida sobre o que está
 valendo, ler o site (`/robots.txt`, `/sitemap.xml`) ou rodar
 `npx tsx poc/validate-live.ts <URL>`. Pendências em `privado/PENDENCIAS.md`.
 
@@ -103,7 +107,8 @@ O site fala **inglês** (padrão, URL sem prefixo: `/roadmap`) e **pt-BR**
   privacidade, dinheiro ou promessa pública (sem token, somente leitura, gorjetas).
 
 ## Stack e arquitetura
-- Next.js (App Router) + TypeScript + viem. Preços: DefiLlama. Deploy: Vercel.
+- Next.js (App Router) + TypeScript + viem. Preços: DefiLlama. Deploy: Hostinger
+  (build com `next build --webpack` — o servidor não roda o Turbopack; não tirar).
 - **Regra anti-retrabalho:** todo código de protocolo vive atrás de
   `ProtocolAdapter` (`core/types.ts`). Rede/protocolo novo = adapter/config
   novos no `core/adapters/registry.ts`; API/UI/preços não mudam.
@@ -134,4 +139,4 @@ O site fala **inglês** (padrão, URL sem prefixo: `/roadmap`) e **pt-BR**
   velocidade real) · `npm test` · `npm run typecheck`
 - `npm run poc -- 0xENDERECO` — imprime posições (todas as redes)
 - `npx tsx poc/validate-batch.ts` — bateria de validação (rodar antes de release)
-- Deploy = `git push` (Vercel republica sozinha em ~1 min)
+- Deploy = `git push` (a Hostinger republica sozinha em ~2 min; logs em hPanel → Implantações)

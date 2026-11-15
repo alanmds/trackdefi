@@ -1,18 +1,22 @@
-# Publicar o trackdefi (grátis, na Vercel)
+# Publicar o trackdefi
 
-**O site já está no ar em https://trackdefi.app**, hospedado na Vercel no plano
-gratuito. Custo: R$ 0.
+**O site está no ar em https://trackdefi.app**, hospedado desde 15/11/2026 na
+Hostinger (app web Node.js, servidor na Holanda). De 10/07 a 15/11/2026 ele
+rodou na Vercel, no plano grátis — saiu porque a cota de CPU das funções
+(4 h por 30 dias) acabava antes do mês.
 
 Este documento tem duas partes: como o deploy funciona **hoje** (parte 1) e o
-passo a passo original de instalação do zero (parte 2), útil para quem quiser
-publicar a própria cópia.
+passo a passo original na Vercel (parte 2), útil para quem quiser publicar a
+própria cópia de graça.
 
 ---
 
 ## Parte 1 — Como funciona hoje
 
-**Deploy é `git push` na branch `main`.** A Vercel republica sozinha em ~1 min.
-Não há botão a apertar nem build manual.
+**Deploy é `git push` na branch `main`.** A Hostinger ("Implantação
+automática", ligada ao repositório público no GitHub) clona, roda
+`npm install` e `npm run build` e republica sozinha em ~2 min. O andamento e
+os logs ficam em hPanel → o site → **Implantações**.
 
 Antes de qualquer push:
 
@@ -26,27 +30,37 @@ Depois do deploy, validar a produção pela HTTP:
 npx tsx poc/validate-live.ts https://trackdefi.app
 ```
 
-### O que está configurado no painel da Vercel
+> ⚠️ **O build usa Webpack (`next build --webpack`) de propósito.** O servidor
+> da Hostinger tem uma glibc antiga, o binário nativo do Next não carrega lá e
+> o Turbopack se recusa a compilar. Não tirar o `--webpack` do `package.json`.
 
-Nada disto vive no repositório — só existe no painel:
+### O que está configurado nos painéis
 
-| Item | Estado |
-|---|---|
-| Domínio principal | `trackdefi.app` |
-| Redirecionamentos 308 | `www.trackdefi.app`, `trackdefi.xyz`, `www.trackdefi.xyz` e `trackdefi.vercel.app` apontam para o principal |
-| `NEXT_PUBLIC_SITE_URL` | `https://trackdefi.app` (Production) |
-| Web Analytics | ligado (sem cookies) |
-| RPCs dedicados (`<REDE>_RPC_URLS`) | configurados nas redes em que o RPC público não serve histórico — ver abaixo |
+Nada disto vive no repositório:
+
+| Onde | Item | Estado |
+|---|---|---|
+| Hostinger | Domínio do app | `trackdefi.app` (SSL automático da Hostinger) |
+| Hostinger | `TRACKDEFI_PRODUCTION` | `1` — liga as travas de produção fora da Vercel (`app/api/hosting.ts`) |
+| Hostinger | `NEXT_PUBLIC_SITE_URL` | `https://trackdefi.app` |
+| Hostinger | `NEXT_PUBLIC_CF_ANALYTICS_TOKEN` | contagem de visitas sem cookie (Cloudflare Web Analytics) |
+| Hostinger | `FEEDBACK_WEBHOOK_URL` | formulário de feedback |
+| Hostinger | RPCs dedicados (`<REDE>_RPC_URLS`) | ver abaixo |
+| Vercel (DNS) | Nameservers do `trackdefi.app` | continuam na Vercel; o registro `A` do apex aponta para a Hostinger |
+| Vercel | Redirecionamentos 308 | `www.trackdefi.app`, `trackdefi.xyz`, `www.trackdefi.xyz` e `trackdefi.vercel.app` → `trackdefi.app` |
 
 > ⚠️ Os redirecionamentos do `trackdefi.xyz` precisam continuar de pé: existe
 > uma "mudança de endereço" registrada no Google Search Console que depende
-> deles.
+> deles. Por isso o projeto na Vercel não é apagado.
+
+Variável `NEXT_PUBLIC_*` entra no código na hora do build: depois de mudar
+uma, é preciso reimplantar (hPanel → **Implantações** → **Reimplantar**).
 
 ### RPC dedicado (por rede)
 
 Cada rede tem a sua variável — `BASE_RPC_URLS`, `OPTIMISM_RPC_URLS`,
 `BSC_RPC_URLS` etc.; a lista completa é o campo `rpcEnv` em `core/chains.ts`.
-Sem ela, a rede usa os RPCs públicos do mesmo arquivo. Duas razões para
+Sem ela, a rede usa os RPCs públicos do mesmo arquivo. Razões para
 configurar:
 
 - **velocidade** em carteira grande;
@@ -71,19 +85,18 @@ Para configurar:
 
 1. Crie uma conta grátis em https://alchemy.com, um app com as redes que
    quiser, e copie a **HTTPS URL** de cada uma.
-2. Vercel → projeto → **Settings → Environment Variables** → **Name:** a
-   variável da rede (ex.: `BSC_RPC_URLS`) · **Value:** a URL (várias separadas
-   por vírgula) → **Save**.
-3. **Deployments** → **Redeploy** no último deploy (variável só vale com deploy
-   novo).
+2. hPanel → o site → **Variáveis de ambiente** → **Adicionar variável de
+   ambiente** (ou **Importar .env**) → **Aplicar mudanças**. O app reinicia
+   sozinho.
 
 A chave fica só no servidor; nunca chega ao navegador.
 
 ---
 
-## Parte 2 — Instalar do zero (histórico)
+## Parte 2 — Instalar do zero na Vercel (grátis)
 
-Feito em 10/07/2026. Mantido para quem quiser publicar a própria cópia.
+Feito em 10/07/2026. Mantido para quem quiser publicar a própria cópia: para
+pouco tráfego, o plano grátis da Vercel basta.
 
 ### GitHub
 
@@ -102,15 +115,10 @@ Feito em 10/07/2026. Mantido para quem quiser publicar a própria cópia.
    com o apex como **Primary** e os demais como **Redirect (308)**. Depois,
    setar `NEXT_PUBLIC_SITE_URL` com o endereço final e redeployar.
 
-### Estatísticas
-
-8. Projeto → aba **Analytics** → **Enable**. O componente já está no layout;
-   sem o clique no painel ele não coleta.
-
 ---
 
-## Limitações conhecidas do plano grátis
+## Limitações conhecidas
 
-Funções da Vercel têm teto de tempo. Carteiras com **milhares** de posições
-(quase sempre spam de airdrop) podem passar do limite e receber um erro honesto
-de timeout — caso patológico raro. O RPC dedicado reduz muito isso.
+Carteiras com **milhares** de posições (quase sempre spam de airdrop) podem
+passar do tempo máximo da varredura (50 s) e receber um erro honesto de
+timeout — caso patológico raro. O RPC dedicado reduz muito isso.
