@@ -18,7 +18,18 @@
 
 import { LOCALES, localePath } from "./i18n/config";
 import { TRACKER_PAGES } from "./trackers";
-import { COVERAGE, humanList, NETWORK_COUNT, NETWORK_NAMES, NO_TOKEN, PROTOCOL_FAMILIES, SITE_NAME, SITE_URL } from "./site";
+import { HOME_MARKDOWN_PATH, MCP_CARD_PATH, MCP_PATH, TOOL_GET_COVERAGE, TOOL_GET_POSITIONS } from "./agents";
+import {
+  CONTACT_EMAIL,
+  COVERAGE,
+  humanList,
+  NETWORK_COUNT,
+  NETWORK_NAMES,
+  NO_TOKEN,
+  PROTOCOL_FAMILIES,
+  SITE_NAME,
+  SITE_URL,
+} from "./site";
 
 export function llmsTxt(): string {
   const families = humanList(PROTOCOL_FAMILIES);
@@ -78,6 +89,16 @@ Networks (${NETWORK_COUNT}): ${humanList(NETWORK_NAMES)}. Classic and concentrat
 ${trackerLines}
 - [Roadmap](${SITE_URL}/roadmap)
 - [Changelog](${SITE_URL}/changelog)
+- [About — who runs it and how it is paid for](${SITE_URL}/about)
+- [Contact](${SITE_URL}/contact) — ${CONTACT_EMAIL}
+- [Terms of use](${SITE_URL}/terms)
+
+## For AI agents
+
+- MCP server (Streamable HTTP, read-only, no authentication): ${SITE_URL}${MCP_PATH} — tools \`${TOOL_GET_POSITIONS.name}\` (every LP position of a wallet address) and \`${TOOL_GET_COVERAGE.name}\` (supported exchanges and networks).
+- MCP server card: ${SITE_URL}${MCP_CARD_PATH}
+- The home page in Markdown: ${SITE_URL}${HOME_MARKDOWN_PATH}, or request ${SITE_URL}/ with \`Accept: text/markdown\`.
+- In the browser, the site registers the same read-only tools through WebMCP.
 
 ## Languages
 

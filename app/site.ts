@@ -264,3 +264,22 @@ export const NO_TOKEN = "No token, no presale, no airdrop.";
  * rede de segurança para quando a variável não estiver setada.
  */
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://trackdefi.app").replace(/\/$/, "");
+
+/**
+ * E-mail público de contato — decidido pelo Alan em 15/11/2026. Aparece na
+ * página /contact, no /about e nos dados estruturados (Organization). O Gmail
+ * pessoal NUNCA vai ao site.
+ */
+export const CONTACT_EMAIL = "contact@trackdefi.app";
+
+/** Perfil oficial no X. */
+export const X_URL = "https://x.com/trackdefi";
+/** Código-fonte público. */
+export const GITHUB_URL = "https://github.com/alanmds/trackdefi";
+
+/**
+ * Perfis que são o MESMO trackdefi (`sameAs` dos dados estruturados): é por
+ * eles que buscadores e agentes confirmam que o site, o repo e o perfil no X
+ * são uma entidade só. Decisão do Alan em 15/11/2026: X e GitHub.
+ */
+export const SAME_AS: readonly string[] = [X_URL, GITHUB_URL];

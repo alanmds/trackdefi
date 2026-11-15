@@ -91,6 +91,10 @@ const ui: UiMessages = {
     coverage:
       "Cobertura: {list} — <roadmap>veja o roadmap</roadmap> · <changelog>novidades</changelog> · <glossary>o que significa cada número</glossary>.",
     feedback: "Feedback",
+    about: "Sobre",
+    contact: "Contato",
+    terms: "Termos",
+    linksAria: "Sobre este site",
   },
 
   search: {

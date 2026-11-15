@@ -546,6 +546,93 @@ const pages = {
     lede: "An idea, a network or exchange you'd like to see, a position we missed, a number that looks off — every message is read by a person.",
   },
 
+  /* Páginas institucionais (15/11/2026): agentes de IA e visitantes as
+     procuram para saber quem está por trás do site. Promessa pública — o
+     Alan lê antes do push. Nada de nome de pessoa, cidade ou e-mail pessoal. */
+  about: {
+    title: "About trackdefi",
+    description:
+      "Who runs trackdefi, why it exists and how it is paid for: an independent, free, read-only tracker of liquidity pool positions.",
+    lede: "{name} is a free website that shows every liquidity pool position of a wallet from its public address. It reads the blockchain directly — no login, no wallet connection.",
+    sections: [
+      {
+        title: "Who runs it",
+        body: "<b>{name} is an independent project run by one person.</b> It is not a company, and it is not affiliated with or endorsed by any of the exchanges or networks it reads.",
+      },
+      {
+        title: "Why it exists",
+        body: "Positions staked in gauges and farms leave the wallet, so most wallets and many trackers stop showing them. {name} was built to show every position in one place — staked ones included — with numbers that say where they come from.",
+      },
+      {
+        title: "How it is paid for",
+        body: "The site is free. Its running costs are covered by voluntary donations (the address is at the bottom of every page) and by ads. {noToken}",
+      },
+      {
+        title: "Open source",
+        body: "The code is public on <github>GitHub</github>, so anyone can check that the site only reads.",
+      },
+    ],
+    contactTitle: "Contact",
+    contact:
+      "Email <email>{email}</email>, use the <feedback>feedback form</feedback>, or follow <x>@trackdefi on X</x>. More on the <contact>contact page</contact>.",
+  },
+
+  contact: {
+    title: "Contact",
+    description: "How to reach trackdefi: email, the feedback form or X. Every message is read by a person.",
+    lede: "{name} is run by one person, and every message is read.",
+    channels: [
+      "<b>Email:</b> <email>{email}</email>",
+      "<b>Feedback form:</b> <feedback>an idea, a missing position, a network to add</feedback> — no email needed.",
+      "<b>X:</b> <x>@trackdefi</x>",
+    ],
+    safetyTitle: "We will never ask for your keys",
+    safety:
+      "No one from {name} will ever ask for your private key, your seed phrase or a wallet signature — not by email, not on X, not anywhere. Anyone who does is not us.",
+  },
+
+  terms: {
+    title: "Terms of use",
+    description:
+      "The terms for using trackdefi, a free, read-only information tool: not financial advice, no warranty, fair use of the site and its MCP server.",
+    updated: "Last updated: {date}",
+    intro: "{name} is a free website that reads public blockchain data and shows it in a readable form. By using it, you agree to these terms.",
+    sections: [
+      {
+        title: "Information, not advice",
+        body: "Everything the site shows is for information only. It is not financial, investment, tax or legal advice, and it is not a recommendation to buy, sell, deposit or withdraw anything. Verify on-chain before acting.",
+      },
+      {
+        title: "No guarantee",
+        body: "Data comes from blockchains, public price sources and the pools themselves. It can be late, incomplete or wrong: a position may be missing, a price may be off, and a past APR does not promise a future one. The site is provided “as is”, without warranties of any kind, and it may change or go offline at any time.",
+      },
+      {
+        title: "Your decisions",
+        body: "You are responsible for what you do with the information. To the fullest extent the law allows, {name} and the person who runs it are not liable for any loss arising from the use of the site or from not being able to use it.",
+      },
+      {
+        title: "Read-only",
+        body: "The site never asks for a private key, a seed phrase or a wallet connection, and it cannot sign, approve or move anything. If a page claiming to be {name} asks for any of these, it is not us.",
+      },
+      {
+        title: "Fair use",
+        body: "Don't use the site to break the law, attack it or overload it. Automated access — scripts and AI assistants, including through the MCP server — is welcome at a reasonable pace. Requests are rate-limited, and abusive traffic may be blocked.",
+      },
+      {
+        title: "Other sites and ads",
+        body: "The site links to block explorers, exchanges and other websites, and it shows ads. We don't control them and are not responsible for their content or offers. An ad is not an endorsement.",
+      },
+      {
+        title: "Donations",
+        body: "Donations are voluntary gifts to keep the site running. They buy nothing — no features, no priority, no token — and they cannot be refunded, because blockchain transfers are final.",
+      },
+      {
+        title: "Changes",
+        body: "These terms may change; the date at the top shows the last update. Questions go to the <contact>contact page</contact>.",
+      },
+    ],
+  },
+
   glossary: {
     title: "Glossary — what every number means",
     description:

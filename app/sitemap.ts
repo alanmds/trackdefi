@@ -43,6 +43,10 @@ const PAGINAS: Pagina[] = [
   ...TRACKER_PAGES.map((t) => ({ path: `/${t.slug}`, data: EDITADA_EM.trackers, changeFrequency: "monthly" as const, priority: 0.8 })),
   // a data da última entrada do log — é exatamente quando a página mudou
   { path: "/changelog", data: CHANGELOG[0].date, changeFrequency: "weekly", priority: 0.6 },
+  // institucionais (15/11/2026): quem está por trás, contato e termos
+  { path: "/about", data: EDITADA_EM.about, changeFrequency: "monthly", priority: 0.5 },
+  { path: "/contact", data: EDITADA_EM.contact, changeFrequency: "monthly", priority: 0.4 },
+  { path: "/terms", data: EDITADA_EM.terms, changeFrequency: "monthly", priority: 0.3 },
 ];
 
 /** Sitemap das páginas indexáveis, uma entrada por página e idioma, cada uma

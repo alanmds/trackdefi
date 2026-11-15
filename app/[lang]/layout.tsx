@@ -4,7 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Fraunces, Inter } from "next/font/google";
 import { COVERAGE, humanList, SITE_NAME, SITE_URL, TOOLS_INDEXED } from "../site";
-import { isLocale, localeInfo, LOCALE_CODES, localePath, type Locale } from "../i18n/config";
+import { siteJsonLd } from "../structured-data";
+import { isLocale, localeInfo, LOCALE_CODES, localePath } from "../i18n/config";
 import { getMessages } from "../i18n/get";
 import { I18nProvider } from "../i18n/provider";
 import { rich, basicTags } from "../i18n/rich";
@@ -15,6 +16,7 @@ import LanguageSwitcher from "../ui/LanguageSwitcher";
 import PageAd from "../ui/PageAd";
 import SiteAnalytics from "../ui/SiteAnalytics";
 import TapTips from "../ui/TapTips";
+import WebMcpTools from "../ui/WebMcpTools";
 import ThemeToggle, { THEME_SCRIPT } from "../ui/ThemeToggle";
 import "../globals.css";
 
@@ -94,20 +96,6 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   };
 }
 
-function websiteJsonLd(locale: Locale) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: SITE_NAME,
-    url: SITE_URL + localePath(locale, "/"),
-    description: siteDescription(locale),
-    inLanguage: localeInfo(locale).htmlLang,
-    applicationCategory: "FinanceApplication",
-    operatingSystem: "Web",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  };
-}
-
 export default async function RootLayout({
   children,
   params,
@@ -136,7 +124,7 @@ export default async function RootLayout({
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd(lang)) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd(lang)) }}
         />
         <I18nProvider locale={lang} ui={ui}>
           <CostBar />
@@ -193,15 +181,25 @@ export default async function RootLayout({
                   },
                 )}
               </span>
-              <span>
+              {/* páginas institucionais: agentes e visitantes as procuram para
+                  saber quem está por trás do site (15/11/2026) */}
+              <nav className="footer-links" aria-label={f.linksAria}>
+                <Link href={to("/about")}>{f.about}</Link>
+                {" · "}
+                <Link href={to("/contact")}>{f.contact}</Link>
+                {" · "}
+                <Link href={to("/terms")}>{f.terms}</Link>
+                {" · "}
                 <Link href={to("/feedback")}>{f.feedback}</Link>
-              </span>
+              </nav>
             </div>
           </footer>
           {/* tooltips no toque: o iPhone não mostra `title` (app/ui/TapTips.tsx) */}
           <TapTips />
           {/* Cloudflare Web Analytics + saída do dono via ?notrack=1 (app/analytics-optout.ts) */}
           <SiteAnalytics />
+          {/* ferramentas para agentes de IA no navegador (WebMCP — app/agents.ts) */}
+          <WebMcpTools />
         </I18nProvider>
       </body>
     </html>

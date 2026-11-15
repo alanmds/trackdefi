@@ -24,4 +24,8 @@ export const EDITADA_EM = {
   simulator: "2026-10-26",
   pairs: "2026-10-26",
   trackers: "2026-11-12",
+  // páginas institucionais — a de termos mostra esta data no topo
+  about: "2026-11-15",
+  contact: "2026-11-15",
+  terms: "2026-11-15",
 } as const;

@@ -1169,6 +1169,13 @@ button {
   margin-bottom: 8px;
 }
 
+/* "Last updated: …" logo abaixo do título (termos de uso) */
+.prose-meta {
+  color: var(--ink-3);
+  font-size: 13px;
+  margin: -6px 0 14px;
+}
+
 .prose ul,
 .prose ol {
   padding-left: 22px;

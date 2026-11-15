@@ -502,6 +502,90 @@ const pages: PagesMessages = {
     lede: "Uma ideia, uma rede ou corretora que você gostaria de ver, uma posição que não mostramos, um número que parece errado — toda mensagem é lida por uma pessoa.",
   },
 
+  about: {
+    title: "Sobre o trackdefi",
+    description:
+      "Quem mantém o trackdefi, por que ele existe e como se paga: um rastreador independente, grátis e somente leitura de posições em pools de liquidez.",
+    lede: "O {name} é um site grátis que mostra todas as posições em pools de liquidez de uma carteira a partir do endereço público. Ele lê a blockchain direto — sem login, sem conectar carteira.",
+    sections: [
+      {
+        title: "Quem mantém",
+        body: "<b>O {name} é um projeto independente, mantido por uma pessoa.</b> Não é uma empresa e não tem vínculo nem aval de nenhuma das corretoras ou redes que lê.",
+      },
+      {
+        title: "Por que existe",
+        body: "Posições em stake em gauges e farms saem da carteira, então a maioria das carteiras e muitos rastreadores deixam de mostrá-las. O {name} foi feito para mostrar todas as posições num lugar só — inclusive as em stake — com números que dizem de onde vêm.",
+      },
+      {
+        title: "Como se paga",
+        body: "O site é grátis. Os custos são cobertos por doações voluntárias (o endereço fica no rodapé de toda página) e por anúncios. {noToken}",
+      },
+      {
+        title: "Código aberto",
+        body: "O código é público no <github>GitHub</github>: qualquer pessoa pode conferir que o site só lê.",
+      },
+    ],
+    contactTitle: "Contato",
+    contact:
+      "Escreva para <email>{email}</email>, use o <feedback>formulário de feedback</feedback> ou siga o <x>@trackdefi no X</x>. Mais na <contact>página de contato</contact>.",
+  },
+
+  contact: {
+    title: "Contato",
+    description: "Como falar com o trackdefi: e-mail, formulário de feedback ou X. Toda mensagem é lida por uma pessoa.",
+    lede: "O {name} é mantido por uma pessoa, e toda mensagem é lida.",
+    channels: [
+      "<b>E-mail:</b> <email>{email}</email>",
+      "<b>Formulário de feedback:</b> <feedback>uma ideia, uma posição que faltou, uma rede para incluir</feedback> — sem precisar de e-mail.",
+      "<b>X:</b> <x>@trackdefi</x>",
+    ],
+    safetyTitle: "Nunca vamos pedir suas chaves",
+    safety:
+      "Ninguém do {name} vai pedir sua chave privada, sua frase de recuperação ou uma assinatura da carteira — nem por e-mail, nem no X, nem em lugar nenhum. Quem pedir não somos nós.",
+  },
+
+  terms: {
+    title: "Termos de uso",
+    description:
+      "Os termos de uso do trackdefi, ferramenta de informação grátis e somente leitura: não é recomendação financeira, sem garantia, uso justo do site e do servidor MCP.",
+    updated: "Última atualização: {date}",
+    intro: "O {name} é um site grátis que lê dados públicos de blockchain e os mostra de forma legível. Ao usá-lo, você concorda com estes termos.",
+    sections: [
+      {
+        title: "Informação, não recomendação",
+        body: "Tudo o que o site mostra é só informação. Não é recomendação financeira, de investimento, tributária ou jurídica, nem sugestão para comprar, vender, depositar ou sacar nada. Confira na blockchain antes de agir.",
+      },
+      {
+        title: "Sem garantia",
+        body: "Os dados vêm das blockchains, de fontes públicas de preço e dos próprios pools. Podem estar atrasados, incompletos ou errados: uma posição pode faltar, um preço pode estar fora, e um APR passado não promete o futuro. O site é oferecido “como está”, sem garantia de nenhum tipo, e pode mudar ou sair do ar a qualquer momento.",
+      },
+      {
+        title: "Suas decisões",
+        body: "Você é responsável pelo que faz com a informação. Até onde a lei permite, o {name} e a pessoa que o mantém não respondem por perdas decorrentes do uso do site ou da impossibilidade de usá-lo.",
+      },
+      {
+        title: "Somente leitura",
+        body: "O site nunca pede chave privada, frase de recuperação ou conexão de carteira, e não consegue assinar, aprovar nem mover nada. Se uma página dizendo ser o {name} pedir qualquer uma dessas coisas, não somos nós.",
+      },
+      {
+        title: "Uso justo",
+        body: "Não use o site para infringir a lei, atacá-lo ou sobrecarregá-lo. Acesso automatizado — scripts e assistentes de IA, inclusive pelo servidor MCP — é bem-vindo num ritmo razoável. As requisições têm limite, e tráfego abusivo pode ser bloqueado.",
+      },
+      {
+        title: "Outros sites e anúncios",
+        body: "O site tem links para exploradores de blocos, corretoras e outros sites, e mostra anúncios. Não os controlamos e não respondemos pelo conteúdo nem pelas ofertas deles. Anúncio não é recomendação.",
+      },
+      {
+        title: "Doações",
+        body: "Doações são presentes voluntários para manter o site no ar. Não compram nada — nem funcionalidade, nem prioridade, nem token — e não podem ser devolvidas, porque transferências em blockchain são definitivas.",
+      },
+      {
+        title: "Mudanças",
+        body: "Estes termos podem mudar; a data no topo mostra a última atualização. Dúvidas: <contact>página de contato</contact>.",
+      },
+    ],
+  },
+
   glossary: {
     title: "Glossário — o que significa cada número",
     description:

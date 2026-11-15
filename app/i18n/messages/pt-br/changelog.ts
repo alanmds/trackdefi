@@ -7,6 +7,14 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "ai-assistants-mcp": {
+    title: "Assistentes de IA podem consultar as posições de uma carteira",
+    body: "Assistentes compatíveis com MCP (o Model Context Protocol) agora podem pedir ao trackdefi todas as posições em pools de liquidez de um endereço e recebem os mesmos números, somente leitura, que você vê na página. Sem chave nem cadastro, e com os mesmos limites do site.",
+  },
+  "about-contact-terms": {
+    title: "Páginas de sobre, contato e termos",
+    body: "Quem mantém o trackdefi, como ele se paga e como falar com a gente agora têm páginas próprias, junto com os termos de uso. Os links ficam no rodapé de toda página.",
+  },
   "exchange-tracker-pages": {
     title: "Uma página por corretora: Uniswap, Aerodrome, PancakeSwap, Orca",
     body: "Quatro páginas novas dizem exatamente o que o trackdefi lê em cada família de corretora, em quais redes, e o que ainda não faz: Uniswap, Aerodrome junto com Velodrome e Aero, PancakeSwap e Orca. Cada uma tem o próprio campo de busca e responde às perguntas mais comuns sobre aquela corretora.",

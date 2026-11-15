@@ -9,17 +9,8 @@ import { basicTags, fill, rich, stripTags } from "../i18n/rich";
 import { localeFrom, type LangParams } from "../i18n/server";
 import { pageMetadata } from "../i18n/seo";
 import { TRACKER_PAGES } from "../trackers";
-import {
-  coverageSentence,
-  DEMO_WALLET,
-  humanList,
-  logoSlug,
-  NETWORKS,
-  networksOf,
-  networksSentence,
-  protocolsOn,
-  SITE_NAME,
-} from "../site";
+import { homeFaq } from "../home-faq";
+import { DEMO_WALLET, logoSlug, NETWORKS, networksSentence, protocolsOn, SITE_NAME } from "../site";
 
 export async function generateMetadata({ params }: LangParams): Promise<Metadata> {
   return pageMetadata({ locale: await localeFrom(params), path: "/" });
@@ -34,16 +25,8 @@ export default async function Home({ params }: LangParams) {
 
   /* FAQ visível abaixo + dados estruturados correspondentes (mesmo conteúdo,
      exigência do Google). Perguntas = intenções reais de busca do público-alvo.
-     Os valores que variam (redes, cobertura) saem de app/site.ts. */
-  const faqVars = {
-    name: SITE_NAME,
-    networks: networksSentence("and", lang),
-    velodromeNetworks: humanList(networksOf("Velodrome"), "and", lang),
-    pancakeNetworks: humanList(networksOf("PancakeSwap v3"), "and", lang),
-    coverage: coverageSentence(lang),
-    noToken: pages.noToken,
-  };
-  const faq = h.faq.map((f) => ({ q: fill(f.q, faqVars), a: fill(f.a, faqVars) }));
+     Montado em app/home-faq.ts, que a home em Markdown também usa. */
+  const faq = homeFaq(lang);
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -90,7 +73,7 @@ export default async function Home({ params }: LangParams) {
           )}
         </p>
         {/* a frase com as redes por extenso: abaixo da busca desde 15/10/2026 */}
-        <p className="lede">{fill(h.lede, { networks: faqVars.networks })}</p>
+        <p className="lede">{fill(h.lede, { networks: networksSentence("and", lang) })}</p>
         <div className="coverage">
           <Link href={to("/roadmap")} className="chip">
             {rich(h.more, { soon: (c) => <span className="soon">{c}</span> })}

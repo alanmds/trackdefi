@@ -61,6 +61,10 @@ const ui = {
     coverage:
       "Coverage: {list} — <roadmap>see the roadmap</roadmap> · <changelog>what's new</changelog> · <glossary>what each number means</glossary>.",
     feedback: "Feedback",
+    about: "About",
+    contact: "Contact",
+    terms: "Terms",
+    linksAria: "About this site",
   },
 
   search: {

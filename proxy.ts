@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { HOME_LINK_HEADER, HOME_MARKDOWN_PATH, prefersMarkdown } from "./app/agents";
 import { DEFAULT_LOCALE, isLocale } from "./app/i18n/config";
 
 /**
@@ -20,6 +21,17 @@ import { DEFAULT_LOCALE, isLocale } from "./app/i18n/config";
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const first = pathname.split("/")[1];
+
+  /* Home para agentes de IA (15/11/2026, ver `app/agents.ts`): quem pede
+     `Accept: text/markdown` recebe a home em Markdown na mesma URL; todo mundo
+     recebe o cabeçalho `Link` apontando para ela, para o `llms.txt` e para o
+     cartão do servidor MCP. `Vary: Accept` porque a mesma URL tem duas formas. */
+  if (pathname === "/") {
+    const headers = { link: HOME_LINK_HEADER, vary: "Accept" };
+    const url = request.nextUrl.clone();
+    url.pathname = prefersMarkdown(request.headers.get("accept")) ? HOME_MARKDOWN_PATH : `/${DEFAULT_LOCALE}`;
+    return NextResponse.rewrite(url, { headers });
+  }
 
   if (first === DEFAULT_LOCALE) {
     const url = request.nextUrl.clone();

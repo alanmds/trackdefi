@@ -4,36 +4,22 @@
  * Casca fina de HTTP sobre core/service (mesma filosofia da CLI): valida o
  * endereço, aplica rate-limit por IP e cache por carteira, com timeout e
  * mensagens de erro limpas. Nenhuma chave privada trafega — só leitura pública.
+ * As travas moram em `app/api/wallet-scan.ts`, divididas com o servidor MCP.
  *
  * Respostas:
  *   200  DTO de PositionsResponse (header x-cache: HIT|MISS)
  *   400  { error: "invalid_address" }
  *   429  { error: "rate_limited" }
  *   502  { error: "upstream" }   — RPC/rede falhou
+ *   503  { error: "busy" }       — fila de varreduras cheia
  *   504  { error: "timeout" }
  */
 
-import { readFileSync } from "node:fs";
-import { parseWalletAddress } from "../../../core/address";
-import { getWalletPositions } from "../../../core/service";
-import { FixedWindowLimiter, Semaphore, TtlCache } from "../../../core/guards";
-import { isHostedServer } from "../hosting";
+import { clientIp, scanWallet, type ScanErrorCode } from "../wallet-scan";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // teto da função (conferir limite do plano Vercel na Fase 6)
-
-const CACHE_TTL_MS = 60_000;
-const RL_WINDOW_MS = 60_000;
-const RL_MAX = 30; // requisições por IP por minuto
-const SCAN_TIMEOUT_MS = 50_000;
-
-const MAX_CONCURRENT_SCANS = 4; // varreduras simultâneas por instância (protege a cota do RPC)
-
-// Estado por instância — ver LIMITAÇÃO em core/guards.ts.
-const cache = new TtlCache<string>(CACHE_TTL_MS);
-const limiter = new FixedWindowLimiter(RL_WINDOW_MS, RL_MAX);
-const scans = new Semaphore(MAX_CONCURRENT_SCANS);
 
 /**
  * Cache da CDN (13/11/2026): a mesma carteira lida de novo dentro de 5 min sai
@@ -44,6 +30,14 @@ const scans = new Semaphore(MAX_CONCURRENT_SCANS);
  */
 const CDN_CACHE = "public, max-age=0, s-maxage=300, stale-while-revalidate=900";
 
+const STATUS: Record<ScanErrorCode, number> = {
+  invalid_address: 400,
+  rate_limited: 429,
+  upstream: 502,
+  busy: 503,
+  timeout: 504,
+};
+
 function jsonResponse(body: unknown, status: number, extra?: Record<string, string>): Response {
   return new Response(typeof body === "string" ? body : JSON.stringify(body), {
     status,
@@ -53,13 +47,6 @@ function jsonResponse(body: unknown, status: number, extra?: Record<string, stri
       ...(extra ?? {}),
     },
   });
-}
-
-function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    p,
-    new Promise<T>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
-  ]);
 }
 
 export function OPTIONS(): Response {
@@ -73,54 +60,19 @@ export function OPTIONS(): Response {
 }
 
 export async function GET(request: Request): Promise<Response> {
-  const ip = (request.headers.get("x-forwarded-for") ?? "local").split(",")[0].trim();
-  if (!limiter.check(ip)) {
-    return jsonResponse({ error: "rate_limited", message: "Too many requests. Try again in a few seconds." }, 429);
-  }
+  const raw = new URL(request.url).searchParams.get("address") ?? "";
+  const r = await scanWallet(clientIp(request), raw);
 
-  const raw = new URL(request.url).searchParams.get("address")?.trim() ?? "";
-  const parsed = parseWalletAddress(raw);
-  if (!parsed) {
-    return jsonResponse({ error: "invalid_address", message: "Invalid wallet address." }, 400);
-  }
-  const address = parsed.address;
-  // EVM ignora a caixa; base58 NÃO (outra caixa = outra carteira)
-  const cacheKey = parsed.kind === "evm" ? address.toLowerCase() : address;
-
-  // Modo fixture (dev/preview sem rede): serve um DTO congelado do disco.
-  // Ignorado no servidor publicado por segurança (ver app/api/hosting.ts).
-  const fixturePath = process.env.TRACKDEFI_FIXTURE?.trim();
-  if (fixturePath && !isHostedServer()) {
-    try {
-      return jsonResponse(readFileSync(fixturePath, "utf8"), 200, { "x-fixture": "1" });
-    } catch {
-      /* fixture ausente — segue o fluxo normal */
-    }
-  }
-
-  const cached = cache.get(cacheKey);
-  if (cached) return jsonResponse(cached, 200, { "x-cache": "HIT", "cache-control": CDN_CACHE });
-
-  if (!scans.tryAcquire()) {
+  if (!r.ok) {
     return jsonResponse(
-      { error: "busy", message: "The server is scanning other wallets right now. Try again in a few seconds." },
-      503,
-      { "retry-after": "10" },
+      { error: r.code, message: r.message },
+      STATUS[r.code],
+      r.code === "busy" ? { "retry-after": "10" } : undefined,
     );
   }
-
-  try {
-    const dto = await withTimeout(getWalletPositions(address), SCAN_TIMEOUT_MS);
-    const body = JSON.stringify(dto);
-    cache.set(cacheKey, body);
-    return jsonResponse(body, 200, { "x-cache": "MISS", "cache-control": CDN_CACHE });
-  } catch (e) {
-    if ((e as Error).message === "timeout") {
-      return jsonResponse({ error: "timeout", message: "The blockchain read took too long. Please try again." }, 504);
-    }
-    console.error(`[api/positions] upstream failure for ${address}:`, e);
-    return jsonResponse({ error: "upstream", message: "Failed to read the blockchain. Try again in a moment." }, 502);
-  } finally {
-    scans.release();
-  }
+  if (r.source === "fixture") return jsonResponse(r.body, 200, { "x-fixture": "1" });
+  return jsonResponse(r.body, 200, {
+    "x-cache": r.source === "cache" ? "HIT" : "MISS",
+    "cache-control": CDN_CACHE,
+  });
 }

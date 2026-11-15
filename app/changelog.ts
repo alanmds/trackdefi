@@ -55,6 +55,20 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "ai-assistants-mcp",
+    date: "2026-11-15",
+    kind: "feature",
+    title: "AI assistants can look up a wallet's positions",
+    body: "Assistants that support MCP (the Model Context Protocol) can now ask trackdefi for every liquidity pool position of a wallet address and get the same read-only numbers you see on the page. They need no key or sign-up, and they share the same limits as the site.",
+  },
+  {
+    id: "about-contact-terms",
+    date: "2026-11-15",
+    kind: "project",
+    title: "About, contact and terms pages",
+    body: "Who runs trackdefi, how it is paid for and how to reach us now have their own pages, along with the terms of use. The links are at the bottom of every page.",
+  },
+  {
     id: "exchange-tracker-pages",
     date: "2026-11-12",
     kind: "feature",

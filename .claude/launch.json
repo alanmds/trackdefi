@@ -14,6 +14,12 @@
       "port": 3002
     },
     {
+      "name": "trackdefi-build-fixture",
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": ["/c", "set", "TRACKDEFI_FIXTURE=poc/fixture-dto.json", "&&", "npx", "next", "start", "-p", "3003"],
+      "port": 3003
+    },
+    {
       "name": "trackdefi-build",
       "runtimeExecutable": "cmd.exe",
       "runtimeArgs": ["/c", "npx", "next", "start", "-p", "3001"],

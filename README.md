@@ -62,6 +62,16 @@ opened, no alerts, and no transactions of any kind. The [roadmap](https://trackd
 [how it works](https://trackdefi.app/how-it-works) explains where every number
 comes from.
 
+## For AI agents
+
+- **MCP server** (Streamable HTTP, read-only, no authentication):
+  `https://trackdefi.app/api/mcp`, with the tools `get_wallet_positions` and
+  `get_coverage`. Server card at
+  [`/.well-known/mcp/server-card.json`](https://trackdefi.app/.well-known/mcp/server-card.json).
+- **Markdown:** the home page answers `Accept: text/markdown`, and
+  [`/llms.txt`](https://trackdefi.app/llms.txt) is the fact sheet.
+- **WebMCP:** in the browser, the site registers the same read-only tools.
+
 ## Stack
 
 - **Next.js (App Router) + TypeScript** — site + API
