@@ -1,5 +1,6 @@
 /**
- * Tirar os aparelhos do Alan da contagem do Vercel Analytics.
+ * Tirar os aparelhos do Alan da contagem de visitas (nasceu para o Vercel
+ * Analytics; desde 15/11/2026 vale para o Cloudflare Web Analytics).
  *
  * A Vercel não tem filtro de dono (nem por IP, nem no painel): a única
  * alavanca é o `beforeSend`, que roda no navegador antes de cada envio e pode

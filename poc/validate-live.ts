@@ -46,7 +46,13 @@ async function hit(path: string) {
   } catch {
     /* respostas não-JSON caem nas checagens de status */
   }
-  return { status: res.status, ms, cache: res.headers.get("x-cache"), fixture: res.headers.get("x-fixture"), body };
+  // desde 14/11/2026 a CDN guarda a resposta 200 (s-maxage): a cópia da borda
+  // repete o `x-cache` da 1ª leitura (MISS), e quem diz que veio da borda é o
+  // cabeçalho do host — x-vercel-cache na Vercel, x-hcdn-cache-status na Hostinger.
+  const edge = res.headers.get("x-vercel-cache") ?? res.headers.get("x-hcdn-cache-status");
+  const fromEdge = !!edge && /^(HIT|STALE)$/i.test(edge);
+  const cache = fromEdge ? `HIT (CDN ${edge})` : res.headers.get("x-cache");
+  return { status: res.status, ms, cache, fixture: res.headers.get("x-fixture"), body };
 }
 
 function report(checks: Check[]): boolean {
@@ -110,7 +116,7 @@ async function main() {
     report([
       {
         name: `2ª chamada é HIT instantâneo (veio ${b.cache} em ${b.ms} ms)`,
-        ok: b.status === 200 && b.cache === "HIT" && b.ms < 3000,
+        ok: b.status === 200 && !!b.cache?.startsWith("HIT") && b.ms < 3000,
       },
     ]) && allOk;
 

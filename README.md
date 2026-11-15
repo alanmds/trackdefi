@@ -82,7 +82,8 @@ comes from.
 - **Languages** — English (default, no URL prefix) and Brazilian Portuguese
   (`/pt-br`); adding one is a dictionary folder plus a line in
   `app/i18n/config.ts`
-- **Vercel** — hosting; **Vercel Analytics** — cookieless usage stats
+- **Hostinger** (Node.js, Netherlands) — hosting; **Cloudflare Web Analytics**
+  — cookieless usage stats
 
 ## Architecture
 

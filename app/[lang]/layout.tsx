@@ -200,7 +200,7 @@ export default async function RootLayout({
           </footer>
           {/* tooltips no toque: o iPhone não mostra `title` (app/ui/TapTips.tsx) */}
           <TapTips />
-          {/* Vercel Analytics + saída do dono via ?notrack=1 (app/analytics-optout.ts) */}
+          {/* Cloudflare Web Analytics + saída do dono via ?notrack=1 (app/analytics-optout.ts) */}
           <SiteAnalytics />
         </I18nProvider>
       </body>
