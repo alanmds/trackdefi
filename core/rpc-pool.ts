@@ -75,7 +75,10 @@ export function isOutage(e: unknown): boolean {
 }
 
 export interface PoolOptions {
+  /** tempo máximo de um pedido a RPC dedicado (padrão 30 s) */
   timeoutMs?: number;
+  /** idem para RPC público (padrão 15 s): host morto não pode segurar a varredura inteira */
+  publicTimeoutMs?: number;
   now?: () => number;
   /** teste: troca o envio HTTP real */
   makeSend?: (url: string) => Slot["send"];
@@ -90,7 +93,7 @@ export function poolTransport(chain: Chain, plan: PlannedRpc[], opts: PoolOption
     fails: 0,
     send:
       opts.makeSend?.(p.url) ??
-      ((req) => http(p.url, { timeout: opts.timeoutMs ?? 30_000, retryCount: 0 })({ chain, retryCount: 0 }).request(req as never)),
+      ((req) => http(p.url, { timeout: p.tier === "public" ? (opts.publicTimeoutMs ?? 15_000) : (opts.timeoutMs ?? 30_000), retryCount: 0 })({ chain, retryCount: 0 }).request(req as never)),
   }));
   let turn = 0;
 

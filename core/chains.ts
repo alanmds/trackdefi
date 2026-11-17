@@ -139,6 +139,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     defaultRpcs: [
       "https://robinhood-rpc.publicnode.com",
       "https://robinhood.drpc.org",
+      "https://4663.rpc.thirdweb.com",
       "https://rpc.mainnet.chain.robinhood.com",
     ],
   },
@@ -183,7 +184,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     secPerBlock: 2,
     rpcEnv: "MODE_RPC_URLS",
     opStackWeth: true,
-    defaultRpcs: ["https://mainnet.mode.network", "https://mode.drpc.org"],
+    defaultRpcs: ["https://mainnet.mode.network", "https://mode.drpc.org", "https://34443.rpc.thirdweb.com"],
   },
   57073: {
     chain: ink,
@@ -197,7 +198,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     rpcEnv: "INK_RPC_URLS",
     dexSlug: "ink",
     opStackWeth: true,
-    defaultRpcs: ["https://rpc-gel.inkonchain.com", "https://rpc-qnd.inkonchain.com", "https://ink.drpc.org"],
+    defaultRpcs: ["https://rpc-gel.inkonchain.com", "https://rpc-qnd.inkonchain.com", "https://ink.drpc.org", "https://57073.rpc.thirdweb.com"],
   },
   130: {
     chain: unichain,
@@ -229,7 +230,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     rpcEnv: "SONEIUM_RPC_URLS",
     dexSlug: "soneium",
     opStackWeth: true,
-    defaultRpcs: ["https://rpc.soneium.org", "https://soneium.drpc.org"],
+    defaultRpcs: ["https://rpc.soneium.org", "https://soneium.drpc.org", "https://1868.rpc.thirdweb.com"],
   },
   252: {
     chain: fraxtal,
@@ -242,7 +243,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     secPerBlock: 2,
     rpcEnv: "FRAXTAL_RPC_URLS",
     opStackWeth: true,
-    defaultRpcs: ["https://rpc.frax.com", "https://fraxtal-rpc.publicnode.com", "https://fraxtal.drpc.org"],
+    defaultRpcs: ["https://rpc.frax.com", "https://fraxtal-rpc.publicnode.com", "https://fraxtal.drpc.org", "https://252.rpc.thirdweb.com"],
   },
   /* A cauda da Superchain (27/09/2026, poc/probe-superchain.ts 5/5 verde).
      secPerBlock MEDIDO sobre 10 mil blocos. priceSlug confirmado pedindo um
@@ -263,7 +264,8 @@ export const CHAINS: Record<number, ChainInfo> = {
     secPerBlock: 2,
     rpcEnv: "LISK_RPC_URLS",
     opStackWeth: true,
-    defaultRpcs: ["https://rpc.api.lisk.com", "https://lisk.drpc.org"],
+    /* o oficial (rpc.api.lisk.com) estava fora do ar em 17/11/2026 e travava a varredura: fica por último */
+    defaultRpcs: ["https://lisk.drpc.org", "https://1135.rpc.thirdweb.com", "https://rpc.api.lisk.com"],
   },
   1923: {
     chain: swellchain,
@@ -277,7 +279,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     rpcEnv: "SWELL_RPC_URLS",
     opStackWeth: true,
     // o RPC que a viem sugere (swell-mainnet.alt.technology) não resolve mais — 27/09/2026
-    defaultRpcs: ["https://swell.drpc.org"],
+    defaultRpcs: ["https://swell.drpc.org", "https://1923.rpc.thirdweb.com"],
   },
   1750: {
     chain: metalL2,
@@ -316,7 +318,7 @@ export const CHAINS: Record<number, ChainInfo> = {
     secPerBlock: 1,
     rpcEnv: "CELO_RPC_URLS",
     opStackWeth: true,
-    defaultRpcs: ["https://forno.celo.org", "https://celo.drpc.org"],
+    defaultRpcs: ["https://forno.celo.org", "https://celo.drpc.org", "https://42220.rpc.thirdweb.com"],
   },
   56: {
     chain: bsc,

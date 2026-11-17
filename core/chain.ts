@@ -5,7 +5,7 @@
  * A chave fica só no servidor, nunca no navegador.
  */
 
-import { createPublicClient, fallback, http } from "viem";
+import { createPublicClient } from "viem";
 import { chainInfo, evmChain } from "./chains";
 import { planRpcs, poolTransport } from "./rpc-pool";
 import type { ChainReader } from "./types";
@@ -55,11 +55,10 @@ export function createReader(chainId: number): ChainReader {
   const chain = evmChain(chainId);
   const client = createPublicClient({
     chain,
-    // com RPC dedicado na env: os provedores DIVIDEM a carga (core/rpc-pool.ts);
-    // sem ele, só os públicos em ordem de reserva, como sempre foi
-    transport: hasDedicatedRpc(chainId)
-      ? poolTransport(chain, planRpcs(envRpcs(chainId), chainInfo(chainId).defaultRpcs))
-      : fallback(rpcUrls(chainId).map((url) => http(url, { timeout: 30_000 }))),
+    // os provedores DIVIDEM a carga e quem cai esfria (core/rpc-pool.ts). Só com RPC público,
+    // a ordem da lista manda e o host que falha sai da fila por um tempo — antes ele segurava
+    // a varredura inteira até o timeout de 30 s (Lisk, 17/11/2026)
+    transport: poolTransport(chain, planRpcs(envRpcs(chainId), chainInfo(chainId).defaultRpcs)),
   });
   if (hasDedicatedRpc(chainId)) {
     /* O `multicall` do viem parte a lista em pedidos de ~1 KB de calldata (≈6 chamadas cada) se
