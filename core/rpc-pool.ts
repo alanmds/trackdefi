@@ -108,7 +108,8 @@ export function poolTransport(chain: Chain, plan: PlannedRpc[], opts: PoolOption
     };
     const ded = rotate(slots.filter((s) => s.tier === "dedicated" && ready(s)));
     const alc = alchemyBudgetLeft(t) ? slots.filter((s) => s.tier === "alchemy" && ready(s)) : [];
-    const pub = rotate(slots.filter((s) => s.tier === "public" && ready(s)));
+    // públicos: a ORDEM da lista é a preferência (o 1.º é o melhor conhecido); só os dedicados revezam
+    const pub = slots.filter((s) => s.tier === "public" && ready(s));
     const live = [...ded, ...alc, ...pub];
     // todos esfriando (ou orçamento acabou e não há outro): melhor tentar do que falhar de cara
     const rest = slots.filter((s) => !live.includes(s));
