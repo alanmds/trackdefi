@@ -7,6 +7,10 @@
 import type { ChangelogTranslations } from "../../get";
 
 const changelog: ChangelogTranslations = {
+  "superseed-retired": {
+    title: "Superseed removida: a rede parou de responder",
+    body: "A rede da Superseed parou de responder, então nenhuma carteira pode mais ser lida lá e toda busca mostrava um aviso sobre isso. Ela saiu da lista de redes aceitas e pode voltar se a rede voltar. As posições nas outras redes da Velodrome não mudam.",
+  },
   "ai-assistants-mcp": {
     title: "Assistentes de IA podem consultar as posições de uma carteira",
     body: "Assistentes compatíveis com MCP (o Model Context Protocol) agora podem pedir ao trackdefi todas as posições em pools de liquidez de um endereço e recebem os mesmos números, somente leitura, que você vê na página. Sem chave nem cadastro, e com os mesmos limites do site.",

@@ -213,8 +213,8 @@ const pages = {
         body: "the singleton-and-hooks architecture. Positions, amounts, price ranges and pending swap fees, checked against Uniswap's own interface to the cent. Closed positions are hidden, same as Uniswap does.",
       },
       {
-        title: "Lisk, Swell, Metal L2, Superseed & Celo · Velodrome",
-        body: "the rest of Velodrome's Superchain deployment, read the same way as the first five. Positions, amounts, staked positions and pending XVELO emissions are all exact. Where public price data doesn't reach yet (Swell, Metal L2, Superseed), dollar values are read from the networks' own pools.",
+        title: "Lisk, Swell, Metal L2 & Celo · Velodrome",
+        body: "the rest of Velodrome's Superchain deployment, read the same way as the first five. Positions, amounts, staked positions and pending XVELO emissions are all exact. Where public price data doesn't reach yet (Swell, Metal L2), dollar values are read from the networks' own pools.",
       },
       {
         title: "BNB Chain · PancakeSwap v3",

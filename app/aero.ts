@@ -20,7 +20,7 @@ const SUGAR_PROTOCOLS = new Set(["aerodrome", "velodrome"]);
 
 /**
  * Redes-folha da Velodrome que seguem com troca e liquidez, sem gauges nem
- * token (aero.xyz/aero-upgrade). Mode, Swell, Metal L2 e Superseed ficam de
+ * token (aero.xyz/aero-upgrade). Mode, Swell e Metal L2 ficam de
  * fora: a fonte oficial não diz nada sobre elas.
  */
 export const VELODROME_NO_GAUGE_CHAINS = [130, 1868, 252, 42220, 1135] as const;

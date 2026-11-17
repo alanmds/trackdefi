@@ -18,7 +18,6 @@ import {
   optimism,
   robinhood,
   soneium,
-  superseed,
   swellchain,
   unichain,
 } from "viem/chains";
@@ -247,7 +246,7 @@ export const CHAINS: Record<number, ChainInfo> = {
   },
   /* A cauda da Superchain (27/09/2026, poc/probe-superchain.ts 5/5 verde).
      secPerBlock MEDIDO sobre 10 mil blocos. priceSlug confirmado pedindo um
-     preço real só na Lisk e na Celo — Swell, Metal L2 e Superseed NÃO têm
+     preço real só na Lisk e na Celo — Swell e Metal L2 NÃO têm
      cobertura de preço na DefiLlama (conferido pela lista oficial de redes
      dela): lá as posições saem com quantidade exata e valor "—". Os slugs
      delas seguem o padrão da DefiLlama para funcionarem sozinhos no dia em
@@ -293,19 +292,6 @@ export const CHAINS: Record<number, ChainInfo> = {
     rpcEnv: "METAL_RPC_URLS",
     opStackWeth: true,
     defaultRpcs: ["https://rpc.metall2.com", "https://metall2.drpc.org"],
-  },
-  5330: {
-    chain: superseed,
-    vm: "evm",
-    label: "Superseed",
-    priceSlug: "superseed",
-    yieldsLabel: "Superseed",
-    explorerUrl: "https://explorer.superseed.xyz",
-    explorerLabel: "Superseed Explorer",
-    secPerBlock: 2,
-    rpcEnv: "SUPERSEED_RPC_URLS",
-    opStackWeth: true,
-    defaultRpcs: ["https://mainnet.superseed.xyz", "https://superseed.drpc.org"],
   },
   42220: {
     chain: celo,

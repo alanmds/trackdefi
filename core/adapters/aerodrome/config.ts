@@ -109,13 +109,12 @@ export const VELODROME_FRAXTAL = leafChain(252, "0xCAaf4556fF489521d4c722CB27551
 
 /* A cauda (27/09/2026) — LP_SUGAR dos `deployments/<chain>.env` do repo
    velodrome-finance/sugar; poc/probe-superchain.ts 5/5 verde (mesmo bytecode
-   de 22.335 bytes, XVELO no mesmo endereço, struct decodifica). O LP_SUGAR da
-   Superseed tem o MESMO endereço do da Ink — deploy determinístico em redes
-   diferentes, conferido com bytecode vivo nas duas. */
+   de 22.335 bytes, XVELO no mesmo endereço, struct decodifica). A Superseed
+   (5330, LP_SUGAR 0x215cEad0…8a43, o MESMO da Ink) saiu em 17/11/2026: a L2 foi
+   desligada em 15/08/2026 e nenhum RPC responde. */
 export const VELODROME_LISK = leafChain(1135, "0xD39E277B327705026dB4fb4E2b63E09ACBCD1754");
 export const VELODROME_SWELL = leafChain(1923, "0x6C0c56920D8B4273E489A5f2b5E39C1C610a7c38");
 export const VELODROME_METAL = leafChain(1750, "0x4ea3301ab7FBEdb21e70a01e242212B5ad0AF6fE");
-export const VELODROME_SUPERSEED = leafChain(5330, "0x215cEad02e0b9E0E494DD179585C18a772048a43");
 /** a Celo é a única com outra carteira de teste no .env do repo */
 export const VELODROME_CELO = leafChain(
   42220,
@@ -133,7 +132,6 @@ export const VELODROME_LEAF_CHAINS: SugarChainConfig[] = [
   VELODROME_LISK,
   VELODROME_SWELL,
   VELODROME_METAL,
-  VELODROME_SUPERSEED,
   VELODROME_CELO,
 ];
 

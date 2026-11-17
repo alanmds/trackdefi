@@ -55,6 +55,13 @@ export const KIND_LABEL: Record<ChangeKind, string> = {
 /** mais recente primeiro */
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: "superseed-retired",
+    date: "2026-11-17",
+    kind: "network",
+    title: "Superseed removed: the network stopped responding",
+    body: "The Superseed network stopped responding, so no wallet can be read there anymore and every search showed a warning about it. We removed it from the supported networks, and it can come back if the network does. Positions on the other Velodrome networks are unaffected.",
+  },
+  {
     id: "ai-assistants-mcp",
     date: "2026-11-15",
     kind: "feature",

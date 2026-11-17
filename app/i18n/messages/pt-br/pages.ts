@@ -178,8 +178,8 @@ const pages: PagesMessages = {
         body: "a arquitetura de contrato único com hooks. Posições, quantidades, faixas de preço e taxas de swap pendentes, conferidas com a interface da própria Uniswap até o centavo. Posições encerradas ficam ocultas, como na Uniswap.",
       },
       {
-        title: "Lisk, Swell, Metal L2, Superseed e Celo · Velodrome",
-        body: "o restante da implantação da Velodrome na Superchain, lido do mesmo jeito que as cinco primeiras. Posições, quantidades, posições em stake e emissões pendentes de XVELO são todas exatas. Onde dados públicos de preço ainda não chegam (Swell, Metal L2, Superseed), os valores em dólar são lidos dos próprios pools dessas redes.",
+        title: "Lisk, Swell, Metal L2 e Celo · Velodrome",
+        body: "o restante da implantação da Velodrome na Superchain, lido do mesmo jeito que as cinco primeiras. Posições, quantidades, posições em stake e emissões pendentes de XVELO são todas exatas. Onde dados públicos de preço ainda não chegam (Swell, Metal L2), os valores em dólar são lidos dos próprios pools dessas redes.",
       },
       {
         title: "BNB Chain · PancakeSwap v3",

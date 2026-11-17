@@ -34,7 +34,7 @@ When a token has no reliable price, trackdefi shows `—` instead of guessing.
 |---|---|
 | Aero | Base, Optimism, Ethereum, Arbitrum, Ink, Robinhood Chain |
 | Aerodrome | Base |
-| Velodrome | Optimism, Unichain, Ink, Mode, Soneium, Fraxtal, Lisk, Swell, Metal L2, Superseed, Celo |
+| Velodrome | Optimism, Unichain, Ink, Mode, Soneium, Fraxtal, Lisk, Swell, Metal L2, Celo |
 | Uniswap v2 | Base, Optimism, Ethereum, Arbitrum, Robinhood Chain, Unichain, BNB Chain |
 | Uniswap v3 | Base, Optimism, Ethereum, Arbitrum, Robinhood Chain, Unichain, BNB Chain |
 | Uniswap v4 | Base, Optimism, Ethereum, Arbitrum, BNB Chain, Robinhood Chain |
