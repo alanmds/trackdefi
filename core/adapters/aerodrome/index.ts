@@ -15,6 +15,7 @@ import { erc20Abi, type Address } from "viem";
 import type { ChainReader, LockPosition, LpPosition, PoolQuery, PoolSnapshot, PositionKind, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { mapLimit } from "../../util";
+import { primaryIsAlchemy } from "../../chain";
 import {
   clFactoryAbi,
   clFeeAbi,
@@ -75,9 +76,9 @@ export interface AerodromeOptions {
   config?: SugarChainConfig;
   sugarAddress?: Address;
   factories?: Address[];
-  /** janelas de pools varridas em paralelo (default 8) */
+  /** janelas de pools varridas em paralelo (default 8; 4 com Alchemy, que tem teto de CU/s) */
   concurrency?: number;
-  /** pools por janela de varredura (default 200) */
+  /** pools por janela de varredura (default: 2000 com Alchemy, 200 com RPC público) */
   poolWindow?: bigint;
   onWarn?: WarnSink;
 }
@@ -107,8 +108,14 @@ export class AerodromeAdapter implements ProtocolAdapter {
     this.emissionsToken = config.emissionsToken;
     this.sugar = opts.sugarAddress ?? config.sugar;
     this.factories = opts.factories ?? config.factories;
-    this.concurrency = opts.concurrency ?? 8;
-    this.poolWindow = opts.poolWindow ?? 200n;
+    /* Alchemy cobra por PEDIDO (eth_call = 26 CU, seja qual for o tamanho) e tem teto de CU/s:
+       medido em 17/11/2026 (poc/probe-janela-sugar.ts), janelas de 200 pools gastavam ≈5.500 CU
+       por varredura na Base (67% de tudo); com 2.000 gastam ≈600, com o MESMO resultado (conferido em 2 carteiras).
+       RPC público aguenta pouco por chamada — fica nas janelas pequenas de antes. Janela
+       pesada que falha continua se dividindo ao meio (scanWindow). */
+    const alchemy = primaryIsAlchemy(this.chainId);
+    this.concurrency = opts.concurrency ?? (alchemy ? 4 : 8);
+    this.poolWindow = opts.poolWindow ?? (alchemy ? 2000n : 200n);
     this.warn = opts.onWarn ?? (() => {});
     this.veSugar = config.veSugar;
     this.rewardsSugar = config.rewardsSugar;

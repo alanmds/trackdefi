@@ -114,7 +114,9 @@ core/            pure engine, testable without a UI
   math/          Q96 concentrated-liquidity math (BigInt)
   prices/        price clients (DefiLlama, DexScreener)
   yields/        position-level APR ("what is this position earning now")
-  adapters/      aerodrome/ (Sugar family) · uniswap-v3/ · registry.ts
+  adapters/      aerodrome/ (Sugar family) · aero/ · uniswap-v3/ · uniswap-v4/ ·
+                 pancake-v3/ · sushiswap-v3/ · ramses-v3/ · classic-v2/ · orca/ ·
+                 registry.ts
 app/             Next.js site + /api/positions
   [lang]/        every page, once per language (w/[address] wallet results,
                  how-it-works, glossary, roadmap, changelog, feedback)
@@ -162,12 +164,20 @@ Copy `.env.example`. All variables are optional:
   RPCs. Every network has its own (`OPTIMISM_RPC_URLS`, `BSC_RPC_URLS`, …; the
   full list is `rpcEnv` in `core/chains.ts`). The "earning now" fee window
   needs an RPC that serves historical state, which most public RPCs don't.
+- `SOLANA_RPC_URLS` — RPC for Solana (Orca). The public one rate-limits after a
+  few reads, so production needs a dedicated provider.
+- `TRACKDEFI_PRODUCTION=1` — set on hosts other than Vercel to turn on the
+  production guards (fixture ignored, no internal error details).
+- `NEXT_PUBLIC_CF_ANALYTICS_TOKEN`, `FEEDBACK_WEBHOOK_URL` — optional: cookieless
+  visit counting and the `/feedback` form delivery.
 - `TRACKDEFI_FIXTURE` — **dev only**; serve a frozen DTO instead of reading the
-  chain. Ignored on Vercel.
+  chain. Ignored in production.
 
 ## Deploy
 
-See [DEPLOY.md](DEPLOY.md) for the step-by-step (GitHub + Vercel, free tier).
+The site runs on Hostinger (Node.js); every push to `main` redeploys it. See
+[DEPLOY.md](DEPLOY.md) for how that works and for a step-by-step to publish your
+own copy on Vercel's free tier.
 
 ## Notes
 

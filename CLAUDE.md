@@ -14,7 +14,7 @@ ambiente (`NEXT_PUBLIC_SITE_URL`, `TRACKDEFI_PRODUCTION`, RPCs) — tudo isso s�
 existe no hPanel da Hostinger (DNS e redirects: Vercel) e não chega aqui por
 git nem pelo Drive. Na dúvida sobre o que está
 valendo, ler o site (`/robots.txt`, `/sitemap.xml`) ou rodar
-`npx tsx poc/validate-live.ts <URL>`. Pendências em `privado/PENDENCIAS.md`.
+`npx tsx poc/validate-live.ts <URL>`. Pendências em `privado/PENDENCIAS.md` (a §0 é a revisão mais recente e o que é urgente: **cota da Alchemy**, 17/11/2026).
 
 Idioma de trabalho: **português**. Site: **inglês** (padrão, sem prefixo na URL)
 e **português do Brasil** (`/pt-br`) — ver "Idiomas" abaixo. Windows.
@@ -137,6 +137,8 @@ O site fala **inglês** (padrão, URL sem prefixo: `/roadmap`) e **pt-BR**
 ## Comandos
 - `npm run dev` (lento p/ varredura) · `npm run build && npm run start` (mede
   velocidade real) · `npm test` · `npm run typecheck`
+- `npm run horas` — soma as horas de trabalho e atualiza `app/custos-total.json` (a faixa de custo do site)
+- `npm run salvar` / `npm run retomar` — backup no Drive / ao trocar de computador
 - `npm run poc -- 0xENDERECO` — imprime posições (todas as redes)
 - `npx tsx poc/validate-batch.ts` — bateria de validação (rodar antes de release)
 - Deploy = `git push` (a Hostinger republica sozinha em ~2 min; logs em hPanel → Implantações)
