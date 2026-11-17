@@ -14,6 +14,7 @@
  */
 
 import { parseAbi, type Address } from "viem";
+import { alchemyBudgetLeft, chargeAlchemy } from "../../alchemy-budget";
 import { rpcUrls } from "../../chain";
 import type { ChainReader } from "../../types";
 import { factoriesOn, MAX_TOKEN_PAGES } from "./config";
@@ -45,7 +46,10 @@ type Page = { tokenBalances?: Array<{ contractAddress: string; tokenBalance: str
 async function fetchPage(url: string, account: string, pageKey: string | undefined): Promise<Page> {
   let last: unknown;
   for (let attempt = 0; attempt < 3; attempt++) {
+    // orçamento diário (core/alchemy-budget.ts): sem ele, esta chamada — que SÓ a Alchemy atende — não sai
+    if (!alchemyBudgetLeft()) throw new Error("orçamento diário da Alchemy esgotado");
     try {
+      chargeAlchemy("alchemy_getTokenBalances");
       const r = await fetch(url, {
         method: "POST",
         headers: { "content-type": "application/json" },

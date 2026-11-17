@@ -28,6 +28,7 @@ import { amountsForLiquidity } from "../../math/liquidity";
 import { getSqrtRatioAtTick } from "../../math/tickmath";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { chainInfo, evmChain } from "../../chains";
+import { alchemyBudgetLeft, chargeAlchemy } from "../../alchemy-budget";
 import { cleanSymbol } from "../aerodrome/index";
 import {
   DYNAMIC_FEE_FLAG,
@@ -300,6 +301,9 @@ export class UniswapV4Adapter implements ProtocolAdapter {
     account: Address,
     pageKey: string | undefined,
   ): Promise<{ corpo: IndiceResposta } | { erro: string }> {
+    // orçamento diário (core/alchemy-budget.ts): esta chamada só a Alchemy atende
+    if (!alchemyBudgetLeft()) return { erro: "orçamento diário da Alchemy esgotado" };
+    chargeAlchemy("alchemy_getAssetTransfers");
     let r: Response;
     try {
       r = await fetch(endpoint, {
@@ -338,6 +342,21 @@ export class UniswapV4Adapter implements ProtocolAdapter {
    * que já saíram.
    */
   private async fetchRawPositions(account: Address): Promise<V4RawPosition[]> {
+    /* Atalho (17/11/2026): o PositionManager é um ERC-721, então `balanceOf` diz em UMA leitura
+       barata se a carteira tem algum NFT v4 agora. Zero = nada a enumerar, e a enumeração é a
+       parte cara (`alchemy_getAssetTransfers` = 120 CU por rede contra 26 de um eth_call). Se a
+       leitura falhar, segue o caminho de sempre. */
+    try {
+      const held = (await this.reader.readContract({
+        address: this.positionManager,
+        abi: positionManagerAbi,
+        functionName: "balanceOf",
+        args: [account],
+      })) as bigint;
+      if (held === 0n) return [];
+    } catch {
+      /* sem o atalho, a enumeração normal decide */
+    }
     let candidatos = await this.candidatos(account);
     if (candidatos === null || candidatos.length === 0) return [];
     if (candidatos.length > this.maxNfts) {

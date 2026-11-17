@@ -91,6 +91,16 @@ Para configurar:
 
 A chave fica só no servidor; nunca chega ao navegador.
 
+**Vários provedores grátis na mesma variável.** `BASE_RPC_URLS` aceita várias URLs
+separadas por vírgula, e elas **dividem a carga** (`core/rpc-pool.ts`): os provedores que
+não são da Alchemy (dRPC, Ankr, Infura, BlockPI…) revezam entre si, a Alchemy fica de
+reserva (a cota dela é guardada para o que só ela faz: o índice do Uniswap v4 e a lista
+de pools v2), e os RPCs públicos da rede são a última linha. Provedor que responde 429
+ou cai sai da fila por alguns segundos e volta sozinho. `ALCHEMY_DAILY_CU` (padrão
+800000) é um teto diário estimado: passado dele, a Alchemy sai da leitura comum até a
+virada do dia (UTC). Para um provedor novo basta acrescentar a URL à variável da rede
+e reaplicar as variáveis.
+
 ---
 
 ## Parte 2 — Instalar do zero na Vercel (grátis)

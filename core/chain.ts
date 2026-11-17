@@ -7,6 +7,7 @@
 
 import { createPublicClient, fallback, http } from "viem";
 import { chainInfo, evmChain } from "./chains";
+import { planRpcs, poolTransport } from "./rpc-pool";
 import type { ChainReader } from "./types";
 
 /**
@@ -21,12 +22,20 @@ import type { ChainReader } from "./types";
  * público — aí degrada para estimativa, como já acontecia.
  */
 export function rpcUrls(chainId: number): string[] {
-  const info = chainInfo(chainId);
-  const env = (process.env[info.rpcEnv] ?? "")
+  return [...new Set([...envRpcs(chainId), ...chainInfo(chainId).defaultRpcs])];
+}
+
+/** só as URLs dedicadas da env da rede (as que o dono configurou no painel) */
+export function envRpcs(chainId: number): string[] {
+  return (process.env[chainInfo(chainId).rpcEnv] ?? "")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
-  return [...new Set([...env, ...info.defaultRpcs])];
+}
+
+/** há ao menos um RPC dedicado (pago ou plano grátis com chave) configurado na rede? */
+export function hasDedicatedRpc(chainId: number): boolean {
+  return envRpcs(chainId).length > 0;
 }
 
 /**
@@ -43,11 +52,16 @@ export function primaryIsAlchemy(chainId: number): boolean {
 
 export function createReader(chainId: number): ChainReader {
   // a Solana não passa por aqui: tem cliente próprio em core/solana.ts
+  const chain = evmChain(chainId);
   const client = createPublicClient({
-    chain: evmChain(chainId),
-    transport: fallback(rpcUrls(chainId).map((url) => http(url, { timeout: 30_000 }))),
+    chain,
+    // com RPC dedicado na env: os provedores DIVIDEM a carga (core/rpc-pool.ts);
+    // sem ele, só os públicos em ordem de reserva, como sempre foi
+    transport: hasDedicatedRpc(chainId)
+      ? poolTransport(chain, planRpcs(envRpcs(chainId), chainInfo(chainId).defaultRpcs))
+      : fallback(rpcUrls(chainId).map((url) => http(url, { timeout: 30_000 }))),
   });
-  if (primaryIsAlchemy(chainId)) {
+  if (hasDedicatedRpc(chainId)) {
     /* O `multicall` do viem parte a lista em pedidos de ~1 KB de calldata (≈6 chamadas cada) se
        ninguém disser o contrário, e a Alchemy cobra 26 CU POR PEDIDO. Com pedidos de até 64 KB
        a mesma leitura vira 1 pedido só. Quem já pedia um lote maior (16 KB) também sobe. */

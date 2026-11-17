@@ -15,7 +15,7 @@ import { erc20Abi, type Address } from "viem";
 import type { ChainReader, LockPosition, LpPosition, PoolQuery, PoolSnapshot, PositionKind, ProtocolAdapter, TokenInfo, WarnSink } from "../../types";
 import { isInRange, tickToPrice0In1 } from "../../math/ticks";
 import { mapLimit } from "../../util";
-import { primaryIsAlchemy } from "../../chain";
+import { hasDedicatedRpc } from "../../chain";
 import {
   clFactoryAbi,
   clFeeAbi,
@@ -113,7 +113,7 @@ export class AerodromeAdapter implements ProtocolAdapter {
        por varredura na Base (67% de tudo); com 2.000 gastam ≈600, com o MESMO resultado (conferido em 2 carteiras).
        RPC público aguenta pouco por chamada — fica nas janelas pequenas de antes. Janela
        pesada que falha continua se dividindo ao meio (scanWindow). */
-    const alchemy = primaryIsAlchemy(this.chainId);
+    const alchemy = hasDedicatedRpc(this.chainId);
     this.concurrency = opts.concurrency ?? (alchemy ? 4 : 8);
     this.poolWindow = opts.poolWindow ?? (alchemy ? 2000n : 200n);
     this.warn = opts.onWarn ?? (() => {});
